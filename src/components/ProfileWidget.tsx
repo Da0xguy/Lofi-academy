@@ -346,6 +346,49 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
               color="text-[#3c3c3c] bg-[#89A8B2]/20 border-2 border-[#3c3c3c]"
             />
           </div>
+
+          {/* Divider and Claimable Worthless NFT Section */}
+          <div className="border-t-2 border-dashed border-[#3c3c3c]/15 pt-4 mt-1">
+            <h4 className="text-[10px] font-mono font-bold text-[#D67B52] uppercase tracking-wider mb-2 flex items-center gap-1">
+              <span>🎁 Special Souvenir Quest</span>
+            </h4>
+            <div className="bg-amber-50/50 border-2 border-[#3c3c3c] rounded-2xl p-3 shadow-inner text-stone-800">
+              <div className="flex justify-between items-start gap-1">
+                <div>
+                  <h5 className="text-[12px] font-bold font-serif text-[#3c3c3c] flex items-center gap-1">
+                    <span>🥫 Certified Worthless NFT</span>
+                  </h5>
+                  <p className="text-[10px] text-[#6D5D6E] font-medium leading-normal mt-1">
+                    With exactly 0.0% economic utility or commercial value. Claim this trash directly into your Sui Kiosk to demonstrate on-chain permission mechanics!
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-3 flex justify-between items-center bg-white p-2 border-2 border-[#3c3c3c] rounded-xl text-[10px]">
+                {user.mintedBadges.some((b) => b.trackId === "worthless-nft") ? (
+                  <>
+                    <span className="font-mono text-emerald-700 font-extrabold flex items-center gap-1">
+                      <span>✓</span> IN KIOSK
+                    </span>
+                    <span className="text-[9px] text-[#D67B52] font-mono font-bold">
+                      ID: {user.mintedBadges.find((b) => b.trackId === "worthless-nft")?.tokenId}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="font-mono text-[#D67B52] font-bold">Price: $0.00 MIST</span>
+                    <button
+                      onClick={() => handleMintBadge("worthless-nft", "Certified Worthless Shard")}
+                      disabled={isMinting !== null || !user.walletAddress}
+                      className={`px-3 py-1 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold rounded-lg border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer transition-all active:translate-y-[1px] disabled:opacity-40 disabled:cursor-not-allowed`}
+                    >
+                      {isMinting === "worthless-nft" ? "Claiming..." : "Claim NFT"}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Dynamic visual log of active mint triggers */}

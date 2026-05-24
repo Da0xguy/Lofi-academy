@@ -296,6 +296,73 @@ export const initialTracks: LearningTrack[] = [
             explanation: "Sui Kiosk locks the digital assets inside a standardized on-chain account module, restricting direct ownership extracts unless transaction parameters verify compliance with creator guidelines."
           }
         ]
+      },
+      {
+        id: "protocols-web3-mechanics",
+        title: "How Web3 Works on Sui",
+        description: "Explore cryptographic keypairs, peer RPC node drivers, consensus validation, and state records.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "step1",
+            title: "Cryptography: Public & Private Keypairs",
+            content: "web3 runs on public-key cryptography. your public key is like a cozy mailbox address that anyone can see, search, or deposit tokens into. your private key, however, is the secret hand-held key that signs events and transactions! on sui, transactions use secure algorithms like Ed25519, establishing direct decentralized ownership without ever exposing your private credentials. never share your seed phrase! 🗝️🐻",
+            yetiMood: "thinking",
+            chalkboardHeader: "CRYPTOGRAPHIC VAULTS"
+          },
+          {
+            id: "step2",
+            title: "RPC Node infrastructure",
+            content: "how does your web browser or wallet app read blockchain state or broadcast a transaction? via RPC (Remote Procedure Call) node providers! they host active ledgers to receive transaction requests, query the database, and sync the results immediately back to your browser client, maintaining high-speed lofi academy access under any peak load. 📡🍵",
+            yetiMood: "chill",
+            chalkboardHeader: "RPC CONNECTIVITY DIRECT"
+          },
+          {
+            id: "step3",
+            title: "Speed Drivers: Narwhal & Bullshark",
+            content: "ordinary blockchains order all transactions in a single global line. sui separates data routing entirely! it utilizes Narwhal as a high-throughput transaction mempool, and Bullshark/Mysticeti as a rapid consensus driver. but wait—for simple peer-to-peer transfers, sui bypasses consensus entirely, updating state accounts instantly! ⚡🎮",
+            yetiMood: "excited",
+            chalkboardHeader: "SUI PARALLEL CONSENSUS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "What is the function of a private key in the Web3 paradigm?",
+            options: [
+              "To encrypt your profile background image",
+              "To securely sign transaction instructions to prove authorized ownership",
+              "To query third-party public rest APIs",
+              "To store currency tokens locally on your physical processor chip"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "In public-key cryptography, the private key generates secure digital signatures to authenticate transaction blocks without revealing the underlying secret key."
+          },
+          {
+            id: "q2",
+            question: "How do client web browsers read data or send transactions to the Sui ledger?",
+            options: [
+              "By writing directly to raw system storage disks with absolute access",
+              "By querying RPC (Remote Procedure Call) provider nodes",
+              "By utilizing central banking wire transfer services",
+              "By texting validators directly via phone lines"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "RPC nodes hold the current blockchain database state and offer standard APIs for wallets and frontends to retrieve transaction history, token balances, or broadcast new blocks."
+          },
+          {
+            id: "q3",
+            question: "What distinguishes Sui's Narwhal & Bullshark consensus approach from traditional blockchains?",
+            options: [
+              "It slows processing down for educational safety",
+              "It divides memory mempools from state consensus, processing simple operations without global consensus",
+              "It removes cryptography from smart contracts",
+              "It forces all users to run local nodes on laptops"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "By structuring memory routing (Narwhal) independently from transaction execution agreements (Bullshark) and skipping global consensus entirely on single-owner objects, Sui achieves unparalleled speeds."
+          }
+        ]
       }
     ]
   },
