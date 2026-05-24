@@ -222,16 +222,29 @@ app.post("/api/sui/mint-badge", (req, res) => {
   const gasUsedMIST = 1012500 + Math.floor(Math.random() * 123400); // UI displays in SUI (1 SUI = 1e9 MIST)
   const gasUsedSUI = (gasUsedMIST / 1_000_000_000).toFixed(6);
   
-  const logs = [
-    `[INFO] Preparing Move call: 0xecc5617a::badge_kiosk::mint_to_sender`,
-    `[INFO] Checking wallet authentication: Approved for ${wallet}`,
-    `[INFO] Verified track completion certificate: "${trackName}"`,
-    `[MOVE_EXEC] Allocating object UID...`,
-    `[MOVE_EXEC] Borrowing Kiosk ownership authority...`,
-    `[MOVE_EXEC] Created Object: ID ${objectId.slice(0, 16)}...`,
-    `[MOVE_EXEC] Event emitted: 0xecc5617a::badge_kiosk::BadgeMinted { recipient: ${wallet.slice(0, 8)}..., badge_type: "${badgeId}", xp_granted: 150 }`,
-    `[SUCCESS] Transaction executed. Gas used: ${gasUsedSUI} SUI`
-  ];
+  let logs: string[] = [];
+  if (badgeId === "worthless-nft") {
+    logs = [
+      `[WARNING] INITIALIZING TRANSFERS FOR A CERTIFIED WORTHLESS ITEM.`,
+      `[INFO] Preparing Move call: 0x000abc1e::junk::mint_worthless_garbage`,
+      `[INFO] Approving zero-utility transaction protocol for: ${wallet}`,
+      `[MOVE_EXEC] Allocating object UID with literally zero real utility or monetary backing...`,
+      `[MOVE_EXEC] Locked trash descriptor: ID ${objectId.slice(0, 16)}...`,
+      `[MOVE_EXEC] Event emitted: 0x000abc1e::junk::GarbageCreated { recipient: ${wallet.slice(0, 8)}..., asset: "Sui Cozy Lint Block", dynamic_worth: 0.00000000 }`,
+      `[SUCCESS] Garbage collector transaction fully settled. Gas of ${gasUsedSUI} SUI was paid, but output value remains $0.00.`
+    ];
+  } else {
+    logs = [
+      `[INFO] Preparing Move call: 0xecc5617a::badge_kiosk::mint_to_sender`,
+      `[INFO] Checking wallet authentication: Approved for ${wallet}`,
+      `[INFO] Verified track completion certificate: "${trackName}"`,
+      `[MOVE_EXEC] Allocating object UID...`,
+      `[MOVE_EXEC] Borrowing Kiosk ownership authority...`,
+      `[MOVE_EXEC] Created Object: ID ${objectId.slice(0, 16)}...`,
+      `[MOVE_EXEC] Event emitted: 0xecc5617a::badge_kiosk::BadgeMinted { recipient: ${wallet.slice(0, 8)}..., badge_type: "${badgeId}", xp_granted: 150 }`,
+      `[SUCCESS] Transaction executed. Gas used: ${gasUsedSUI} SUI`
+    ];
+  }
 
   res.json({
     success: true,
