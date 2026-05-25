@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ConnectModal } from '@mysten/dapp-kit-react/ui';
+import { ConnectModal, ConnectButton } from '@mysten/dapp-kit-react/ui';
 import { initialTracks } from "./data";
 import { LearningTrack, TrackModule, UserProfile, MintResult } from "./types";
 import { YetiChalkboard } from "./components/YetiChalkboard";
@@ -274,6 +274,8 @@ export default function App() {
     }
   };
 
+
+
   return (
     <div id="lofi-quest-app" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white">
       
@@ -286,9 +288,10 @@ export default function App() {
             <span className="text-3xl filter drop-shadow">🏔️</span>
             <div>
               <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-                Lofi Quest: Sui Academy
+                Lofi Academy
               </h1>
             </div>
+            <ConnectButton />
           </div>
 
           {/* Real-time Developer HUD Score bar */}
@@ -330,22 +333,7 @@ export default function App() {
               )}
             </div>
 
-            {/* Wallet Quick Status indicator */}
-            <div className="text-xs font-mono">
-              {user.walletAddress ? (
-                <div className="bg-white border-2 border-[#3c3c3c] text-emerald-600 px-3 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center gap-1.5 font-bold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>{user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}</span>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setActiveTab("profile")}
-                  className="px-4 py-1.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] font-bold text-xs rounded-2xl cursor-pointer transition-colors active:translate-y-[1px]"
-                >
-                  Connect Wallet
-                </button>
-              )}
-            </div>
+           
           </div>
 
         </div>
