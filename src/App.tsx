@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { ConnectModal, ConnectButton } from '@mysten/dapp-kit-react/ui';
 import { initialTracks } from "./data";
 import { LearningTrack, TrackModule, UserProfile, MintResult } from "./types";
 import { YetiChalkboard } from "./components/YetiChalkboard";
@@ -9,6 +8,8 @@ import { ProfileWidget } from "./components/ProfileWidget";
 import { TutorFloatingWidget } from "./components/TutorFloatingWidget";
 import { AudioPlayerWidget } from "./components/AudioPlayerWidget";
 import { AdminPanel } from "./components/AdminPanel";
+import { LandingPage } from "./components/LandingPage";
+import { motion, AnimatePresence } from "motion/react";
 
 import { 
   Compass, 
@@ -35,6 +36,21 @@ const YETI_STUDY_ASSET = "/src/assets/images/yeti_study_1779633378264.png";
 const YETI_BADGE_ASSET = "/src/assets/images/yeti_badge_1779633396226.png";
 
 export default function App() {
+  // State for landing page vs main app launch
+  const [appLaunched, setAppLaunched] = useState<boolean>(() => {
+    return localStorage.getItem("sui_yeti_launched") === "true";
+  });
+
+  const handleLaunchApp = () => {
+    setAppLaunched(true);
+    localStorage.setItem("sui_yeti_launched", "true");
+  };
+
+  const handleReturnToLanding = () => {
+    setAppLaunched(false);
+    localStorage.setItem("sui_yeti_launched", "false");
+  };
+
   // Navigation Tabs
   const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "leaderboard" | "profile" | "admin">("dashboard");
 
@@ -274,24 +290,43 @@ export default function App() {
     }
   };
 
-
+  if (!appLaunched) {
+    return (
+      <LandingPage 
+        onLaunch={handleLaunchApp} 
+        userXP={user.xp} 
+      />
+    );
+  }
 
   return (
-    <div id="lofi-quest-app" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white">
+    <motion.div
+      id="lofi-quest-app"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white"
+    >
       
       {/* 1. TOP HEADER & HUD STATUS */}
       <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Logo Branding */}
-          <div className="flex items-center gap-3">
-            <span className="text-3xl filter drop-shadow">🏔️</span>
+          <div 
+            onClick={handleReturnToLanding}
+            className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
+            title="Return to Guided Introduction"
+          >
+            <span className="text-3xl filter drop-shadow group-hover:scale-110 transition-transform">🏔️</span>
             <div>
               <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-                Lofi Academy
+                Lofi Quest: Sui Academy
               </h1>
+              <span className="text-[10px] font-mono uppercase bg-[#89A8B2]/20 text-[#89A8B2] px-2 py-0.5 rounded border-2 border-[#3c3c3c] tracking-widest block mt-0.5 font-bold group-hover:bg-[#89A8B2]/30 transition-colors">
+                CLAY Hackathon MVP
+              </span>
             </div>
-            <ConnectButton />
           </div>
 
           {/* Real-time Developer HUD Score bar */}
@@ -333,7 +368,22 @@ export default function App() {
               )}
             </div>
 
-           
+            {/* Wallet Quick Status indicator */}
+            <div className="text-xs font-mono">
+              {user.walletAddress ? (
+                <div className="bg-white border-2 border-[#3c3c3c] text-emerald-600 px-3 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center gap-1.5 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>{user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setActiveTab("profile")}
+                  className="px-4 py-1.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] font-bold text-xs rounded-2xl cursor-pointer transition-colors active:translate-y-[1px]"
+                >
+                  Connect Wallet
+                </button>
+              )}
+            </div>
           </div>
 
         </div>
@@ -342,6 +392,15 @@ export default function App() {
       {/* 2. SUB-NAV NAVIGATION TABS PANEL */}
       <nav id="app-tabs-navigation" className="bg-white border-b-2 border-[#3c3c3c] py-2.5 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-start gap-2 overflow-x-auto text-[13px] font-mono">
+          <button
+            onClick={handleReturnToLanding}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-[#D67B52] border-dashed border-[#D67B52]/60 hover:border-[#D67B52] hover:bg-[#D67B52]/5"
+            title="Read blockchain mechanics & about pages again"
+          >
+            <Sparkles size={14} className="animate-pulse" />
+            <span>Introduction Guide 📖</span>
+          </button>
+
           {[
             { id: "dashboard", label: "Dashboard Quest Room", icon: Compass },
             { id: "simulator", label: "DeFi Swap/Lend Box", icon: TrendingUp },
@@ -379,8 +438,16 @@ export default function App() {
 
       {/* 4. MASTER CONTENT SCREEN DISPLAY ROUTING */}
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
-        
-        {/* =============== DASHBOARD TAB AREA =============== */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.22 }}
+            className="w-full"
+          >
+            {/* =============== DASHBOARD TAB AREA =============== */}
         {activeTab === "dashboard" && (
           <div className="space-y-6">
             
@@ -771,6 +838,8 @@ export default function App() {
             leadLength={9} // mock/active length
           />
         )}
+          </motion.div>
+        </AnimatePresence>
 
       </main>
 
@@ -788,6 +857,6 @@ export default function App() {
         </p>
       </footer>
 
-    </div>
+    </motion.div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UserProfile, MintResult } from "../types";
 import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw } from "lucide-react";
+import { motion } from "motion/react";
 
 interface ProfileWidgetProps {
   user: UserProfile;
@@ -428,7 +429,21 @@ function BadgeMintRow({ id, title, isCompleted, mintedData, onMint, isMinting, w
   return (
     <div className={`flex items-center justify-between p-3 rounded-xl ${color}`}>
       <div className="flex items-center gap-2">
-        <span className="text-lg">🏅</span>
+        <motion.span 
+          className="text-lg inline-block text-center rounded-full"
+          animate={{ 
+            scale: [1, 1.12, 1],
+            y: [0, -1, 0]
+          }}
+          whileHover={{ scale: 1.25, rotate: 10 }}
+          transition={{
+            duration: 2.2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          🏅
+        </motion.span>
         <div>
           <span className="text-xs font-bold block text-[#3c3c3c]">{title}</span>
           <span className="text-[10px] text-[#6D5D6E] font-mono font-medium">
