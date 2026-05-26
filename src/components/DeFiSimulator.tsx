@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ArrowRightLeft, BookOpen, CircleAlert, Sparkles, TrendingUp, ShieldCheck, RefreshCw, Zap, Landmark } from "lucide-react";
+import { motion } from "motion/react";
 
 interface DeFiSimulatorProps {
   onEarnXP: (xp: number) => void;
@@ -418,10 +419,12 @@ export function DeFiSimulator({ onEarnXP, walletConnected }: DeFiSimulatorProps)
                     </span>
                   </div>
                   <div className="w-full bg-white border-2 border-[#3c3c3c] h-3.5 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full transition-all duration-300 ${healthFactor >= 1.5 ? "bg-emerald-500" : healthFactor >= 1.0 ? "bg-amber-500" : "bg-red-500 animate-pulse"}`}
-                      style={{ width: `${Math.min(100, (healthFactor / 3) * 100)}%` }}
-                    ></div>
+                    <motion.div 
+                      className={`h-full ${healthFactor >= 1.5 ? "bg-emerald-500" : healthFactor >= 1.0 ? "bg-amber-500" : "bg-red-500 animate-pulse"}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(100, (healthFactor / 3) * 100)}%` }}
+                      transition={{ type: "spring", stiffness: 80, damping: 15 }}
+                    ></motion.div>
                   </div>
                   <div className="flex justify-between text-[9px] text-[#6D5D6E] mt-1 font-mono font-bold">
                     <span>0.0 (Liquidation line)</span>

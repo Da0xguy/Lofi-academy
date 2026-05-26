@@ -43,16 +43,17 @@ interface LeaderboardEntry {
   xp: number;
   level: number;
   badges: string[];
+  rankDirection?: "up" | "down" | "same";
 }
 
 const defaultLeaderboard: LeaderboardEntry[] = [
-  { username: "YetiLoverSui", avatar: "🐻", wallet: "0x3e4...b7a1", xp: 1250, level: 5, badges: ["basics", "defi", "protocols", "history"] },
-  { username: "MoveNinja", avatar: "🐱", wallet: "0xa84...92e1", xp: 950, level: 4, badges: ["basics", "defi", "protocols"] },
-  { username: "LofiCoder", avatar: "🦊", wallet: "0x112...cc4f", xp: 750, level: 3, badges: ["basics", "defi"] },
-  { username: "SuiExplorer", avatar: "🐼", wallet: "0x54f...67da", xp: 520, level: 2, badges: ["basics"] },
-  { username: "OceanYeti", avatar: "🦦", wallet: "0x981...ef32", xp: 480, level: 2, badges: ["basics"] },
-  { username: "MystenStyler", avatar: "🐨", wallet: "0x7d6...ab12", xp: 350, level: 1, badges: [] },
-  { username: "SuilendUser", avatar: "🦁", wallet: "0x4fe...93dd", xp: 210, level: 1, badges: [] },
+  { username: "YetiLoverSui", avatar: "🐻", wallet: "0x3e4...b7a1", xp: 1250, level: 5, badges: ["basics", "defi", "protocols", "history"], rankDirection: "same" },
+  { username: "MoveNinja", avatar: "🐱", wallet: "0xa84...92e1", xp: 950, level: 4, badges: ["basics", "defi", "protocols"], rankDirection: "up" },
+  { username: "LofiCoder", avatar: "🦊", wallet: "0x112...cc4f", xp: 750, level: 3, badges: ["basics", "defi"], rankDirection: "down" },
+  { username: "SuiExplorer", avatar: "🐼", wallet: "0x54f...67da", xp: 520, level: 2, badges: ["basics"], rankDirection: "up" },
+  { username: "OceanYeti", avatar: "🦦", wallet: "0x981...ef32", xp: 480, level: 2, badges: ["basics"], rankDirection: "same" },
+  { username: "MystenStyler", avatar: "🐨", wallet: "0x7d6...ab12", xp: 350, level: 1, badges: [], rankDirection: "down" },
+  { username: "SuilendUser", avatar: "🦁", wallet: "0x4fe...93dd", xp: 210, level: 1, badges: [], rankDirection: "up" },
 ];
 
 function loadState(): { leaderboard: LeaderboardEntry[] } {
@@ -113,10 +114,15 @@ app.post("/api/sui/leaderboard", (req, res) => {
   
   if (existingIndex >= 0) {
     // Keep high scores or accumulate
-    state.leaderboard[existingIndex].xp = Math.max(state.leaderboard[existingIndex].xp, xp || 0);
+    const oldXp = state.leaderboard[existingIndex].xp;
+    const newXp = Math.max(oldXp, xp || 0);
+    const direction = newXp > oldXp ? "up" : (state.leaderboard[existingIndex].rankDirection || "same");
+
+    state.leaderboard[existingIndex].xp = newXp;
     state.leaderboard[existingIndex].level = Math.max(state.leaderboard[existingIndex].level, level || 1);
     state.leaderboard[existingIndex].username = finalUsername;
     state.leaderboard[existingIndex].avatar = finalAvatar;
+    state.leaderboard[existingIndex].rankDirection = direction;
     if (badges) {
       state.leaderboard[existingIndex].badges = Array.from(new Set([...(state.leaderboard[existingIndex].badges || []), ...badges]));
     }
@@ -129,6 +135,7 @@ app.post("/api/sui/leaderboard", (req, res) => {
       xp: xp || 0,
       level: level || 1,
       badges: badges || [],
+      rankDirection: "up"
     });
   }
   

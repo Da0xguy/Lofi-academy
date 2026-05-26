@@ -59,6 +59,7 @@ export interface LeaderboardEntry {
   xp: number;
   level: number;
   badges: string[];
+  rankDirection?: "up" | "down" | "same";
 }
 
 export interface MintResult {

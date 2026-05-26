@@ -109,7 +109,7 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
           {/* Header Panel */}
           <div className="bg-[#F3EFEA] p-3.5 border-b-2 border-dashed border-[#3c3c3c]/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl">🍵</span>
+              <Coffee size={18} className="text-[#D67B52]" />
               <div>
                 <h3 className="text-xs font-bold font-mono text-[#D67B52] flex items-center gap-1">
                   <span>Yeti the Tutor</span>
@@ -139,8 +139,9 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
                 }`}
               >
                 {msg.role === "model" && (
-                  <div className="text-[9px] text-[#89A8B2] font-bold tracking-wider font-mono mb-1 text-left uppercase">
-                    ❄ yeti companion
+                  <div className="text-[9px] text-[#89A8B2] font-bold tracking-wider font-mono mb-1 text-left uppercase flex items-center gap-1">
+                    <Sparkles size={8} className="text-[#89A8B2] fill-[#89A8B2]/25" />
+                    <span>yeti companion</span>
                   </div>
                 )}
                 {msg.content}

@@ -1,23 +1,197 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
+:root {
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --bento-bg: #f8f5f2;
+  --bento-dark: #3c3c3c;
+  --bento-sage: #89A8B2;
+  --bento-stone: #E8E1D9;
+  --bento-terracotta: #D67B52;
+  --bento-purple: #6D5D6E;
+  --bento-pink: #E8A0BF;
+  --bento-blue: #B9D7EA;
+  --bento-sand: #F3EFEA;
+
+  /* Additional mappings to override hardcoded values dynamically */
+  --bg-white: #ffffff;
+  --bg-base: #f8f5f2;
+  --bg-f9: #F9F6F0;
+  --bg-sand: #F3EFEA;
+  --bg-stone: #E8E1D9;
+  --text-dark: #3c3c3c;
+  --text-purple: #6D5D6E;
+  --border-dark: #3c3c3c;
+  --shadow-color: #3c3c3c;
+}
+
+.dark {
+  --bento-bg: #111112;
+  --bento-dark: #f5f4f0;
+  --bento-sage: #668894;
+  --bento-stone: #2a2a2e;
+  --bento-terracotta: #df7345;
+  --bento-purple: #a598a6;
+  --bento-pink: #cc8da8;
+  --bento-blue: #7097bd;
+  --bento-sand: #1d1d20;
+
+  /* Clay/Lofi Dark Overrides for arbitrary Tailwind classes */
+  --bg-white: #18181b;
+  --bg-base: #111112;
+  --bg-f9: #111112;
+  --bg-sand: #1e1e21;
+  --bg-stone: #2a2a2e;
+  --text-dark: #f0ede6;
+  --text-purple: #a598a6;
+  --border-dark: #44444a;
+  --shadow-color: #070708;
+}
+
 @theme {
   --font-sans: "Inter", sans-serif;
   --font-serif: "Playfair Display", serif;
   --font-mono: "JetBrains Mono", monospace;
-  --color-bento-bg: #f8f5f2;
-  --color-bento-dark: #3c3c3c;
-  --color-bento-sage: #89A8B2;
-  --color-bento-stone: #E8E1D9;
-  --color-bento-terracotta: #D67B52;
-  --color-bento-purple: #6D5D6E;
-  --color-bento-pink: #E8A0BF;
-  --color-bento-blue: #B9D7EA;
-  --color-bento-sand: #F3EFEA;
+  --color-bento-bg: var(--bento-bg);
+  --color-bento-dark: var(--bento-dark);
+  --color-bento-sage: var(--bento-sage);
+  --color-bento-stone: var(--bento-stone);
+  --color-bento-terracotta: var(--bento-terracotta);
+  --color-bento-purple: var(--bento-purple);
+  --color-bento-pink: var(--bento-pink);
+  --color-bento-blue: var(--bento-blue);
+  --color-bento-sand: var(--bento-sand);
 }
 
 body {
-  background-color: #f8f5f2;
-  color: #3c3c3c;
+  background-color: var(--bg-base);
+  color: var(--text-dark);
   font-family: "Inter", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Helper rules to map hardcoded tailwind utility classes to mode variables */
+.dark body {
+  background-color: var(--bg-base) !important;
+  color: var(--text-dark) !important;
+}
+
+.dark .bg-white {
+  background-color: var(--bg-white) !important;
+}
+
+.dark .hover\:bg-white:hover {
+  background-color: var(--bg-white) !important;
+}
+
+.dark .bg-\[\#f8f5f2\], 
+.dark .bg-\[\#F9F6F0\] {
+  background-color: var(--bg-base) !important;
+}
+
+.dark .bg-\[\#F3EFEA\] {
+  background-color: var(--bg-sand) !important;
+}
+
+.dark .bg-\[\#E8E1D9\] {
+  background-color: var(--bg-stone) !important;
+}
+
+/* Borders mapping */
+.dark .border-\[\#3c3c3c\] {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-b-2 {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-t-2 {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-r-2 {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-l-2 {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-b-4 {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-t-4 {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-b-\[\#3c3c3c\] {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-t-\[\#3c3c3c\] {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-r-\[\#3c3c3c\] {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-l-\[\#3c3c3c\] {
+  border-color: var(--border-dark) !important;
+}
+
+.dark .border-stone-200 {
+  border-color: var(--border-dark) !important;
+}
+
+/* Text mapping */
+.dark .text-\[\#3c3c3c\] {
+  color: var(--text-dark) !important;
+}
+
+.dark .text-\[\#6D5D6E\] {
+  color: var(--text-purple) !important;
+}
+
+/* Specific matches */
+.dark .hover\:border-\[\#3c3c3c\/40\]:hover {
+  border-color: rgba(240, 237, 230, 0.3) !important;
+}
+
+.dark .hover\:bg-\[\#F3EFEA\]\/20:hover {
+  background-color: rgba(30, 30, 33, 0.4) !important;
+}
+
+.dark .hover\:bg-\[\#f8f5f2\]:hover {
+  background-color: var(--bg-base) !important;
+}
+
+.dark .hover\:text-\[\#3c3c3c\]:hover {
+  color: var(--text-dark) !important;
+}
+
+/* Shadows mapping */
+.dark [class*="shadow-"][class*="#3c3c3c"] {
+  --tw-shadow-color: var(--shadow-color) !important;
+}
+
+.dark .shadow-\[1px_1px_0px_0px_\#3c3c3c\] { box-shadow: 1px 1px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[2px_2px_0px_0px_\#3c3c3c\] { box-shadow: 2px 2px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[3px_3px_0px_0px_\#3c3c3c\] { box-shadow: 3px 3px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[4px_4px_0px_0px_\#3c3c3c\] { box-shadow: 4px 4px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[5px_5px_0px_0px_\#3c3c3c\] { box-shadow: 5px 5px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[6px_6px_0px_0px_\#3c3c3c\] { box-shadow: 6px 6px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[8px_8px_0px_0px_\#3c3c3c\] { box-shadow: 8px 8px 0px 0px var(--shadow-color) !important; }
+.dark .shadow-\[0px_4px_0px_0px_\#3c3c3c\/10\] { box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.5) !important; }
+
+/* Custom utility tweaks for dark backgrounds and text inputs */
+.dark input, .dark select, .dark textarea {
+  background-color: var(--bg-white) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-dark) !important;
 }

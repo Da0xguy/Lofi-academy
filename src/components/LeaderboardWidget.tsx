@@ -150,6 +150,28 @@ export function LeaderboardWidget({
                   rankVisual = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E8A0BF]/20 text-[#E8A0BF] font-bold border border-[#E8A0BF]/50">🥉</span>;
                 }
 
+                // Rank trend indicator
+                let trendIcon: React.ReactNode = null;
+                if (entry.rankDirection === "up") {
+                  trendIcon = (
+                    <span className="inline-flex items-center justify-center w-5 h-5 text-emerald-600 bg-emerald-50 border-2 border-emerald-400 rounded-lg text-[8px] font-mono font-black" title="Moved up in rank compared to last session">
+                      ▲
+                    </span>
+                  );
+                } else if (entry.rankDirection === "down") {
+                  trendIcon = (
+                    <span className="inline-flex items-center justify-center w-5 h-5 text-rose-600 bg-rose-50 border-2 border-rose-400 rounded-lg text-[8px] font-mono font-black animate-pulse" title="Moved down in rank compared to last session">
+                      ▼
+                    </span>
+                  );
+                } else {
+                  trendIcon = (
+                    <span className="inline-flex items-center justify-center w-5 h-5 text-stone-400 bg-stone-50 border-2 border-stone-300 rounded-lg text-[8px] font-mono font-bold" title="No change in rank">
+                      ▬
+                    </span>
+                  );
+                }
+
                 return (
                   <tr
                     key={entry.wallet}
@@ -157,7 +179,12 @@ export function LeaderboardWidget({
                       isCurrentUser ? "bg-[#89A8B2]/10 font-bold border-l-4 border-l-[#89A8B2]" : ""
                     }`}
                   >
-                    <td className="py-4 px-3 w-16 text-center">{rankVisual}</td>
+                    <td className="py-4 px-3 w-16">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span className="font-mono text-[11px] font-bold text-[#6D5D6E]">{rankVisual}</span>
+                        {trendIcon}
+                      </div>
+                    </td>
                     
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-2">

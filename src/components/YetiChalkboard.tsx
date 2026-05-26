@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ModuleStep } from "../types";
-import { Coffee, MessageSquare, Sparkles } from "lucide-react";
+import { Coffee, MessageSquare, Sparkles, Brain, Zap } from "lucide-react";
 
 interface YetiChalkboardProps {
   step: ModuleStep;
@@ -25,13 +25,13 @@ export function YetiChalkboard({
   const getMoodDecoration = (mood: string) => {
     switch (mood) {
       case "thinking":
-        return { quote: "yeti is pondering move borrow checkers...", emoji: "🧠" };
+        return { quote: "yeti is pondering move borrow checkers...", icon: <Brain size={14} className="text-[#89A8B2]" /> };
       case "excited":
-        return { quote: "oh! this compiles perfectly, yeti is proud!", emoji: "⚡" };
+        return { quote: "oh! this compiles perfectly, yeti is proud!", icon: <Zap size={14} className="text-yellow-500 fill-yellow-500 animate-bounce" /> };
       case "proud":
-        return { quote: "your level of knowledge is rising like warm steam...", emoji: "✨" };
+        return { quote: "your level of knowledge is rising like warm steam...", icon: <Sparkles size={14} className="text-[#D67B52]" /> };
       default:
-        return { quote: "lofi beats inside, coding outside...", emoji: "🍵" };
+        return { quote: "lofi beats inside, coding outside...", icon: <Coffee size={14} className="text-amber-700 font-bold" /> };
     }
   };
 
@@ -57,7 +57,7 @@ export function YetiChalkboard({
         <div className="mt-4 relative bg-white border-2 border-[#3c3c3c] rounded-2xl p-3 max-w-xs text-xs shadow-[2px_2px_0px_0px_#3c3c3c]">
           <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-l-2 border-t-2 border-[#3c3c3c]"></div>
           <p className="font-mono text-[#3c3c3c] font-bold italic text-center flex items-center justify-center gap-1.5">
-            <span>{decoration.emoji}</span>
+            <span className="flex items-center justify-center">{decoration.icon}</span>
             <span>{decoration.quote}</span>
           </p>
         </div>

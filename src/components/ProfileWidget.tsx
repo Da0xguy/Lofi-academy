@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { UserProfile, MintResult } from "../types";
 import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw } from "lucide-react";
 import { motion } from "motion/react";
+import { ConnectButton } from "@mysten/dapp-kit";
 
 interface ProfileWidgetProps {
   user: UserProfile;
@@ -159,30 +160,13 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
               </div>
 
               <h4 className="font-bold text-sm text-[#3c3c3c] mb-1">Unauthenticated Explorer</h4>
-              <p className="text-xs text-[#6D5D6E] max-w-xs mx-auto mb-4 leading-relaxed">
-                Connect your simulated Sui wallet credentials to claim initial welcome XP and track progress.
+              <p className="text-xs text-[#6D5D6E] max-w-xs mx-auto mb-5 leading-relaxed">
+                Connect your developer or personal Sui Wallet to track your track progress, badges, and claim your starter XP.
               </p>
 
-              <div className="flex bg-[#E8E1D9] p-1 rounded-xl border-2 border-[#3c3c3c] max-w-xs mx-auto mb-3">
-                {["Sui Wallet", "Ethos", "WalletConnect"].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setWalletType(type)}
-                    className={`flex-1 text-[10px] py-1 rounded-lg font-mono font-bold transition-all cursor-pointer ${
-                      walletType === type ? "bg-[#3c3c3c] text-white" : "text-[#6D5D6E]"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+              <div className="flex justify-center">
+                <ConnectButton connectText="Connect dApp Wallet" />
               </div>
-
-              <button
-                onClick={handleConnectWallet}
-                className="px-6 py-2.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white font-bold border-2 border-[#3c3c3c] font-mono text-xs rounded-xl shadow-[3px_3px_0px_0px_#3c3c3c] cursor-pointer transition-all active:translate-y-[2px]"
-              >
-                Connect Simulated {walletType}
-              </button>
             </div>
           )}
         </div>
@@ -194,10 +178,12 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
             <span className="text-[#D67B52] font-bold">{user.xp} XP</span>
           </div>
           <div className="w-full bg-[#E8E1D9] h-3.5 rounded-full overflow-hidden border-2 border-[#3c3c3c]">
-            <div 
-              className="bg-[#89A8B2] h-full transition-all duration-300" 
-              style={{ width: `${(user.xp % 100)}%` }}
-            ></div>
+            <motion.div 
+              className="bg-[#89A8B2] h-full" 
+              initial={{ width: 0 }}
+              animate={{ width: `${(user.xp % 100)}%` }}
+              transition={{ type: "spring", stiffness: 80, damping: 15 }}
+            ></motion.div>
           </div>
           <div className="flex justify-between text-[10px] text-[#6D5D6E] mt-1 font-semibold">
             <span>Level {user.level}</span>

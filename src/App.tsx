@@ -9,7 +9,9 @@ import { TutorFloatingWidget } from "./components/TutorFloatingWidget";
 import { AudioPlayerWidget } from "./components/AudioPlayerWidget";
 import { AdminPanel } from "./components/AdminPanel";
 import { LandingPage } from "./components/LandingPage";
+import Background from "./components/Background";
 import { motion, AnimatePresence } from "motion/react";
+import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 
 import { 
   Compass, 
@@ -41,9 +43,60 @@ export default function App() {
     return localStorage.getItem("sui_yeti_launched") === "true";
   });
 
+  // Dark mode state implementation
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem("sui_yeti_dark_mode") === "true";
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("sui_yeti_dark_mode", darkMode ? "true" : "false");
+  }, [darkMode]);
+
+  const [appLoading, setAppLoading] = useState<boolean>(false);
+  const [loadingPercent, setLoadingPercent] = useState<number>(0);
+  const [loadingStatus, setLoadingStatus] = useState<string>("Initializing Sui CLI Sandbox...");
+
   const handleLaunchApp = () => {
-    setAppLaunched(true);
-    localStorage.setItem("sui_yeti_launched", "true");
+    setAppLoading(true);
+    setLoadingPercent(0);
+    setLoadingStatus("Booting Sui CLI sandbox environments...");
+
+    const interval = setInterval(() => {
+      setLoadingPercent((prev) => {
+        const next = prev + Math.floor(Math.random() * 8) + 4;
+        if (next >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            setAppLoading(false);
+            setAppLaunched(true);
+            localStorage.setItem("sui_yeti_launched", "true");
+          }, 350);
+          return 100;
+        }
+
+        // Dynamically update status logs as loading percentage grows
+        if (next < 20) {
+          setLoadingStatus("Initializing local bytecode compilers & parsers...");
+        } else if (next < 40) {
+          setLoadingStatus("Checking Narwhal mempool sequencers & validators...");
+        } else if (next < 60) {
+          setLoadingStatus("Compiling Move Entry Modules (assisted by Yeti 🐻)...");
+        } else if (next < 80) {
+          setLoadingStatus("Adjusting gas optimization fee parameters... OK.");
+        } else if (next < 95) {
+          setLoadingStatus("Syncing retro chord tracks and static ambient loops... 🎧");
+        } else {
+          setLoadingStatus("Secure object coordinates found. Launching Sui Questroom! 🚀");
+        }
+
+        return next;
+      });
+    }, 110);
   };
 
   const handleReturnToLanding = () => {
@@ -93,6 +146,36 @@ export default function App() {
       lastLoginDate: new Date().toISOString().split("T")[0]
     };
   });
+
+  const currentAccount = useCurrentAccount();
+
+  // Synchronize dApp kit connected wallet address with user profile state
+  useEffect(() => {
+    if (currentAccount) {
+      if (user.walletAddress !== currentAccount.address) {
+        setUser((prev) => {
+          const updated = {
+            ...prev,
+            walletAddress: currentAccount.address,
+            // If connecting for the first time, award welcome bonus
+            xp: prev.claimedWelcomeXP ? prev.xp : prev.xp + 50,
+            claimedWelcomeXP: true
+          };
+          return updated;
+        });
+      }
+    } else {
+      if (user.walletAddress !== null) {
+        setUser((prev) => {
+          const updated = {
+            ...prev,
+            walletAddress: null
+          };
+          return updated;
+        });
+      }
+    }
+  }, [currentAccount, user.walletAddress]);
 
   // Streak bonus claim option
   const [claimedStreakBonus, setClaimedStreakBonus] = useState<boolean>(false);
@@ -290,12 +373,123 @@ export default function App() {
     }
   };
 
+  if (appLoading) {
+    return (
+      <div className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col items-center justify-center p-6 selection:bg-[#D67B52] selection:text-white">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-lg bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 md:p-8 shadow-[8px_8px_0px_0px_#3c3c3c] relative overflow-hidden text-center"
+        >
+          {/* Top retro stripe decor */}
+          <div className="absolute top-0 left-0 right-0 h-3 bg-[#D67B52]"></div>
+          
+          {/* Game controller logo */}
+          <motion.div
+            animate={{ rotate: [0, -10, 10, -10, 0], y: [0, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            className="w-16 h-16 bg-amber-100 text-[#D67B52] border-3 border-[#3c3c3c] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[3px_3px_0px_0px_#3c3c3c] cursor-pointer"
+          >
+            <Gamepad size={32} className="text-[#D67B52]" />
+          </motion.div>
+
+          <h3 className="text-2xl font-serif font-bold text-[#3c3c3c] uppercase tracking-normal mb-1">
+            Loading Sui Academy...
+          </h3>
+          <p className="text-xs font-mono text-[#D67B52] font-semibold tracking-wider uppercase mb-6 flex items-center justify-center gap-1.5">
+            <span className="animate-ping w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Est. sub-second connection setup</span>
+          </p>
+
+          {/* Glowing Virtual Monitor Display Area */}
+          <div className="bg-stone-900 border-3 border-[#3c3c3c] rounded-2xl p-4 mb-6 font-mono text-left relative overflow-hidden shadow-inner">
+            {/* Scanlines layer */}
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.25)_50%),_linear-gradient(90deg,_rgba(255,0,0,0.06),_rgba(0,255,0,0.02),_rgba(0,0,255,0.06))] bg-[size:100%_4px,_6px_100%]"></div>
+            
+            <div className="flex justify-between text-stone-500 text-[10px] uppercase font-bold tracking-wider mb-2 border-b border-stone-800 pb-1.5">
+              <span>🖥️ CONSOLE LOG</span>
+              <span className="text-emerald-500 animate-pulse">{loadingPercent}% COMPLETED</span>
+            </div>
+
+            <div className="space-y-1.5 text-[11px] leading-relaxed select-none">
+              <div className="text-stone-400 font-bold flex gap-2">
+                <span className="text-amber-400">&gt;</span> 
+                <span>{loadingStatus}</span>
+              </div>
+              
+              <div className="text-stone-600 flex gap-2 text-[9px]">
+                <span>SYSTEM MODE:</span>
+                <span className="text-[#89A8B2]">DEVELOPMENT CLIENT SANDBOX</span>
+              </div>
+              <div className="text-stone-600 flex gap-2 text-[9px]">
+                <span>LATENCY STATS:</span>
+                <span className="text-emerald-600">300ms MYSTICETI INSTANT ENGINE DISPATCH</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Retro Progress Bar Container */}
+          <div className="relative">
+            <div className="w-full bg-[#E8E1D9] border-3 border-[#3c3c3c] h-7 rounded-2xl overflow-hidden p-[3px]">
+              <div 
+                className="bg-gradient-to-r from-[#89A8B2] to-[#D67B52] h-full rounded-xl border border-[#3c3c3c]/30 transition-all duration-100"
+                style={{ width: `${loadingPercent}%` }}
+              ></div>
+            </div>
+            {/* Floating indicator */}
+            <span className="absolute right-3 -top-7 text-xs font-mono font-bold text-[#3c3c3c]">
+              {loadingPercent}%
+            </span>
+          </div>
+
+          <div className="mt-6 flex items-center justify-center gap-2 bg-[#89A8B2]/10 border-2 border-[#3c3c3c]/30 px-3 py-2 rounded-xl text-stone-600 font-medium text-xs font-serif">
+            <span>💡 <strong>Study Tip:</strong> SUI utilizes secure, object-centric Move language paradigms, preventing dangerous re-entrancy attacks!</span>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   if (!appLaunched) {
     return (
       <LandingPage 
         onLaunch={handleLaunchApp} 
         userXP={user.xp} 
+        isDarkMode={darkMode}
+        toggleDarkMode={() => setDarkMode(!darkMode)}
+        isWalletConnected={!!currentAccount}
       />
+    );
+  }
+
+  // Restrict app workspace usage completely if the wallet is disconnected
+  if (appLaunched && !currentAccount) {
+    return (
+      <div className="min-h-screen bg-[#F9F6F0] flex flex-col items-center justify-center p-6 selection:bg-[#D67B52] selection:text-white relative">
+        <Background />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full bg-white border-4 border-[#3c3c3c] rounded-3xl p-8 shadow-[6px_6px_0px_0px_#3c3c3c] text-center flex flex-col items-center gap-5 relative z-10"
+        >
+          <div className="w-16 h-16 bg-red-100 border-2 border-[#3c3c3c] rounded-2xl flex items-center justify-center text-[#D67B52] animate-bounce shadow-[2px_2px_0px_0px_#3c3c3c]">
+            <Lock size={28} />
+          </div>
+          <h2 className="text-2xl font-bold font-serif text-[#3c3c3c]">Sui Wallet Disconnected</h2>
+          <p className="text-xs text-[#6D5D6E] font-medium leading-relaxed font-sans">
+            Your Sui Wallet address was disconnected. To continue using the academy questroom, you must keep an active wallet connected.
+          </p>
+          <div className="p-1 scale-105 rounded-xl bg-white border-2 border-[#3c3c3c] mt-2 shadow-[2px_2px_0px_0px_#3c3c3c] font-mono">
+            <ConnectButton connectText="Reconnect SUI Wallet" />
+          </div>
+          <button 
+            onClick={handleReturnToLanding}
+            className="text-stone-500 font-mono text-xs hover:text-[#D67B52] underline cursor-pointer mt-4"
+          >
+            &larr; Return to Guided Introduction
+          </button>
+        </motion.div>
+      </div>
     );
   }
 
@@ -305,8 +499,9 @@ export default function App() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white"
+      className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white relative"
     >
+      <Background />
       
       {/* 1. TOP HEADER & HUD STATUS */}
       <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
@@ -318,7 +513,7 @@ export default function App() {
             className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
             title="Return to Guided Introduction"
           >
-            <span className="text-3xl filter drop-shadow group-hover:scale-110 transition-transform">🏔️</span>
+            <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
             <div>
               <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
                 Lofi Quest: Sui Academy
@@ -328,13 +523,13 @@ export default function App() {
               </span>
             </div>
           </div>
-
+ 
           {/* Real-time Developer HUD Score bar */}
           <div className="flex items-center gap-4 flex-wrap select-none">
             {/* XP and Level Indicators */}
             <div id="hud-stats" className="flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
-              <div className="flex items-center gap-1 font-bold">
-                <span className="text-base">🐻</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <User size={13} className="text-[#89A8B2]" />
                 <span className="text-[#3c3c3c]">{user.username}</span>
               </div>
               <div className="h-4 w-px bg-[#3c3c3c]/30 mx-1"></div>
@@ -369,20 +564,17 @@ export default function App() {
             </div>
 
             {/* Wallet Quick Status indicator */}
-            <div className="text-xs font-mono">
-              {user.walletAddress ? (
-                <div className="bg-white border-2 border-[#3c3c3c] text-emerald-600 px-3 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center gap-1.5 font-bold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>{user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}</span>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setActiveTab("profile")}
-                  className="px-4 py-1.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] font-bold text-xs rounded-2xl cursor-pointer transition-colors active:translate-y-[1px]"
-                >
-                  Connect Wallet
-                </button>
-              )}
+            <div className="text-xs font-mono flex items-center gap-2">
+              <ConnectButton connectText="Connect Wallet" />
+              
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="px-3 py-1.5 bg-white border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs font-bold text-[#3c3c3c] hover:scale-102 transition-all cursor-pointer flex items-center gap-1.5 active:translate-y-[1px]"
+                title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                <span>{darkMode ? "🌙" : "☀️"}</span>
+                <span className="hidden sm:inline">{darkMode ? "Dark" : "Light"}</span>
+              </button>
             </div>
           </div>
 

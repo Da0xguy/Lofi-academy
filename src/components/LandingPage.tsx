@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import Background from "./Background";
 import { 
   Sparkles, 
   TrendingUp, 
@@ -17,19 +18,163 @@ import {
   Music,
   Heart,
   Terminal,
-  ArrowRight
+  ArrowRight,
+  Coins,
+  Key,
+  Check,
+  Pause,
+  Play,
+  ShieldCheck,
+  Moon,
+  Sun
 } from "lucide-react";
+import { ConnectButton } from "@mysten/dapp-kit";
+
+// Interactive Background gaming icons
+const FLOATING_ITEMS = [
+  { id: "game", left: "6%", top: "12%", duration: 25, delay: 0 },
+  { id: "star", left: "93%", top: "18%", duration: 28, delay: 1.2 },
+  { id: "coin", left: "87%", top: "45%", duration: 20, delay: 0.5 },
+  { id: "terminal", left: "8%", top: "65%", duration: 32, delay: 2.1 },
+  { id: "zap", left: "95%", top: "8%", duration: 16, delay: 0.2 },
+];
 
 interface LandingPageProps {
   onLaunch: () => void;
   userXP: number;
+  isDarkMode?: boolean;
+  toggleDarkMode?: () => void;
+  isWalletConnected?: boolean;
 }
 
-export function LandingPage({ onLaunch, userXP }: LandingPageProps) {
+export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMode, isWalletConnected = false }: LandingPageProps) {
   // Coffee click state for playful interactive mascot engagement
   const [coffeeBrewing, setCoffeeBrewing] = useState<boolean>(false);
   const [brewedSips, setBrewedSips] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<"sui" | "web3" | "move">("sui");
+
+  // Autoplay carousel slide scrolling properties
+  const [isAutoplay, setIsAutoplay] = useState<boolean>(true);
+  const [autoplayProgress, setAutoplayProgress] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isAutoplay) {
+      setAutoplayProgress(0);
+      return;
+    }
+
+    const intervalTime = 100; // tick every 100ms
+    const totalTime = 5000;   // 5000ms (5 seconds)
+    const step = (intervalTime / totalTime) * 100;
+
+    const timer = setInterval(() => {
+      setAutoplayProgress((prev) => {
+        const next = prev + step;
+        if (next >= 100) {
+          // Flip to next tab organically
+          setActiveTab((current) => {
+            if (current === "sui") return "web3";
+            if (current === "web3") return "move";
+            return "sui";
+          });
+          return 0;
+        }
+        return next;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, [isAutoplay]);
+
+  // Reset progress timeline whenever active tab updates to guarantee full 5s reading duration
+  useEffect(() => {
+    setAutoplayProgress(0);
+  }, [activeTab]);
+
+  // Retro Mini-Game State
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [gameScore, setGameScore] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(() => {
+    return Number(localStorage.getItem("sui_yeti_gamer_hs") || "0");
+  });
+  const [isJumping, setIsJumping] = useState<boolean>(false);
+  const [blockX, setBlockX] = useState<number>(100);
+  const [obstacleType, setObstacleType] = useState<string>("🧱");
+
+  const obstacles = ["🧱", "⛓️", "⛽", "👾", "📈"];
+
+  const handleJump = () => {
+    if (!gameStarted) {
+      setGameStarted(true);
+      setGameOver(false);
+      setGameScore(0);
+      setBlockX(100);
+      return;
+    }
+    if (gameOver) {
+      setGameOver(false);
+      setGameScore(0);
+      setBlockX(100);
+      return;
+    }
+    if (isJumping) return;
+    setIsJumping(true);
+    setTimeout(() => {
+      setIsJumping(false);
+    }, 450);
+  };
+
+  // Keyboard space key listener helper
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        // Only prevent default on landing screen so we don't block main page scrolling if not active game
+        if (gameStarted && !gameOver) {
+          e.preventDefault();
+          handleJump();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [gameStarted, gameOver, isJumping]);
+
+  // Mini-game clock intervals scheduler
+  useEffect(() => {
+    if (!gameStarted || gameOver) return;
+
+    const timer = setInterval(() => {
+      setBlockX((prev) => {
+        const next = prev - 1.8;
+        if (next <= 0) {
+          // Cleared barrier successfully! Award point
+          setGameScore((s) => {
+            const val = s + 1;
+            if (val > highScore) {
+              setHighScore(val);
+              localStorage.setItem("sui_yeti_gamer_hs", String(val));
+            }
+            return val;
+          });
+          setObstacleType(obstacles[Math.floor(Math.random() * obstacles.length)]);
+          return 100;
+        }
+
+        // Collision checking parameters
+        if (next >= 10 && next <= 24) {
+          if (!isJumping) {
+            setGameOver(true);
+            clearInterval(timer);
+          }
+        }
+
+        return next;
+      });
+    }, 40);
+
+    return () => clearInterval(timer);
+  }, [gameStarted, gameOver, isJumping, highScore]);
 
   const triggerBrewCoffee = () => {
     if (coffeeBrewing) return;
@@ -60,8 +205,60 @@ export function LandingPage({ onLaunch, userXP }: LandingPageProps) {
   };
 
   return (
-    <div id="landing-page-root" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] font-sans selection:bg-[#D67B52] selection:text-white pb-20 leading-relaxed overflow-x-hidden">
+    <div id="landing-page-root" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] font-sans selection:bg-[#D67B52] selection:text-white pb-20 leading-relaxed overflow-x-hidden relative">
+      <Background />
       
+      {/* Top Utility Nav for Landing Page */}
+      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center z-10 relative">
+        <span className="text-sm font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
+          <Compass className="text-[#D67B52]" size={18} /> Lofi Quest: Sui Academy
+        </span>
+        {toggleDarkMode && (
+          <button
+            onClick={toggleDarkMode}
+            className="px-3 py-1.5 bg-white border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs font-bold text-[#3c3c3c] hover:scale-102 transition-transform cursor-pointer flex items-center gap-1.5 active:translate-y-[1px]"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            <span>
+              {isDarkMode ? (
+                <Moon size={14} className="text-indigo-400" />
+              ) : (
+                <Sun size={14} className="text-amber-500 animate-spin" style={{ animationDuration: "12s" }} />
+              )}
+            </span>
+            <span className="hidden sm:inline">{isDarkMode ? "Dark" : "Light"}</span>
+          </button>
+        )}
+      </div>
+      
+      {/* Dynamic Background Floating Gaming Elements Overlay */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {FLOATING_ITEMS.map((item, idx) => (
+          <motion.div
+            key={idx}
+            className="absolute text-2xl filter drop-shadow select-none opacity-[0.22] md:opacity-[0.28]"
+            style={{ left: item.left, top: item.top }}
+            animate={{
+              y: [0, -28, 28, 0],
+              x: [0, 16, -16, 0],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: item.duration,
+              delay: item.delay,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            {item.id === "game" && <Gamepad size={32} className="text-indigo-500/35" />}
+            {item.id === "star" && <Sparkles size={28} className="text-yellow-500/40" />}
+            {item.id === "coin" && <Coins size={28} className="text-[#D67B52]/40" />}
+            {item.id === "terminal" && <Terminal size={28} className="text-emerald-500/35" />}
+            {item.id === "zap" && <Zap size={28} className="text-amber-500/45 fill-amber-300/10" />}
+          </motion.div>
+        ))}
+      </div>
+
       {/* 1. HERO BANNER HEADER SECTOR */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -105,27 +302,43 @@ export function LandingPage({ onLaunch, userXP }: LandingPageProps) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, type: "spring" }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="mt-10 flex flex-col items-center justify-center gap-4 w-full max-w-lg"
         >
-          <motion.button
-            onClick={onLaunch}
-            whileHover={{ scale: 1.06, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full sm:w-auto px-10 py-5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-serif font-extrabold text-lg md:text-xl rounded-2xl border-4 border-[#3c3c3c] shadow-[6px_6px_0px_0px_#3c3c3c] hover:shadow-[8px_8px_0px_0px_#3c3c3c] cursor-pointer transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <span>Enter Academy Questroom</span>
-              <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
-            </span>
-            <div className="absolute top-0 -inset-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-full group-hover:duration-1000 group-hover:translate-x-0 group-hover:transition-all" />
-          </motion.button>
-
-          <a 
-            href="#visual-learn-more"
-            className="w-full sm:w-auto px-8 py-5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-mono font-bold text-sm rounded-2xl border-4 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] cursor-pointer text-center"
-          >
-            How it works &rarr;
-          </a>
+          {isWalletConnected ? (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+              <motion.button
+                onClick={onLaunch}
+                whileHover={{ scale: 1.06, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full sm:w-auto px-10 py-5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-serif font-extrabold text-lg md:text-xl rounded-2xl border-4 border-[#3c3c3c] shadow-[6px_6px_0px_0px_#3c3c3c] hover:shadow-[8px_8px_0px_0px_#3c3c3c] cursor-pointer transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  <span>Enter Academy Questroom</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
+                </span>
+                <div className="absolute top-0 -inset-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-full group-hover:duration-1000 group-hover:translate-x-0 group-hover:transition-all" />
+              </motion.button>
+              <a 
+                href="#visual-learn-more"
+                className="w-full sm:w-auto px-8 py-5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-mono font-bold text-sm rounded-2xl border-4 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] cursor-pointer text-center"
+              >
+                How it works &rarr;
+              </a>
+            </div>
+          ) : (
+            <div className="w-full bg-[#E8E1D9]/40 border-4 border-[#3c3c3c] p-6 rounded-3xl shadow-[5px_5px_0px_0px_#3c3c3c] flex flex-col items-center text-center gap-4">
+              <div className="flex items-center gap-2 text-[#D67B52] font-bold bg-[#D67B52]/10 px-3 py-1.5 rounded-xl border-2 border-[#3c3c3c] text-xs uppercase font-mono shadow-[1px_1px_0px_0px_#3c3c3c]">
+                <Lock size={12} className="animate-bounce" />
+                <span>Sui Wallet Required</span>
+              </div>
+              <p className="text-xs text-[#6D5D6E] font-sans font-semibold max-w-sm leading-relaxed">
+                To access classrooms, complete tasks, analyze Cetus AMM pool statistics, or study secure Move compilations, you need to connect your Sui Wallet first.
+              </p>
+              <div className="p-1 scale-105 rounded-xl bg-white border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]">
+                <ConnectButton connectText="Connect Wallet to Unlock Academy" />
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Floating elements animation representation */}
@@ -148,20 +361,65 @@ export function LandingPage({ onLaunch, userXP }: LandingPageProps) {
         </div>
 
         {/* Column selectors */}
-        <div className="grid grid-cols-3 gap-2 max-w-md mx-auto bg-white border-2 border-[#3c3c3c] p-1.5 rounded-2xl mb-8 font-mono font-bold text-xs shadow-[3px_3px_0px_0px_#3c3c3c]">
-          {(["sui", "web3", "move"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setActiveTab(t)}
-              className={`py-2 px-1 rounded-xl transition-all capitalize cursor-pointer ${
-                activeTab === t 
-                  ? "bg-[#D67B52] text-white border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]" 
-                  : "text-[#6D5D6E] hover:text-[#3c3c3c]"
-              }`}
+        <div id="visual-pillars-grid" className="max-w-md mx-auto mb-8">
+          <div className="grid grid-cols-3 gap-2 bg-white border-2 border-[#3c3c3c] p-1.5 rounded-2xl font-mono font-bold text-xs shadow-[3px_3px_0px_0px_#3c3c3c] relative overflow-hidden">
+            {(["sui", "web3", "move"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => {
+                  setActiveTab(t);
+                  setIsAutoplay(false); // Pause on manual user action so they can comfortably read
+                }}
+                className={`py-2 px-1 rounded-xl transition-all capitalize cursor-pointer relative overflow-hidden ${
+                  activeTab === t 
+                    ? "bg-[#D67B52] text-white border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]" 
+                    : "text-[#6D5D6E] hover:text-[#3c3c3c]"
+                }`}
+              >
+                <span className="relative z-10">{t === "sui" ? "Sui Ledger" : t === "web3" ? "Web3 Tech" : "Move Lang"}</span>
+                {activeTab === t && isAutoplay && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/30 overflow-hidden">
+                    <div 
+                      className="bg-white h-full transition-all duration-100 ease-linear"
+                      style={{ width: `${autoplayProgress}%` }}
+                    />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Autoplay controllers */}
+          <div className="flex items-center justify-between px-1 mt-3 font-mono text-[10px] text-[#6D5D6E] font-bold">
+            <button 
+              onClick={() => {
+                setIsAutoplay(prev => !prev);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 bg-white border-2 border-[#3c3c3c] hover:bg-stone-50 active:translate-y-0.5 rounded-lg shadow-[1.5px_1.5px_0px_0px_#3c3c3c] cursor-pointer transition-all uppercase"
             >
-              {t === "sui" ? "Sui Ledger" : t === "web3" ? "Web3 Tech" : "Move Lang"}
+              <span className="flex items-center gap-1">
+                {isAutoplay ? <Pause size={10} className="text-[#3c3c3c]" /> : <Play size={10} className="text-[#3c3c3c]" />}
+                <span>{isAutoplay ? "Pause Autoplay" : "Play Autoplay"}</span>
+              </span>
             </button>
-          ))}
+            <div className="flex items-center gap-1.5">
+              {isAutoplay ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span>Autoplay (cycling in {Math.max(1, Math.ceil((5000 - (autoplayProgress / 100) * 5000) / 1000))}s)</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  <span className="text-stone-500 font-semibold flex items-center gap-1">
+                    <span>User Controlled. Click</span>
+                    <Play size={8} className="inline text-stone-600 border border-stone-300 rounded p-0.5" />
+                    <span>to auto-cycle</span>
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         <motion.div 
@@ -354,99 +612,102 @@ public entry fun mint_badge(...) {
         </motion.div>
       </motion.div>
 
-      {/* 4. THE PLAYFUL SUI TRANSACTION PATH VISUAL COMPONENT */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="bg-[#1e1e1e] border-4 border-[#3c3c3c] rounded-3xl p-6 md:p-8 font-mono text-xs text-stone-200 shadow-[6px_6px_0px_0px_#3c3c3c] relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-3 bg-stone-800 text-amber-400 font-bold rounded-bl-xl uppercase text-[9px] tracking-widest border-l-2 border-b-2 border-[#3c3c3c]">
-            Sui Transaction Journey Logger
-          </div>
-
-          <h3 className="text-base md:text-lg font-extrabold text-[#D67B52] font-serif tracking-normal mb-3 text-white">
-            What happens on-chain when you trigger a transaction?
-          </h3>
-          <p className="text-[11px] text-[#89A8B2] mb-6 leading-relaxed max-w-2xl font-bold uppercase">
-            Trace the live simulated path from clicking your cursor to permanent block persistence under the hood:
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
-            
-            {/* Step 1 */}
-            <div className="bg-stone-900 border-2 border-[#3c3c3c] p-3.5 rounded-xl hover:border-[#D67B52]/60 transition-colors">
-              <span className="text-[10px] font-bold text-[#D67B52] block mb-1">STEP 1 - SIGN</span>
-              <p className="text-white font-extrabold text-[12px] flex items-center gap-1 mb-1">🔑 Ed25519</p>
-              <p className="text-stone-400 text-[10px] leading-normal font-medium font-sans">
-                The User signs payload using secret keys locally. No cloud servers are queried!
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="bg-stone-900 border-2 border-[#3c3c3c] p-3.5 rounded-xl hover:border-[#D67B52]/60 transition-colors">
-              <span className="text-[10px] font-bold text-[#D67B52] block mb-1">STEP 2 - API ROUTE</span>
-              <p className="text-white font-extrabold text-[12px] flex items-center gap-1 mb-1">📡 RPC Node</p>
-              <p className="text-stone-400 text-[10px] leading-normal font-medium font-sans">
-                Your browser broadcasts bytes to an access endpoint which structures variables.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="bg-stone-900 border-2 border-[#3c3c3c] p-3.5 rounded-xl hover:border-[#D67B52]/60 transition-colors">
-              <span className="text-[10px] font-bold text-[#D67B52] block mb-1">STEP 3 - MEMPOOL</span>
-              <p className="text-white font-extrabold text-[12px] flex items-center gap-1 mb-1">🌊 Narwhal</p>
-              <p className="text-stone-400 text-[10px] leading-normal font-medium font-sans">
-                The high throughput data router batches packages and schedules memory pipelines.
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="bg-stone-900 border-2 border-[#3c3c3c] p-3.5 rounded-xl hover:border-[#D67B52]/60 transition-colors">
-              <span className="text-[10px] font-bold text-[#D67B52] block mb-1">STEP 4 - VALIDATE</span>
-              <p className="text-white font-extrabold text-[12px] flex items-center gap-1 mb-1">⚡ Mysticeti</p>
-              <p className="text-stone-400 text-[10px] leading-normal font-medium font-sans">
-                Validators review signatures synchronously, matching double-spend safety blocks.
-              </p>
-            </div>
-
-            {/* Step 5 */}
-            <div className="bg-stone-900 border-2 border-[#3c3c3c] p-3.5 rounded-xl hover:border-emerald-600 transition-colors">
-              <span className="text-[10px] font-bold text-emerald-500 block mb-1">STEP 5 - COMMITTED</span>
-              <p className="text-green-400 font-extrabold text-[12px] flex items-center gap-1 mb-1">📦 Safe Object</p>
-              <p className="text-stone-400 text-[10px] leading-normal font-medium font-sans">
-                The transaction finishes successfully. Asset updates sit securely inside Sui Kiosks.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {/* 5. INTERACTIVE COZY COFFEE WIDGET PLACEHOLDER FOR FUN MASCOT ENGAGEMENT */}
-      <div className="max-w-4xl mx-auto px-6 py-6 text-center">
+      {/* 5B. PLAYABLE MINI-ARCADE: YETI'S BLOCK CONSENSUS JUMP RUNNER */}
+      <div className="max-w-4xl mx-auto px-6 py-6 text-center z-10 relative">
         <div className="bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 shadow-[5px_5px_0px_0px_#3c3c3c] max-w-xl mx-auto">
-          <Coffee size={36} className={`mx-auto text-[#D67B52] mb-3 ${coffeeBrewing ? "animate-bounce" : ""}`} />
+          <Gamepad size={36} className="mx-auto text-indigo-600 mb-3 animate-pulse" />
           
-          <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">Yeti's Cozy Coffee station</h4>
-          <p className="text-xs text-[#6D5D6E] font-semibold mt-1 max-w-sm mx-auto">
-            Interactive mascot module: Brew hot virtual espresso here to warm Yeti up before studying contract compilation code!
+          <h4 className="text-lg font-bold font-serif text-[#3c3c3c] uppercase tracking-wide">Yeti's Consensus Block Runner</h4>
+          <p className="text-xs text-[#6D5D6E] font-semibold mt-1 mb-4 max-w-sm mx-auto">
+            Interactive background game: Make Yeti jump over unconfirmed block obstacles! Press <strong>[Spacebar]</strong> or click jump!
           </p>
 
-          <div className="mt-4 flex flex-col items-center gap-3">
-            <button
-              onClick={triggerBrewCoffee}
-              disabled={coffeeBrewing}
-              className={`px-5 py-2.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 hover:scale-102 transition-colors border-2 border-[#3c3c3c] font-mono text-xs font-bold text-white rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer disabled:opacity-50`}
-            >
-              {coffeeBrewing ? "Brewing Cozy Flat White... ☕" : "Brew Free Hot Espresso ☕"}
-            </button>
+          {/* Arcade Cabinet Screen */}
+          <div 
+            onClick={handleJump}
+            className="relative h-44 w-full bg-stone-900 border-4 border-[#3c3c3c] rounded-2xl overflow-hidden shadow-inner font-mono cursor-pointer select-none group"
+            title="Click screen zone to Jump!"
+          >
+            {/* Ambient grid scanlines effect */}
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.22)_50%)] bg-[size:100%_4px] opacity-20"></div>
 
-            {brewedSips > 0 && (
+            {/* Score HUD Overlay */}
+            <div className="absolute top-2 left-3 right-3 flex justify-between text-[11px] font-bold z-20">
+              <span className="text-amber-400">SCORE: {gameScore}</span>
+              <span className="text-stone-400">HI-SCORE: {highScore}</span>
+            </div>
+
+            {/* Parallax Star fields and mountain outlines */}
+            <div className="absolute bottom-6 left-0 right-0 h-0.5 bg-stone-700"></div>
+            <div className="absolute bottom-1 right-2 text-stone-600 text-[8px] tracking-widest font-bold uppercase select-none pointer-events-none">
+              Mysticeti Lanes
+            </div>
+
+            {/* Yeti Avatar 🐻 */}
+            <motion.div 
+              className="absolute left-10 text-3xl z-10"
+              style={{ bottom: "24px" }}
+              animate={isJumping ? { y: -58, rotate: [0, -15, 15, 0] } : { y: 0, rotate: 0 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+            >
+              <span>🐻</span>
+              <span className="absolute -top-3 -right-2 text-[10px] animate-bounce">☕</span>
+            </motion.div>
+
+            {/* Moving Obstacle Block 🧱 (transaction hash) */}
+            {gameStarted && !gameOver && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-[11px] font-mono text-emerald-700 font-extrabold uppercase mt-1"
+                className="absolute text-xl z-10 flex flex-col items-center"
+                style={{ bottom: "24px", left: `${blockX}%` }}
               >
-                ★ mascot status: Yeti has drank {brewedSips} coffee sips! "Warmth is rising!"
+                <span>{obstacleType}</span>
+                <span className="text-[7px] text-rose-400 font-bold bg-stone-950 px-1 border border-rose-500 rounded font-mono">
+                  0xSUI
+                </span>
               </motion.div>
             )}
+
+            {/* Non-Started state indicator overlay */}
+            {!gameStarted && (
+              <div className="absolute inset-0 bg-stone-900/90 flex flex-col items-center justify-center p-4">
+                <span className="text-indigo-400 text-xs font-bold blink animate-pulse mb-1">
+                  [ STANDBY STATUS READY ]
+                </span>
+                <p className="text-stone-400 text-[10px] max-w-xs leading-normal">
+                  Tap anywhere on the arcade machine screen or click button below to activate Yeti consensus!
+                </p>
+                <button className="mt-3 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-semibold shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer">
+                  INSERT COIN 🪙
+                </button>
+              </div>
+            )}
+
+            {/* Game Over state layout */}
+            {gameOver && (
+              <div className="absolute inset-0 bg-[#e74c3c]/15 backdrop-blur-[1px] bg-stone-950/90 flex flex-col items-center justify-center p-4 z-30">
+                <span className="text-red-500 text-xs font-black uppercase tracking-widest mb-1.5 animate-bounce">
+                  💥 Ledger Collision! GAME OVER 💥
+                </span>
+                <p className="text-stone-400 text-[9px] max-w-xs mb-3">
+                  Score: <strong className="text-amber-400">{gameScore}</strong> | High Score: <strong className="text-white">{highScore}</strong>
+                </p>
+                <button className="px-4 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-black shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer uppercase">
+                  RESTART LEDGER LOOP 🔄
+                </button>
+              </div>
+            )}
+
+          </div>
+
+          {/* Physical Gamepad controls style */}
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <button
+              onClick={handleJump}
+              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 hover:scale-103 transition-transform text-white border-2 border-[#3c3c3c] font-mono text-xs font-bold rounded-xl shadow-[3px_3px_0px_0px_#3c3c3c] cursor-pointer flex items-center gap-2 select-none"
+            >
+              <span>{gameStarted && !gameOver ? "JUMP YETI! ⬆️" : "START LEDGER GAME 🎮"}</span>
+              <span className="bg-indigo-800 text-[9px] px-1 rounded">Space</span>
+            </button>
           </div>
         </div>
       </div>
