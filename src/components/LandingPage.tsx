@@ -211,7 +211,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
       {/* Top Utility Nav for Landing Page */}
       <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center z-10 relative">
         <span className="text-sm font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-          <Compass className="text-[#D67B52]" size={18} /> Lofi Quest: Sui Academy
+          <Compass className="text-[#D67B52]" size={18} /> Lofi Academy
         </span>
         {toggleDarkMode && (
           <button
@@ -313,7 +313,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
                 className="w-full sm:w-auto px-10 py-5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-serif font-extrabold text-lg md:text-xl rounded-2xl border-4 border-[#3c3c3c] shadow-[6px_6px_0px_0px_#3c3c3c] hover:shadow-[8px_8px_0px_0px_#3c3c3c] cursor-pointer transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <span>Enter Academy Questroom</span>
+                  <span>Enter Academy</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
                 </span>
                 <div className="absolute top-0 -inset-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-full group-hover:duration-1000 group-hover:translate-x-0 group-hover:transition-all" />
@@ -322,7 +322,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
                 href="#visual-learn-more"
                 className="w-full sm:w-auto px-8 py-5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-mono font-bold text-sm rounded-2xl border-4 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] cursor-pointer text-center"
               >
-                How it works &rarr;
+                How it works
               </a>
             </div>
           ) : (
