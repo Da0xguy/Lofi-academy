@@ -7,7 +7,6 @@ import { LeaderboardWidget } from "./components/LeaderboardWidget";
 import { ProfileWidget } from "./components/ProfileWidget";
 import { TutorFloatingWidget } from "./components/TutorFloatingWidget";
 import { AudioPlayerWidget } from "./components/AudioPlayerWidget";
-import { AdminPanel } from "./components/AdminPanel";
 import { LandingPage } from "./components/LandingPage";
 import Background from "./components/Background";
 import { motion, AnimatePresence } from "motion/react";
@@ -105,7 +104,7 @@ export default function App() {
   };
 
   // Navigation Tabs
-  const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "leaderboard" | "profile" | "admin">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "leaderboard" | "profile">("dashboard");
 
   // Lessons curriculum state
   const [tracks, setTracks] = useState<LearningTrack[]>(initialTracks);
@@ -334,29 +333,7 @@ export default function App() {
     setLeaderboardRefreshCode((prev) => prev + 1);
   };
 
-  // Action: Admin updates course modules
-  const handleUpdateTracks = (newTracks: LearningTrack[]) => {
-    setTracks(newTracks);
-  };
 
-  // Action: Reset Database
-  const handleResetDatabase = () => {
-    localStorage.removeItem("sui_yeti_user");
-    setUser({
-      username: "CozyExplorer",
-      avatar: "🦊",
-      walletAddress: null,
-      xp: 0,
-      level: 1,
-      completedModules: [],
-      completedTracks: [],
-      claimedWelcomeXP: false,
-      mintedBadges: [],
-      streak: 1,
-      lastLoginDate: new Date().toISOString().split("T")[0]
-    });
-    setLeaderboardRefreshCode((prev) => prev + 1);
-  };
 
   // Action: Take daily streak reward (+25 XP)
   const handleClaimStreakBonus = () => {
@@ -597,8 +574,7 @@ export default function App() {
             { id: "dashboard", label: "Dashboard Quest Room", icon: Compass },
             { id: "simulator", label: "DeFi Swap/Lend Box", icon: TrendingUp },
             { id: "leaderboard", label: "CLAY Leaderboard", icon: Trophy },
-            { id: "profile", label: "Sui Kiosk Profile", icon: User },
-            { id: "admin", label: "Content Admin Controller", icon: Settings }
+            { id: "profile", label: "Sui Kiosk Profile", icon: User }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -1021,15 +997,7 @@ export default function App() {
           />
         )}
 
-        {/* =============== ADMIN TAB AREA =============== */}
-        {activeTab === "admin" && (
-          <AdminPanel
-            tracks={tracks}
-            onUpdateTracks={handleUpdateTracks}
-            onResetDatabase={handleResetDatabase}
-            leadLength={9} // mock/active length
-          />
-        )}
+
           </motion.div>
         </AnimatePresence>
 
