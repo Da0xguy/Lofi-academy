@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
+import {lofistudy} from "../assets/lofistudy.png";
 import { ModuleStep } from "../types";
 import { Coffee, MessageSquare, Sparkles, Brain, Zap } from "lucide-react";
 
@@ -43,7 +44,7 @@ export function YetiChalkboard({
       <div className="w-full lg:w-1/3 flex flex-col items-center">
         <div className="relative group p-2 border-2 border-[#3c3c3c] rounded-3xl bg-white shadow-[4px_4px_0px_0px_#3c3c3c] overflow-hidden">
           <img
-            src={yetiStudyAsset}
+            src={lofistudy}
             alt="Yeti Study Space"
             referrerPolicy="no-referrer"
             className="w-60 h-60 object-cover rounded-2xl group-hover:scale-105 transition-all duration-300 pointer-events-none filter brightness-95"
