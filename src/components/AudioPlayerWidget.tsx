@@ -333,11 +333,35 @@ export function AudioPlayerWidget() {
         </div>
       </div>
 
-      <div className="mt-3 pt-2.5 border-t border-dashed border-[#3c3c3c]/30 text-center">
-        <p className="text-[10px] font-mono text-[#6D5D6E] flex items-center justify-center gap-1">
+      <div className="mt-3 pt-2.5 border-t border-dashed border-[#3c3c3c]/30 flex flex-col md:flex-row items-center justify-between gap-3">
+        <p className="text-[10px] font-mono text-[#6D5D6E] flex items-center justify-center gap-1 shrink-0">
           <Zap size={10} className="text-[#D67B52]" />
-          Real-time WebAudio engine, no internet streaming lag
+          Real-time WebAudio engines can run offline.
         </p>
+
+        <div className="flex flex-wrap items-center gap-2 justify-center md:justify-end">
+          <span className="text-[10px] font-bold font-serif text-[#6D5D6E] uppercase tracking-wider">🎧 Good Lofi Jams:</span>
+          
+          <a 
+            href="https://www.youtube.com/watch?v=jfKfPfyJRdk"
+            target="_blank" 
+            rel="noopener noreferrer"
+            title="Open Lofi Girl YouTube Stream"
+            className="text-[9px] font-mono font-bold text-[#D67B52] bg-white border border-[#3c3c3c] rounded-lg px-2 py-1 shadow-[1px_1px_0px_0px_#3c3c3c] hover:bg-[#D67B52]/10 transition-all flex items-center gap-1 active:translate-y-px"
+          >
+            <span>📺 Lofi Girl (24/7 Live)</span>
+          </a>
+
+          <a 
+            href="https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0EXPn" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            title="Open Lofi Beats Spotify Playlist"
+            className="text-[9px] font-mono font-bold text-emerald-800 bg-[#E8F5E9] border border-emerald-700/50 rounded-lg px-2 py-1 shadow-[1px_1px_0px_0px_#1b5e20] hover:bg-[#C8E6C9] transition-all flex items-center gap-1 active:translate-y-px"
+          >
+            <span>🟢 Spotify Lofi Beats</span>
+          </a>
+        </div>
       </div>
     </div>
   );
