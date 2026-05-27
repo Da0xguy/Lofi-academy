@@ -239,7 +239,7 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
                         : "bg-[#E8E1D9] text-gray-400 cursor-not-allowed border-[#3c3c3c]/50"
                   }`}
                 >
-                  {user.claimedWelcomeXP ? "Claimed ✓" : "Claim XP &rarr;"}
+                  {user.claimedWelcomeXP ? "Claimed ✓" : "Claim XP"}
                 </button>
               </div>
             </div>
