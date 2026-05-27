@@ -621,9 +621,6 @@ export default function App() {
                 <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
                   Lofi Quest: Sui Academy
                 </h1>
-                <span className="text-[10px] font-mono uppercase bg-[#89A8B2]/20 text-[#89A8B2] px-2 py-0.5 rounded border-2 border-[#3c3c3c] tracking-widest block mt-0.5 font-bold group-hover:bg-[#89A8B2]/30 transition-colors">
-                  CLAY Hackathon MVP
-                </span>
               </div>
             </div>
 
