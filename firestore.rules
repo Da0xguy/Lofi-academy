@@ -21,10 +21,10 @@ service cloud.firestore {
         && data.avatar.size() >= 1 
         && data.avatar.size() <= 16
         && (data.walletAddress == null || (data.walletAddress is string && data.walletAddress.size() <= 128))
-        && data.xp is int 
+        && (data.xp is int || data.xp is float) 
         && data.xp >= 0 
         && data.xp <= 500000
-        && data.level is int 
+        && (data.level is int || data.level is float) 
         && data.level >= 1 
         && data.level <= 100
         && data.completedModules is list 
@@ -34,7 +34,7 @@ service cloud.firestore {
         && data.claimedWelcomeXP is bool
         && data.mintedBadges is list 
         && data.mintedBadges.size() <= 100
-        && data.streak is int 
+        && (data.streak is int || data.streak is float) 
         && data.streak >= 0 
         && data.streak <= 10000
         && data.lastLoginDate is string 
@@ -43,8 +43,11 @@ service cloud.firestore {
     
     // Users Collection matched by lowercase wallet address
     match /users/{walletAddress} {
-      // Allow read so public profile states are cross-shareable or viewable in dashboard
-      allow get, list: if isValidId(walletAddress);
+      // Allow single document get operations
+      allow get: if isValidId(walletAddress);
+
+      // Allow list operations to fetch leaderboard ranks
+      allow list: if true;
       
       // Allow writes only if structure is perfectly safe and matches validated constraints
       allow create: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
