@@ -89,6 +89,17 @@
         "worthless-nft"
       ],
       "rankDirection": "up"
+    },
+    {
+      "username": "Ay",
+      "avatar": "🦊",
+      "wallet": "0x_guest_ab615402",
+      "xp": 410,
+      "level": 3,
+      "badges": [
+        "worthless-nft"
+      ],
+      "rankDirection": "up"
     }
   ]
 }
