@@ -462,7 +462,6 @@ export default function App() {
 
             <div className="space-y-1.5 text-[11px] leading-relaxed select-none">
               <div className="text-stone-400 font-bold flex gap-2">
-                <span className="text-amber-400">&gt;</span> 
                 <span>{loadingStatus}</span>
               </div>
               
@@ -728,7 +727,6 @@ export default function App() {
                 <Icon size={14} className="shrink-0" />
                 <span className="hidden md:inline">{tab.label}</span>
                 <span className="hidden sm:inline md:hidden">{tab.shortLabel}</span>
-                <span className="sm:hidden">{tab.symbol}</span>
               </button>
             );
           })}
