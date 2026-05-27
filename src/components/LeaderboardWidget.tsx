@@ -42,13 +42,23 @@ export function LeaderboardWidget({
 
   // Submit current user details to leaderboard
   const syncCurrentUserToLeaderboard = async () => {
-    if (!userWallet) return;
+    let activeWallet = userWallet;
+    if (!activeWallet) {
+      let guestId = localStorage.getItem("sui_yeti_guest_wallet");
+      if (!guestId) {
+        const randomHex = Math.random().toString(16).substring(2, 10);
+        guestId = `0x_guest_${randomHex}`;
+        localStorage.setItem("sui_yeti_guest_wallet", guestId);
+      }
+      activeWallet = guestId;
+    }
+
     try {
       await fetch("/api/sui/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          wallet: userWallet,
+          wallet: activeWallet,
           username: username,
           xp: userXP,
           level: userLevel,
@@ -69,9 +79,7 @@ export function LeaderboardWidget({
   }, [refreshTrigger]);
 
   useEffect(() => {
-    if (userWallet) {
-      syncCurrentUserToLeaderboard();
-    }
+    syncCurrentUserToLeaderboard();
   }, [userWallet, userXP, userLevel, JSON.stringify(userBadges), username, avatar]);
 
   // Filter rankings according to query

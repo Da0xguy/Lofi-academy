@@ -87,10 +87,10 @@ export function YetiChalkboard({
             <AnimatePresence mode="wait">
               <motion.div
                 key={step.id}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: -10 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
                 className="space-y-4"
               >
                 <h4 className="text-base font-bold text-white flex items-center gap-2 font-serif">
@@ -127,7 +127,7 @@ export function YetiChalkboard({
                   onClick={onPrev}
                   className="px-3 py-1 bg-white hover:bg-yellow-50 text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-lg text-xs font-bold tracking-wider font-mono cursor-pointer transition-colors"
                 >
-                  &larr; Back
+                  Back
                 </button>
               )}
               
@@ -137,7 +137,7 @@ export function YetiChalkboard({
                 onClick={onNext}
                 className="px-5 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white shadow-[2px_2px_0px_0px_#3c3c3c] font-mono border-2 border-[#3c3c3c] rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer active:translate-y-[1px]"
               >
-                <span>{stepIndex === totalSteps - 1 ? "Start Assessment ✏️" : "Next Part &rarr;"}</span>
+                <span>{stepIndex === totalSteps - 1 ? "Start Assessment ✏️" : "Next Part"}</span>
               </button>
             </div>
           </div>

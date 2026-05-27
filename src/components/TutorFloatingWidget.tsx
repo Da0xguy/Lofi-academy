@@ -25,10 +25,10 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
 
   // Quick topics preseed
   const quickTopics = [
-    { label: "What are Move double-spends?", query: "what are move double-spends and how does the compiler prevent them?" },
-    { label: "Explain Sui Object ID limits", query: "explain why everything on sui is an object and how that makes transfers fast?" },
-    { label: "Predictable SUI Storage Fund Gas", query: "what is the sui storage fund and how does it keep gas prices stable?" },
-    { label: "Is Kiosk standard for royalities?", query: "how does sui kiosk work for securing creator royalties?" }
+    { label: "Double-spends? 🔒", query: "what are move double-spends and how does the compiler prevent them?" },
+    { label: "Sui Objects 📦", query: "explain why everything on sui is an object and how that makes transfers fast?" },
+    { label: "Storage Fund ⛽", query: "what is the sui storage fund and how does it keep gas prices stable?" },
+    { label: "Kiosk Royalties 🎨", query: "how does sui kiosk work for securing creator royalties?" }
   ];
 
   // Auto-scroller
@@ -87,7 +87,7 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
         <button
           onClick={() => setIsOpen(true)}
           id="btn-trigger-yeti"
-          className="fixed bottom-6 right-6 z-50 px-5 py-3.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white font-mono text-xs font-bold rounded-full border-2 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group cursor-pointer"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 px-4 py-3 sm:px-5 sm:py-3.5 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white font-mono text-xs font-bold rounded-full border-2 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] flex items-center gap-2 transition-all hover:scale-105 active:scale-95 group cursor-pointer animate-fade-in"
         >
           <div className="relative">
             <span className="absolute -top-1.5 -right-1 flex h-2 w-2">
@@ -96,7 +96,8 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
             </span>
             <MessageSquare size={16} fill="currentColor" className="text-white group-hover:rotate-12 transition-transform" />
           </div>
-          <span>Ask Yeti AI Tutor</span>
+          <span className="hidden sm:inline">Ask Yeti AI Tutor</span>
+          <span className="sm:hidden text-[11px] tracking-tight">Yeti AI 🐻</span>
         </button>
       )}
 
@@ -104,10 +105,10 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
       {isOpen && (
         <div 
           id="yeti-chat-panel"
-          className="fixed bottom-6 right-6 z-50 w-[380px] h-[550px] bg-white border-2 border-[#3c3c3c] rounded-3xl shadow-[6px_6px_0px_0px_#3c3c3c] flex flex-col justify-between overflow-hidden text-[#3c3c3c]"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[380px] h-[480px] sm:h-[550px] max-h-[82vh] sm:max-h-[550px] bg-white border-2 border-[#3c3c3c] rounded-3xl shadow-[6px_6px_0px_0px_#3c3c3c] flex flex-col justify-between overflow-hidden text-[#3c3c3c]"
         >
           {/* Header Panel */}
-          <div className="bg-[#F3EFEA] p-3.5 border-b-2 border-dashed border-[#3c3c3c]/40 flex items-center justify-between">
+          <div className="bg-[#F3EFEA] p-3 sm:p-3.5 border-b-2 border-dashed border-[#3c3c3c]/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Coffee size={18} className="text-[#D67B52]" />
               <div>
@@ -115,7 +116,7 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
                   <span>Yeti the Tutor</span>
                   <Sparkles size={11} className="text-[#D67B52] animate-pulse" />
                 </h3>
-                <p className="text-[10px] text-[#6D5D6E] font-mono">Gemini-powered lofi assistant, 100% cozy</p>
+                <p className="text-[9px] sm:text-[10px] text-[#6D5D6E] font-mono">Gemini lofi assistant, 100% cozy</p>
               </div>
             </div>
 
@@ -128,18 +129,18 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
           </div>
 
           {/* Messages list with auto scroll overflow container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4" ref={scrollRef}>
+          <div className="flex-1 p-3.5 overflow-y-auto space-y-4" ref={scrollRef}>
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex max-w-[85%] flex-col rounded-2xl p-3 text-xs leading-relaxed font-sans border-2 ${
+                className={`flex max-w-[88%] flex-col rounded-2xl p-2.5 sm:p-3 text-xs leading-relaxed font-sans border-2 ${
                   msg.role === "user"
-                    ? "bg-[#D67B52] text-white border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] ml-auto font-semibold rounded-tr-none"
-                    : "bg-[#f8f5f2] text-[#3c3c3c] border-[#3c3c3c] mr-auto shadow-[2px_2px_0px_0px_#3c3c3c] rounded-tl-none font-medium text-[12px] font-mono whitespace-pre-line select-text"
+                    ? "bg-[#D67B52] text-white border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] ml-auto font-semibold rounded-tr-none text-[11px] sm:text-xs"
+                    : "bg-[#f8f5f2] text-[#3c3c3c] border-[#3c3c3c] mr-auto shadow-[2px_2px_0px_0px_#3c3c3c] rounded-tl-none font-medium text-[11px] sm:text-[12px] font-mono whitespace-pre-line select-text"
                 }`}
               >
                 {msg.role === "model" && (
-                  <div className="text-[9px] text-[#89A8B2] font-bold tracking-wider font-mono mb-1 text-left uppercase flex items-center gap-1">
+                  <div className="text-[8px] sm:text-[9px] text-[#89A8B2] font-bold tracking-wider font-mono mb-1 text-left uppercase flex items-center gap-1">
                     <Sparkles size={8} className="text-[#89A8B2] fill-[#89A8B2]/25" />
                     <span>yeti companion</span>
                   </div>
@@ -149,23 +150,23 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
             ))}
 
             {isTyping && (
-              <div className="bg-[#f8f5f2] text-[#6D5D6E] border-2 border-[#3c3c3c] p-2 rounded-xl text-[11px] font-mono flex items-center gap-2 shadow-[2px_2px_0px_0px_#3c3c3c]">
-                <RefreshCw size={12} className="animate-spin text-[#89A8B2]" />
+              <div className="bg-[#f8f5f2] text-[#6D5D6E] border-2 border-[#3c3c3c] p-2 rounded-xl text-[10px] sm:text-[11px] font-mono flex items-center gap-2 shadow-[2px_2px_0px_0px_#3c3c3c]">
+                <RefreshCw size={11} className="animate-spin text-[#89A8B2]" />
                 <span>yeti is translating to lofi frequencies...</span>
               </div>
             )}
           </div>
 
           {/* Selector Starter Quick Buttons list */}
-          <div className="p-2 border-t-2 border-dashed border-[#3c3c3c]/30 bg-[#f8f5f2]/50">
-            <span className="text-[9px] text-[#6D5D6E] uppercase font-mono px-1 block mb-1 font-bold">Topics search guide</span>
-            <div className="flex flex-wrap gap-1 font-mono text-[9px]">
+          <div className="p-2 border-t-2 border-dashed border-[#3c3c3c]/30 bg-[#f8f5f2]/50 max-h-[110px] overflow-y-auto">
+            <span className="text-[8px] sm:text-[9px] text-[#6D5D6E] uppercase font-mono px-1 block mb-1 font-bold">Topics search guide</span>
+            <div className="flex flex-wrap gap-1 font-mono text-[8px] sm:text-[9px]">
               {quickTopics.map((topic, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => handleSendMessage(topic.query)}
-                  className="px-2 py-1 bg-white hover:bg-[#89A8B2]/20 text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-lg text-left cursor-pointer transition-colors truncate max-w-full font-bold shadow-[1px_1px_0px_0px_#3c3c3c]"
+                  className="px-2 py-0.5 sm:py-1 bg-white hover:bg-[#89A8B2]/20 text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-lg text-left cursor-pointer transition-colors max-w-full font-bold shadow-[1px_1px_0px_0px_#3c3c3c]"
                 >
                   {topic.label}
                 </button>
@@ -179,21 +180,21 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
               e.preventDefault();
               handleSendMessage();
             }}
-            className="p-3 border-t-2 border-[#3c3c3c] bg-[#F3EFEA] flex gap-2"
+            className="p-2.5 border-t-2 border-[#3c3c3c] bg-[#F3EFEA] flex gap-2"
           >
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="sip coffee and type any Move questions..."
-              className="flex-1 bg-white border-2 border-[#3c3c3c] rounded-xl px-3 py-2 text-xs text-[#3c3c3c] placeholder-[#6D5D6E]/60 focus:outline-none focus:border-[#89A8B2] font-mono font-medium shadow-[2px_2px_0px_0px_#3c3c3c]"
+              placeholder="Ask Yeti a Move question..."
+              className="flex-1 bg-white border-2 border-[#3c3c3c] rounded-xl px-2.5 py-1.5 text-xs text-[#3c3c3c] placeholder-[#6D5D6E]/60 focus:outline-none focus:border-[#89A8B2] font-mono font-medium shadow-[2px_2px_0px_0px_#3c3c3c]"
             />
             <button
               type="submit"
               disabled={!inputMessage.trim()}
               className="p-2 bg-[#D67B52] hover:bg-[#D67B52]/90 border-2 border-[#3c3c3c] text-white rounded-xl transition-all cursor-pointer disabled:opacity-30 disabled:scale-100 flex items-center justify-center shadow-[2px_2px_0px_0px_#3c3c3c] active:translate-y-[1px]"
             >
-              <Send size={14} fill="currentColor" />
+              <Send size={13} fill="currentColor" />
             </button>
           </form>
         </div>

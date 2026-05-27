@@ -322,7 +322,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
                 href="#visual-learn-more"
                 className="w-full sm:w-auto px-8 py-5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-mono font-bold text-sm rounded-2xl border-4 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] cursor-pointer text-center"
               >
-                How it works &rarr;
+                How it works
               </a>
             </div>
           ) : (
@@ -761,7 +761,6 @@ public entry fun mint_badge(...) {
           className="w-full py-4 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white font-serif font-extrabold text-base rounded-xl border-2 border-[#3c3c3c] shadow-[3px_3px_0px_0px_#3c3c3c] cursor-pointer cursor-semibold flex items-center justify-center gap-2"
         >
           <span>Launch Lofi Quest Room Now</span>
-          <span>&rarr;</span>
         </motion.button>
       </div>
 

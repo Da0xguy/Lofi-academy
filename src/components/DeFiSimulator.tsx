@@ -61,7 +61,7 @@ export function DeFiSimulator({ onEarnXP, walletConnected }: DeFiSimulatorProps)
         amountOut: finalReceived.toFixed(4),
         currencyOut: toCurrency,
         gasBudget: GAS_SWAP_ESTIMATE,
-        routingPath: `Cetus Optimized Pool [${fromCurrency} &rarr; ${toCurrency}]`,
+        routingPath: `Cetus Optimized Pool [${fromCurrency} → ${toCurrency}]`,
         executionLatencyMs: 140 + Math.floor(Math.random() * 80), // sub-second!
         logs: [
           `[DEX_API] Found swap route: Cetus Smart Router Pool V3`,
@@ -179,11 +179,12 @@ export function DeFiSimulator({ onEarnXP, walletConnected }: DeFiSimulatorProps)
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="bg-[#F3EFEA] p-4 rounded-3xl border-2 border-[#3c3c3c] relative shadow-[3px_3px_0px_0px_#3c3c3c]">
-              <span className="absolute right-3 top-3 px-2 py-0.5 bg-white rounded-md border-2 border-[#3c3c3c] font-mono text-[9px] text-[#89A8B2] font-bold">
-                Live Rate: 1 SUI = {SUI_PRICE} USDC
-              </span>
-
-              <h3 className="text-xs font-mono text-[#D67B52] font-bold mb-3 uppercase tracking-wider">Exchange Swap Desk</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
+                <h3 className="text-xs font-mono text-[#D67B52] font-bold uppercase tracking-wider">Exchange Swap Desk</h3>
+                <span className="self-start sm:self-auto px-2 py-0.5 bg-white rounded-md border-2 border-[#3c3c3c] font-mono text-[9px] text-[#89A8B2] font-bold shadow-[1px_1px_0px_0px_#3c3c3c]/10">
+                  Live Rate: 1 SUI = {SUI_PRICE} USDC
+                </span>
+              </div>
               
               <div className="space-y-3">
                 {/* Outgoing Asset */}
@@ -331,7 +332,7 @@ export function DeFiSimulator({ onEarnXP, walletConnected }: DeFiSimulatorProps)
                     </div>
                   </div>
 
-                  <div className="space-y-1 text-[10px] text-stone-400 max-h-24 overflow-y-auto font-mono opacity-80 select-none leading-relaxed">
+                  <div className="space-y-1 text-[10.5px] text-stone-300 max-h-48 sm:max-h-36 overflow-y-auto font-mono opacity-90 select-none leading-relaxed pr-1 border-t border-[#3c3c3c]/30 pt-2 mt-2">
                     {swapReceipt.logs.map((log: string, idx: number) => (
                       <div key={idx} className={log.includes("[SUCCESS]") ? "text-[#2ecc71] font-bold" : ""}>{log}</div>
                     ))}
@@ -358,12 +359,13 @@ export function DeFiSimulator({ onEarnXP, walletConnected }: DeFiSimulatorProps)
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="bg-[#F3EFEA] p-4 rounded-3xl border-2 border-[#3c3c3c] relative shadow-[3px_3px_0px_0px_#3c3c3c]">
-              <span className="absolute right-3 top-3 px-2 py-0.5 bg-white rounded-md border-2 border-[#3c3c3c] font-mono text-[9px] text-[#D67B52] flex items-center gap-1 font-bold shadow-[1px_1px_0px_0px_#3c3c3c]">
-                <Landmark size={10} />
-                Navi Protocol Partner
-              </span>
-
-              <h3 className="text-xs font-mono text-[#D67B52] font-bold mb-3 uppercase tracking-wider">Lending Portfolio Structure</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
+                <h3 className="text-xs font-mono text-[#D67B52] font-bold uppercase tracking-wider">Lending Portfolio Structure</h3>
+                <span className="self-start sm:self-auto px-2 py-0.5 bg-white rounded-md border-2 border-[#3c3c3c] font-mono text-[9px] text-[#D67B52] flex items-center gap-1 font-bold shadow-[1px_1px_0px_0px_#3c3c3c]/10">
+                  <Landmark size={10} />
+                  Navi Protocol Partner
+                </span>
+              </div>
 
               <div className="space-y-3 font-mono">
                 {/* Collateral supplied */}
@@ -493,7 +495,7 @@ export function DeFiSimulator({ onEarnXP, walletConnected }: DeFiSimulatorProps)
                     </div>
                   </div>
 
-                  <div className="space-y-1 text-[10px] text-stone-400 max-h-24 overflow-y-auto leading-relaxed">
+                  <div className="space-y-1 text-[10.5px] text-stone-300 max-h-48 sm:max-h-36 overflow-y-auto font-mono opacity-90 leading-relaxed pr-1 border-t border-[#3c3c3c]/30 pt-2 mt-2">
                     {lendReceipt.logs.map((log: string, idx: number) => (
                       <div key={idx} className={log.includes("[SUCCESS]") ? "text-green-400 font-bold" : ""}>{log}</div>
                     ))}

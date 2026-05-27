@@ -183,6 +183,35 @@ export default function App() {
   const [claimedStreakBonus, setClaimedStreakBonus] = useState<boolean>(false);
   const [leaderboardRefreshCode, setLeaderboardRefreshCode] = useState<number>(0);
 
+  // States for XP and Level up celebratory animations/popups
+  const [showLevelUpOverlay, setShowLevelUpOverlay] = useState<boolean>(false);
+  const [animateLevelUpHUD, setAnimateLevelUpHUD] = useState<boolean>(false);
+  const [animateXPHUD, setAnimateXPHUD] = useState<boolean>(false);
+
+  const prevLevelRef = React.useRef<number>(user.level);
+  const prevXPRef = React.useRef<number>(user.xp);
+
+  // Trigger XP indicators flash
+  useEffect(() => {
+    if (user.xp > prevXPRef.current) {
+      setAnimateXPHUD(true);
+      const timer = setTimeout(() => setAnimateXPHUD(false), 900);
+      return () => clearTimeout(timer);
+    }
+    prevXPRef.current = user.xp;
+  }, [user.xp]);
+
+  // Trigger Level indicators flash and overlay trigger
+  useEffect(() => {
+    if (prevLevelRef.current !== 0 && user.level > prevLevelRef.current) {
+      setAnimateLevelUpHUD(true);
+      setShowLevelUpOverlay(true);
+      const timer = setTimeout(() => setAnimateLevelUpHUD(false), 2400);
+      return () => clearTimeout(timer);
+    }
+    prevLevelRef.current = user.level;
+  }, [user.level]);
+
   // Dynamic Level evaluation checking XP progress
   useEffect(() => {
     // Level calculation formula: Level 1 = 0-99 XP, Level 2 = 100-299 XP, etc.
@@ -204,6 +233,46 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("sui_yeti_user", JSON.stringify(user));
   }, [user]);
+
+  // Sync user score to the backend leaderboard on any updates to achievements
+  useEffect(() => {
+    const syncToLeaderboard = async () => {
+      let activeWallet = user.walletAddress;
+      if (!activeWallet) {
+        let guestId = localStorage.getItem("sui_yeti_guest_wallet");
+        if (!guestId) {
+          const randomHex = Math.random().toString(16).substring(2, 10);
+          guestId = `0x_guest_${randomHex}`;
+          localStorage.setItem("sui_yeti_guest_wallet", guestId);
+        }
+        activeWallet = guestId;
+      }
+
+      try {
+        await fetch("/api/sui/leaderboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            wallet: activeWallet,
+            username: user.username,
+            xp: user.xp,
+            level: user.level,
+            badges: user.mintedBadges.map((b) => b.trackId),
+            avatar: user.avatar
+          })
+        });
+        setLeaderboardRefreshCode((prev) => prev + 1);
+      } catch (err) {
+        console.error("Failed to sync score to backend leaderboard:", err);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      syncToLeaderboard();
+    }, 450);
+
+    return () => clearTimeout(debounceTimer);
+  }, [user.walletAddress, user.xp, user.level, JSON.stringify(user.mintedBadges), user.username, user.avatar]);
 
   // Helper. Award dynamic XP safely
   const handleAwardXP = (amount: number) => {
@@ -518,39 +587,91 @@ export default function App() {
           {/* Real-time Developer HUD Score bar - collapses on mobile */}
           <div className={`${mobileMenuOpen ? "flex" : "hidden md:flex"} flex-wrap items-center gap-4 select-none w-full md:w-auto pt-3 md:pt-0 border-t border-dashed md:border-t-0 border-[#3c3c3c]/20 justify-start md:justify-end`}>
             {/* XP and Level Indicators */}
-            <div id="hud-stats" className="flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
-              <div className="flex items-center gap-1.5 font-bold">
+            <div id="hud-stats" className="flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-2.5 sm:px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
+              <div className="flex items-center gap-1 font-bold">
                 <User size={13} className="text-[#89A8B2]" />
-                <span className="text-[#3c3c3c]">{user.username}</span>
+                <span className="text-[#3c3c3c] max-w-[65px] sm:max-w-[100px] truncate">{user.username}</span>
               </div>
-              <div className="h-4 w-px bg-[#3c3c3c]/30 mx-1"></div>
-              <div>
-                <span className="text-[#6D5D6E] font-bold">XP:</span>{" "}
+              <div className="h-4 w-px bg-[#3c3c3c]/30 mx-0.5 sm:mx-1"></div>
+              
+              {/* Animated XP Container */}
+              <motion.div 
+                className="flex items-center gap-0.5 relative"
+                animate={animateXPHUD ? {
+                  scale: [1, 1.25, 0.95, 1.15, 1],
+                  color: ["#3c3c3c", "#D67B52", "#3c3c3c"]
+                } : {}}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+              >
+                <span className="text-[#6D5D6E] font-bold hidden sm:inline">XP:</span>
+                <span className="sm:hidden text-[#D67B52]" title="XP">✨</span>
                 <strong className="text-[#D67B52] font-extrabold">{user.xp}</strong>
-              </div>
-              <div className="h-4 w-px bg-[#3c3c3c]/30 mx-1"></div>
-              <div>
-                <span className="text-[#6D5D6E] font-bold">Lvl:</span>{" "}
+                <AnimatePresence>
+                  {animateXPHUD && (
+                    <motion.span 
+                      key="xp-bubble"
+                      id="hud-xp-bubble"
+                      initial={{ opacity: 0, y: 8, scale: 0.8 }}
+                      animate={{ opacity: 1, y: -20, scale: 1.1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black text-[#D67B52] bg-amber-50 border border-[#D67B52] px-1 rounded-md shadow-xs pointer-events-none whitespace-nowrap"
+                    >
+                      ✨ +XP
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              <div className="h-4 w-px bg-[#3c3c3c]/30 mx-0.5 sm:mx-1"></div>
+
+              {/* Animated Level Container */}
+              <motion.div 
+                className="flex items-center gap-0.5 relative cursor-help"
+                animate={animateLevelUpHUD ? {
+                  scale: [1, 1.45, 0.9, 1.25, 0.95, 1.1, 1],
+                  rotate: [0, -12, 12, -8, 8, -3, 0],
+                  color: ["#3c3c3c", "#47a36c", "#3c3c3c"]
+                } : {}}
+                title="Your Current Lofi Rank Level"
+                transition={{ duration: 1.6, ease: "easeInOut" }}
+              >
+                <span className="text-[#6D5D6E] font-bold hidden sm:inline">Lvl:</span>
+                <span className="sm:hidden text-[#89A8B2]" title="Level">🏆</span>
                 <strong className="text-[#89A8B2] font-extrabold">{user.level}</strong>
-              </div>
+                <AnimatePresence>
+                  {animateLevelUpHUD && (
+                    <motion.span 
+                      key="lvl-bubble"
+                      id="hud-lvl-bubble"
+                      initial={{ opacity: 0, y: 12, scale: 0.7 }}
+                      animate={{ opacity: 1, y: -24, scale: 1.2 }}
+                      exit={{ opacity: 0, y: -35 }}
+                      transition={{ duration: 1.5, ease: "easeOut" }}
+                      className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black uppercase text-green-700 bg-green-50 border border-green-500 px-1 py-0.5 rounded-md shadow-xs pointer-events-none whitespace-nowrap z-50 animate-bounce"
+                    >
+                      ⭐ Level Up! ⭐
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
 
             {/* Daily Streak Indicator */}
-            <div className="flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
+            <div className="flex items-center gap-1.5 bg-white border-2 border-[#3c3c3c] px-2.5 sm:px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
               <Flame size={14} className="text-orange-500 animate-pulse fill-orange-500" />
-              <span className="text-[#6D5D6E] font-bold">Streak:</span>
-              <strong className="text-orange-500 font-extrabold">{user.streak} Day</strong>
+              <span className="text-[#6D5D6E] font-bold hidden sm:inline">Streak:</span>
+              <strong className="text-orange-500 font-extrabold">{user.streak}<span className="hidden sm:inline"> Day</span>🔥</strong>
               
               {!claimedStreakBonus ? (
                 <button
                   onClick={handleClaimStreakBonus}
                   id="btn-claim-streak"
-                  className="ml-2 px-2 py-0.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold border border-[#3c3c3c] rounded hover:shadow-[1px_1px_0px_0px_#3c3c3c] text-[10px] uppercase cursor-pointer"
+                  className="ml-1 px-1.5 py-0.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold border border-[#3c3c3c] rounded hover:shadow-[1px_1px_0px_0px_#3c3c3c] text-[9px] sm:text-[10px] uppercase cursor-pointer"
                 >
-                  +25 Bonus
+                  Bonus
                 </button>
               ) : (
-                <span className="ml-2 text-[10px] text-green-600 uppercase font-sans font-bold">Claimed ✓</span>
+                <span className="ml-1 text-[9px] sm:text-[10px] text-green-600 uppercase font-sans font-bold">✓</span>
               )}
             </div>
 
@@ -588,10 +709,10 @@ export default function App() {
           </button>
 
           {[
-            { id: "dashboard", label: "Dashboard Quest Room", icon: Compass },
-            { id: "simulator", label: "DeFi Swap/Lend Box", icon: TrendingUp },
-            { id: "leaderboard", label: "CLAY Leaderboard", icon: Trophy },
-            { id: "profile", label: "Sui Kiosk Profile", icon: User }
+            { id: "dashboard", label: "Dashboard Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
+            { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", symbol: "📊", icon: TrendingUp },
+            { id: "leaderboard", label: "CLAY Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
+            { id: "profile", label: "Sui Kiosk Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -603,14 +724,16 @@ export default function App() {
                   setActiveTab(tab.id as any);
                   setMobileMenuOpen(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-xs sm:text-sm ${
                   isActive 
                      ? "bg-[#F3EFEA] text-[#D67B52] border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]" 
                      : "text-[#6D5D6E] border-transparent hover:border-[#3c3c3c]/40 hover:bg-[#f8f5f2] hover:text-[#3c3c3c]"
                 }`}
               >
-                <Icon size={14} />
-                <span>{tab.label}</span>
+                <Icon size={14} className="shrink-0" />
+                <span className="hidden md:inline">{tab.label}</span>
+                <span className="hidden sm:inline md:hidden">{tab.shortLabel}</span>
+                <span className="sm:hidden">{tab.symbol}</span>
               </button>
             );
           })}
@@ -730,7 +853,7 @@ export default function App() {
                             onClick={() => handleStartModule(mod)}
                             className="px-5 py-2 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs hover:scale-102 flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer active:translate-y-[1px]"
                           >
-                            <span>{isCompleted ? "Review Module ☕" : "Start Quest &rarr;"}</span>
+                            <span>{isCompleted ? "Review Module ☕" : "Start Quest"}</span>
                           </button>
                         </div>
                       </div>
@@ -859,14 +982,14 @@ export default function App() {
                         disabled={selectedOptionIndex === null}
                         className="px-6 py-2 bg-[#D67B52] hover:bg-[#D67B52]/90 disabled:opacity-40 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs font-mono cursor-pointer transition-all shadow-[2px_2px_0px_0px_#3c3c3c]"
                       >
-                        Submit Answer &rarr;
+                        Submit Answer
                       </button>
                     ) : (
                       <button
                         onClick={handleNextQuestion}
                         className="px-6 py-2 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs font-mono cursor-pointer transition-all shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center gap-1"
                       >
-                        <span>{currentQuestionIndex === activeModule.quiz.length - 1 ? "Get Results 🏆" : "Next Question &rarr;"}</span>
+                        <span>{currentQuestionIndex === activeModule.quiz.length - 1 ? "Get Results 🏆" : "Next Question"}</span>
                       </button>
                     )}
                   </div>
@@ -909,7 +1032,7 @@ export default function App() {
                         onClick={() => setActiveTab("profile")}
                         className="flex-1 py-2.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs font-mono shadow-[2px_2px_0px_0px_#3c3c3c] transition-all cursor-pointer active:translate-y-[1px]"
                       >
-                        Go to Profile Kiosk NFT &rarr;
+                        Go to Profile Kiosk NFT
                       </button>
                       <button
                         onClick={() => setFlowState("syllabus")}
@@ -1021,6 +1144,126 @@ export default function App() {
         currentTrack={activeTrack?.title}
         currentLesson={activeModule?.title}
       />
+
+      {/* Level Up Celebration Sparkle Popup Overlay */}
+      <AnimatePresence>
+        {showLevelUpOverlay && (
+          <motion.div
+            id="lvl-celebrate-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[#3c3c3c]/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 selection:bg-[#D67B52] selection:text-white"
+          >
+            {/* Ambient burst rays layout or background sparkles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {/* Confetti or dynamic sparkle entities rising */}
+              {Array.from({ length: 18 }).map((_, i) => {
+                const angle = (i * 360) / 18;
+                const distance = 160 + Math.random() * 100;
+                const x = Math.cos((angle * Math.PI) / 180) * distance;
+                const y = Math.sin((angle * Math.PI) / 180) * distance;
+                return (
+                  <motion.div
+                    key={i}
+                    className="absolute left-1/2 top-1/2 text-xl sm:text-2xl"
+                    initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                    animate={{
+                      x,
+                      y,
+                      scale: [0, 1.3, 0.8, 0],
+                      opacity: [1, 1, 0.8, 0],
+                      rotate: [0, 180 + Math.random() * 180],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      delay: Math.random() * 0.2,
+                      ease: "easeOut",
+                      repeat: Infinity,
+                      repeatDelay: 1,
+                    }}
+                  >
+                    {["✨", "⭐", "🎉", "🔥", "☕", "🐻", "SUI", "🎓"][i % 8]}
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.85, y: 50, rotate: -3 }}
+              animate={{
+                scale: 1,
+                y: 0,
+                rotate: 0,
+                transition: { type: "spring", damping: 14, stiffness: 120 }
+              }}
+              exit={{ scale: 0.85, y: 40, opacity: 0 }}
+              className="relative max-w-sm w-full bg-white border-4 border-[#3c3c3c] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#3c3c3c] text-center overflow-hidden"
+            >
+              {/* Highlight background accent pattern */}
+              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#89A8B2] via-[#E8A0BF] to-[#D67B52]" />
+
+              <div className="absolute top-3 right-3 text-stone-400 font-mono text-[9px] select-none font-bold">
+                Yeti Milestone! 🐻
+              </div>
+
+              {/* Big colorful emoji/sparkle center pop */}
+              <motion.div 
+                animate={{ scale: [1, 1.2, 0.95, 1.1, 1], rotate: [0, 5, -5, 5, 0] }}
+                transition={{ duration: 1.2, ease: "easeInOut", repeat: Infinity, repeatDelay: 2 }}
+                className="w-20 h-20 bg-[#F3EFEA] border-3 border-[#3c3c3c] rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-[3px_3px_0px_0px_#3c3c3c] mt-2"
+              >
+                🎓
+              </motion.div>
+
+              <h2 className="text-3xl font-extrabold font-serif text-[#3c3c3c] mt-4 tracking-tight">
+                Level <span className="text-[#D67B52]">{user.level}</span> Unlocked!
+              </h2>
+
+              <p className="font-mono text-xs font-bold text-[#89A8B2] mt-1.5 uppercase tracking-wide">
+                Rank: {
+                  user.level === 5 ? "🎓 Lofi Mastery Yeti" :
+                  user.level === 4 ? "🦉 Parallel Sage" :
+                  user.level === 3 ? "⚔️ Move Tactician" :
+                  user.level === 2 ? "🎒 Sui Apprentice" : "❄️ Cozy Explorer"
+                }
+              </p>
+
+              <div className="my-5 p-3.5 bg-[#F3EFEA] border-2 border-[#3c3c3c] rounded-2xl text-left font-serif text-xs leading-relaxed text-[#6D5D6E] relative">
+                <span className="absolute -top-3.5 right-3 px-2 py-0.5 bg-white border border-[#3c3c3c] text-[9px] text-[#D67B52] font-mono font-bold rounded">
+                  NEW REWARD ✓
+                </span>
+                <p className="font-bold text-[#3c3c3c] mb-1">
+                  {user.level === 5 ? "👑 Total Academy Mastery achieved!" :
+                   user.level === 4 ? "🚀 Parallel Gas refunds enabled at Swap Desk!" :
+                   user.level === 3 ? "⚡ Risk factors and smart router unlocked!" :
+                   "🔓 New smart contract modules ready on Classroom syllabus!"}
+                </p>
+                <span className="text-[11px] font-mono text-[#89A8B2] font-semibold block mt-1">
+                  {user.level === 5 ? "+500 CLAY Rank multiplier bonus granted." :
+                   user.level === 4 ? "You can checkout Advanced SDK patterns." :
+                   user.level === 3 ? "New profile souvenirs ready to mint." :
+                   "Keep studying blocks with the warm presence of Yeti tutor."}
+                </span>
+              </div>
+
+              {/* Confetti bottom triggers */}
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    setShowLevelUpOverlay(false);
+                    // Add some rewarding interactive feedback
+                    handleAwardXP(15); // Small award on top as a direct gift!
+                  }}
+                  className="w-full py-3 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono text-xs font-black uppercase tracking-wider border-3 border-[#3c3c3c] rounded-2xl shadow-[3px_3px_0px_0px_#3c3c3c] active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_#3c3c3c] transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>Claim Extra +15 XP Bonus! ✨</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Footer copyright */}
       <footer className="border-t-4 border-[#3c3c3c] bg-[#F3EFEA] p-4 text-center text-[10px] text-[#6D5D6E] font-mono">
