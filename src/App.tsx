@@ -462,6 +462,7 @@ export default function App() {
 
             <div className="space-y-1.5 text-[11px] leading-relaxed select-none">
               <div className="text-stone-400 font-bold flex gap-2">
+                <span className="text-amber-400">&gt;</span> 
                 <span>{loadingStatus}</span>
               </div>
               
@@ -704,11 +705,12 @@ export default function App() {
           </button>
 
           {[
-            { id: "dashboard", label: "Dashboard Quest Room", shortLabel: "Quest Room",},
-            { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box"},
-            { id: "leaderboard", label: "CLAY Leaderboard", shortLabel: "Leaderboard"},
-            { id: "profile", label: "Sui Kiosk Profile", shortLabel: "Kiosk"}
+            { id: "dashboard", label: "Dashboard Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
+            { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", symbol: "📊", icon: TrendingUp },
+            { id: "leaderboard", label: "CLAY Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
+            { id: "profile", label: "Sui Kiosk Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
           ].map((tab) => {
+            const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
@@ -727,6 +729,7 @@ export default function App() {
                 <Icon size={14} className="shrink-0" />
                 <span className="hidden md:inline">{tab.label}</span>
                 <span className="hidden sm:inline md:hidden">{tab.shortLabel}</span>
+                <span className="sm:hidden">{tab.symbol}</span>
               </button>
             );
           })}
@@ -1215,10 +1218,10 @@ export default function App() {
 
               <p className="font-mono text-xs font-bold text-[#89A8B2] mt-1.5 uppercase tracking-wide">
                 Rank: {
-                  user.level === 5 ? "Lofi Mastery Yeti" :
-                  user.level === 4 ? "Parallel Sage" :
-                  user.level === 3 ? "Move Tactician" :
-                  user.level === 2 ? "Sui Apprentice" : "Cozy Explorer"
+                  user.level === 5 ? "🎓 Lofi Mastery Yeti" :
+                  user.level === 4 ? "🦉 Parallel Sage" :
+                  user.level === 3 ? "⚔️ Move Tactician" :
+                  user.level === 2 ? "🎒 Sui Apprentice" : "❄️ Cozy Explorer"
                 }
               </p>
 
