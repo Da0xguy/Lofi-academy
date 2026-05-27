@@ -12,7 +12,7 @@ export const initialTracks: LearningTrack[] = [
         id: "basics-intro",
         title: "Introduction to Sui Blockchain",
         description: "What makes Sui radically fast for decentralized networks?",
-        xpValue: 40,
+        xpValue: 45,
         steps: [
           {
             id: "step1",
@@ -34,6 +34,13 @@ export const initialTracks: LearningTrack[] = [
             content: "in ethereum, data is stored inside smart contract accounts as key-value pairs. on sui, everything is an 'Object'. every token, NFT, or profile is stored directly under its own unique ID. think of it like having physical books on your own shelf, rather than everyone sharing a central database ledger inside a library! this allows instant owns and parallel signatures.",
             yetiMood: "excited",
             chalkboardHeader: "EVERYTHING IS AN OBJECT"
+          },
+          {
+            id: "step4",
+            title: "Storage Fund Economics",
+            content: "the storage fund ensures the network stays slim and validators stay happy. when you buy storage, that mist is staked. and guess what? if you delete your data later, you get a partial gas rebate refund back! yeti thinks this is perfect digital recycling. ♻️🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "ECONOMIC RECYCLING"
           }
         ],
         quiz: [
@@ -72,6 +79,18 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "On Sui, all data and assets are represented as first-class, standalone 'Objects' saved on-chain, containing owner addresses, version, and type."
+          },
+          {
+            id: "q4",
+            question: "What happens to your gas expenses if you delete an obsolete on-chain object?",
+            options: [
+              "You are fined a fee for network disruption",
+              "You receive a storage rebate refund from the storage fund",
+              "Nothing happens",
+              "Your wallet is locked temporarily"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Sui rewards developers and users for keeping state bloat minimal by issuing storage rebates when long-lived objects are pruned."
           }
         ]
       },
@@ -79,7 +98,7 @@ export const initialTracks: LearningTrack[] = [
         id: "basics-move",
         title: "The Move Language Safety",
         description: "Understand the asset safety principles behind the Sui Move language.",
-        xpValue: 50,
+        xpValue: 55,
         steps: [
           {
             id: "step1",
@@ -96,6 +115,14 @@ export const initialTracks: LearningTrack[] = [
             highlightCode: "struct Sweatshirt has key, store {\n    id: UID,\n    color: String\n}",
             yetiMood: "chill",
             chalkboardHeader: "REAL WORLD ABILITIES"
+          },
+          {
+            id: "step3",
+            title: "Bytecode Verifier Shield",
+            content: "before a move contract ever touches raw validator hardware, it goes through an intense security scanner called the bytecode verifier. it checks type rules, enforces field privacy, and guarantees memory safety. it's like a warm safety detector that keeps any bad spells away from your code closet! 🐻🛡️",
+            highlightCode: "// Bytecode verification guards the execution stack\n// enforcing runtime-level capabilities strictly",
+            yetiMood: "excited",
+            chalkboardHeader: "BYTECODE VERIFIER GUARD"
           }
         ],
         quiz: [
@@ -122,6 +149,73 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 2,
             explanation: "Without the 'copy' capability, the currency cannot be duplicated, ensuring absolute supply protection directly in the compiler bytecode verification level."
+          },
+          {
+            id: "q3",
+            question: "What is the role of the Move Bytecode Verifier?",
+            options: [
+              "To auto-write JavaScript frontend routes",
+              "To verify contract storage code syntax",
+              "To enforce ownership and type rules at the bytecode execution level before deployment",
+              "To convert Move code into Solidity"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "The byte-code verifier ensures that all executable Move code conforms to safety invariants (such as references and type boundaries) before executing on-chain."
+          }
+        ]
+      },
+      {
+        id: "basics-staking",
+        title: "Staking & Validator Delegations",
+        description: "How Sui's Proof of Stake consensus maintains decentralization and network health.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "step1",
+            title: "Active Stake & Validator Rewards",
+            content: "sui uses a Delegated Proof of Stake model! validators run heavy-duty computers to check all transactions. you can delegate your $SUI to them to pool validation strength. in return, you secure the winter lands and earn a portion of the stake rewards! 🐻🏰",
+            yetiMood: "chill",
+            chalkboardHeader: "PROOF OF STAKE HARMONY"
+          },
+          {
+            id: "step2",
+            title: "The Slashing Guard",
+            content: "what happens if a validator misbehaves, like going offline or double-signing blocks? they face the risk of slashing, where staked assets can be taken away! this alignment keeps validators honest, fast, and constantly awake. yeti is cozy, but validators are alert! ⏰🌨️",
+            yetiMood: "thinking",
+            chalkboardHeader: "SLASHING PROTECTION"
+          },
+          {
+            id: "step3",
+            title: "Unstaking Epoch Timing",
+            content: "uncorking your stake is simple but takes some patience. changes to staked delegations register at the boundary of an 'epoch' (which lasts roughly 24 hours on sui). once the epoch spins, your stake is unlocked and ready to flow. 🔄🍵",
+            yetiMood: "excited",
+            chalkboardHeader: "THE WHEEL OF EPOCHS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "When do validator stake delegations and unstaking actions take visual effect?",
+            options: [
+              "Instantly",
+              "After 1 hour",
+              "At the epoch boundary (roughly every 24 hours)",
+              "Only on weekends"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Sui state adjustments including validator stake parameters settle at the turn of an epoch, which marks a coordinated 24-hour cycle of node state validation."
+          },
+          {
+            id: "q2",
+            question: "What mechanism discourages validators from acting maliciously on-chain?",
+            options: [
+              "The risk of Slashing (stake forfeiture)",
+              "They are banned from the discord group",
+              "We take their keyboard",
+              "A minor fine in paper currency"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Slashing ensures validators remain financially accountable; any hostile deviation forfeits their staked capital."
           }
         ]
       }
@@ -138,7 +232,7 @@ export const initialTracks: LearningTrack[] = [
         id: "defi-swaps",
         title: "DEX Swaps & Liquidities",
         description: "How automated liquidity works on protocols like Cetus & Turbos.",
-        xpValue: 50,
+        xpValue: 55,
         steps: [
           {
             id: "step1",
@@ -153,6 +247,13 @@ export const initialTracks: LearningTrack[] = [
             content: "when you trigger a large swap, the token price can shift while your transaction travels to the node. this shift is called 'Slippage'. if real prices drift beyond your slippage allowance (e.g. 0.5%), the swap automatically aborts! this keeps you safe from bad deal arbitrage. plus, sui's sub-second execution guarantees your swap locks in the exact price index you see. pretty sweet! 💸",
             yetiMood: "thinking",
             chalkboardHeader: "SLIPPAGE EXPLAINED"
+          },
+          {
+            id: "step3",
+            title: "Concentrated Liquidity pools (CLMM)",
+            content: "traditionally, AMM pools spread liquidity across the entire price scale (0 to infinity). but in Concentrated Liquidity (CLMM) like Cetus, you put your capital inside customized price ranges! this creates super thick depth where trading actually happens, boosting your fee yield and minimizing user slippage. smart, isn't it? 🌡️🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "CONCENTRATED POWER"
           }
         ],
         quiz: [
@@ -179,6 +280,18 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "Sub-second validation times leave searchers or arbitrage miners with virtually zero window to sandwich or front-run user swaps, giving you the cleanest execution rates."
+          },
+          {
+            id: "q3",
+            question: "How does concentrated liquidity (CLMM) differ from traditional AMM pools?",
+            options: [
+              "It forces all prices to match flat fiat exchange currencies",
+              "It allocates capital only within specific, chosen price ranges to maximize design efficiency",
+              "It disables swaps entirely",
+              "It requires manual book matching by traders"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "By centering assets in the active trading bandwidth, capital efficiency increases significantly, rewarding liquidity providers with higher fees."
           }
         ]
       },
@@ -186,7 +299,7 @@ export const initialTracks: LearningTrack[] = [
         id: "defi-lending",
         title: "Lending Protocol Architecture",
         description: "Understand collateralized borrowing and Navi/Suilend design.",
-        xpValue: 50,
+        xpValue: 55,
         steps: [
           {
             id: "step1",
@@ -196,17 +309,24 @@ export const initialTracks: LearningTrack[] = [
             chalkboardHeader: "NAVI & SUILEND CRUCIBLE"
           },
           {
-            id: "strp2",
+            id: "step2",
             title: "The Risk of Liquidation",
             content: "careful now! if the value of your supplied $SUI drops too low, or the value of your borrowed assets increases, your health factor falls below 1.0. once this splits, third-party Liquidators can automatically step in, pay off your debt, and claim your collateral at a discount! make sure you manage risk and keep loans healthy under the cold weather... 🌨️☕",
             yetiMood: "thinking",
             chalkboardHeader: "RISK OF LIQUIDATION"
+          },
+          {
+            id: "step3",
+            title: "Dynamic Interest Rate Slopes",
+            content: "protocols like Suilend don't use fixed interest rates. rates are drawn on a curve! when matching pools are mostly empty (high utilization), interest rates spike up to reward new lenders and nudge borrowers to repay. when money is super abundant (low utilization), rates soften to invite friendly borrowers! curve math keeps the balance. 📈🐻",
+            yetiMood: "thinking",
+            chalkboardHeader: "RATE EQUILIBRIUM"
           }
         ],
         quiz: [
           {
             id: "q1",
-            question: "What happens on Nav/Suilend if your loan's health factor drops below 1.0?",
+            question: "What happens on Navi/Suilend if your loan's health factor drops below 1.0?",
             options: [
               "Nothing, the loan lasts forever",
               "Liquidators will claim your collateral at a discount to settle your outstanding borrow debt",
@@ -227,6 +347,73 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 2,
             explanation: "LTV specifies the percentage amount you can borrow against your deposited backing. An LTV of 70% means for every $100 of SUI, you can borrow up to $70 of stablecoins."
+          },
+          {
+            id: "q3",
+            question: "What governs the interest rate inside Web3 decentralized lending pools?",
+            options: [
+              "The central banking interest boards",
+              "A random dice-rolling trigger on-chain",
+              "Pool utilization ratios mapping along design response curves",
+              "A strict fixed rate of 5%"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Utilization-dependent rate curves adjust dynamically to preserve capital reserves during high credit demands, maintaining protocol safety."
+          }
+        ]
+      },
+      {
+        id: "defi-liquid-staking",
+        title: "Liquid Staking Derivatives (LSDs)",
+        description: "Learn how to put your staked SUI to work using liquid wrapping tokens.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "step1",
+            title: "The Staking Lock Constraints",
+            content: "staking secures the homeland, but traditional staking locks your $SUI up so you can't use it in DEXs or play games. liquid staking changes the game! you store SUI, and the protocol hands you back an receipt ticket (e.g. afSUI, haSUI, or sSUI) representing your staked pool that dynamically gains value! 🎟️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "UNLOCKING CAPTIVE STAKE"
+          },
+          {
+            id: "step2",
+            title: "Double Yield Opportunities",
+            content: "here is the magic formula: you earn 4-5% staking APY passively through your liquid receipt token (like haSUI), and simultaneously, you use that same receipt token as lending collateral or swap assets! it doubles your operational utility within the cozy ecosystem loops. yeti loves smart efficiency! 🧪✨",
+            yetiMood: "excited",
+            chalkboardHeader: "SWISS KNIFE STAKING"
+          },
+          {
+            id: "step3",
+            title: "Instant De-pegging Risk Warning",
+            content: "just bear in mind: the exchange price of your liquid token is bound to the core validator reserves, but market trading pools can experience tiny deviations or price slips during sudden panic cascades. always audit pool slippage thresholds, even in warm lo-fi spaces! 🗺️🐻",
+            yetiMood: "thinking",
+            chalkboardHeader: "MARKET DEVIATIONS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "What primary utility does Liquid Staking provide to a SUI developer?",
+            options: [
+              "It makes gas costs completely zero",
+              "It yields a tradable, interest-bearing token representation of your staked assets, preserving capital liquidity",
+              "It deletes all stored on-chain transactions",
+              "It converts SUI directly into Bitcoin"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Liquid staking wrappers represent staked balances, accumulating staking rewards while allowing the tokens to be traded, lent, or pledged in other DeFi protocols."
+          },
+          {
+            id: "q2",
+            question: "What risk can affect liquid staking structures during high panic sell events?",
+            options: [
+              "Temporary market de-pegging from the underlying redemption index in open secondary pools",
+              "Your wallet address being randomly modified on-chain",
+              "Losing the private key sequence",
+              "Your validator turning into a web2 database"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Though exchange redemption rates are on-chain guaranteed, high sell pressure in open liquidity pools may drag down immediate spot prices for quick sellers."
           }
         ]
       }
@@ -243,7 +430,7 @@ export const initialTracks: LearningTrack[] = [
         id: "protocols-deepbook",
         title: "DeepBook Orderbook Engine",
         description: "Explore the deep, shared liquidity engine written directly by Sui Core.",
-        xpValue: 40,
+        xpValue: 45,
         steps: [
           {
             id: "step1",
@@ -251,6 +438,13 @@ export const initialTracks: LearningTrack[] = [
             content: "unlike most chains where a fully peer-to-peer limit orderbook is way too expensive to operate on-chain, sui has a native central limit orderbook called DeepBook! deepbook is open source, built directly by the mysten engineering team, and allows any application on the network to pool bids and asks together for the ultimate shared liquidity. 🎧📖",
             yetiMood: "chill",
             chalkboardHeader: "DEEPBOOK SUI ENGINE"
+          },
+          {
+            id: "step2",
+            title: "DeepBook V3 Key Features",
+            content: "DeepBook V3 leverages sui's lightning speed to offer flashloans, customizable order structures, and instant taker fills, keeping trading as light as falling snowflakes. plus, anyone can build a visual dashboard or charting interface on top of DeepBook's public pipelines! 🐻📊",
+            yetiMood: "excited",
+            chalkboardHeader: "DEEPBOOK EVOLVED"
           }
         ],
         quiz: [
@@ -265,6 +459,18 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "DeepBook is a community-owned, foundational decentralized orderbook integrated directly as a native system protocol, providing core liquidity to any builder."
+          },
+          {
+            id: "q2",
+            question: "Which of the following describes DeepBook V3 enhancements?",
+            options: [
+              "It enforces slower execution speeds for gas protection",
+              "It integrates flashloans and highly automated limit order triggers",
+              "It removes on-chain orderbooks completely",
+              "It runs in external browser databases instead of on-chain"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "DeepBook V3 incorporates ultra-efficient order pipelines, offering instant flashloans and complex order structures matching professional web2 speed levels."
           }
         ]
       },
@@ -272,7 +478,7 @@ export const initialTracks: LearningTrack[] = [
         id: "protocols-kiosk",
         title: "Sui NFT Kiosk & Royalty Safeguards",
         description: "Uncover how Kiosk secures creator royalties and handles ownership permissions securely.",
-        xpValue: 40,
+        xpValue: 45,
         steps: [
           {
             id: "step1",
@@ -280,6 +486,13 @@ export const initialTracks: LearningTrack[] = [
             content: "royalties are standard for artists, but on old chains, buyers could dodge them by transferring items in private channels. sui solves this with Kiosk! a kiosk is a shared commerce container on-chain. your NFTs reside inside your kiosk, and the move contract rules can enforce strict royalty fees during custom sales! this keeps creators protected and supported. 🐻👑",
             yetiMood: "proud",
             chalkboardHeader: "NFT KIOSK CONTAINERS"
+          },
+          {
+            id: "step2",
+            title: "Transfer Policies & Locked Envelopes",
+            content: "when you trade an NFT inside a kiosk, the system utilizes a specialized rulebook called a 'TransferPolicy'. the item remains locked in a protective envelope until the matching transaction fulfills the required fees, signatures, or badges. this keeps sales entirely secure, with no trust required between strangers! 🛡️🍵",
+            yetiMood: "chill",
+            chalkboardHeader: "SECURE COMMERCE SHUTTERS"
           }
         ],
         quiz: [
@@ -294,6 +507,18 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "Sui Kiosk locks the digital assets inside a standardized on-chain account module, restricting direct ownership extracts unless transaction parameters verify compliance with creator guidelines."
+          },
+          {
+            id: "q2",
+            question: "What is the role of a TransferPolicy in the Sui Kiosk framework?",
+            options: [
+              "It controls how fast a web application reloads in browsers",
+              "It defines and enforces rules (like royalites) that must be satisfied for an NFT to complete execution transfer",
+              "It translates Move code to other standard languages",
+              "It limits the number of wallets a user can open"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "TransferPolicies act as gates on the transaction path, ensuring royalties or state requirements are resolved before the asset shifts owner nodes."
           }
         ]
       },
@@ -301,7 +526,7 @@ export const initialTracks: LearningTrack[] = [
         id: "protocols-web3-mechanics",
         title: "How Web3 Works on Sui",
         description: "Explore cryptographic keypairs, peer RPC node drivers, consensus validation, and state records.",
-        xpValue: 50,
+        xpValue: 55,
         steps: [
           {
             id: "step1",
@@ -323,6 +548,13 @@ export const initialTracks: LearningTrack[] = [
             content: "ordinary blockchains order all transactions in a single global line. sui separates data routing entirely! it utilizes Narwhal as a high-throughput transaction mempool, and Bullshark/Mysticeti as a rapid consensus driver. but wait—for simple peer-to-peer transfers, sui bypasses consensus entirely, updating state accounts instantly! ⚡🎮",
             yetiMood: "excited",
             chalkboardHeader: "SUI PARALLEL CONSENSUS"
+          },
+          {
+            id: "step4",
+            title: "Gas Budgeting and Safe Limits",
+            content: "every transaction specifies a 'Gas Budget'—which is the absolute maximum MIST you are willing to spend. if your contract goes into an infinite loop or runs out of gas, the transaction is rejected, and the unused gas is safely returned to you! no extra draining and no unexpected losses here. 🌨️🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "PROTECTIVE GAS BUDGETS"
           }
         ],
         quiz: [
@@ -361,6 +593,73 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "By structuring memory routing (Narwhal) independently from transaction execution agreements (Bullshark) and skipping global consensus entirely on single-owner objects, Sui achieves unparalleled speeds."
+          },
+          {
+            id: "q4",
+            question: "What occurs if a Sui transition runs out of gas during code execution?",
+            options: [
+              "The contract drops all validator stakes",
+              "All wallets on the machine are locked",
+              "The transaction fails, resets state modifications safely, and returns unused budget gas",
+              "The network crashes immediately"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "If gas budget runs dry, the transaction state reverts safely to prevent corrupt records, and any unconsumed gas reserves are returned back."
+          }
+        ]
+      },
+      {
+        id: "protocols-zklogin",
+        title: "Sui zkLogin: Zero-Knowledge Web2 Credentials",
+        description: "Connect to the blockchain using normal Google, Apple, or Twitch logins without active seeds.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "step1",
+            title: "Web3's Hardest Barrier",
+            content: "traditionally, to enter the web3 realm, users had to write down 12 secret seed words, setup browser extensions, and worry about lose-keys panic. it was way too stressful for normal explorers. sui zkLogin solves this by letting you sign in with standard web2 services (like Google)! 🔑🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "SEEDLESS EVOLUTION"
+          },
+          {
+            id: "step2",
+            title: "Zero-Knowledge Cryptography",
+            content: "how remains secure without sharing password logs? Zero-Knowledge Proofs (ZKP)! zkLogin uses cryptographic proofs to link your web2 credential token (which proves who you are) directly with a newly generated on-chain address. the validator verifies the proof without ever seeing your profile data! super private! 🛡️🧪",
+            yetiMood: "excited",
+            chalkboardHeader: "ZERO-KNOWLEDGE VEIL"
+          },
+          {
+            id: "step3",
+            title: "Familiar Warm onboarding",
+            content: "with zkLogin, dynamic gaming dApps and retail apps can onboard billions of mainstream users in seconds! newcomers feel cozy, and their keys are safely managed under high-grade math signatures. let's dance in the snow! 🐻💃",
+            yetiMood: "proud",
+            chalkboardHeader: "BILLION-USER INTERFACE"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "What is SUI zkLogin designed to solve?",
+            options: [
+              "Removing blockchain validators entirely from the network",
+              "The friction of setting up traditional Web3 wallets by allowing standard logins (Google, Apple, etc.)",
+              "Paying transaction costs using cash",
+              "Hosting browser pages inside Discord bots"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "zkLogin eliminates seed-phrase onboarding complexities. Users log in with standard OAuth Web2 credentials to automatically configure safe cryptographic wallets."
+          },
+          {
+            id: "q2",
+            question: "Why doesn't zkLogin reveal your email/profile password to validators?",
+            options: [
+              "The validators don't care about safety",
+              "It uses Zero-Knowledge (ZK) Proofs to authenticate validation without exposing raw private secrets to nodes",
+              "The information is encrypted on paper",
+              "It routes requests through local VPN servers"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "ZKP translates your identity token parameters into highly complex mathematical proofs that prove authorized access. Real logins remain totally private and invisible."
           }
         ]
       }
@@ -392,6 +691,13 @@ export const initialTracks: LearningTrack[] = [
             content: "Sui successfully launched its mainnet on May 3, 2023! Since then, it has broken world records: executing over 65 million transactions in a single day, sustaining 297,000 sub-second Peak TPS (Transactions Per Second), and achieving massive TVL (Total Value Locked) in DeFi. yeti is extremely honored to welcome you into this historic quest! ❄️✨",
             yetiMood: "proud",
             chalkboardHeader: "SUI RECORD-BREAKING RUN"
+          },
+          {
+            id: "step3",
+            title: "Sui Ecosystem & Capy NFT Launch",
+            content: "during early test phases, Mysten Labs launched 'Sui Capys'—cute interactive aquatic creatures that demonstrated the power of dynamic, composable objects! users could purchase clothing items, customize accessories, and breed new Capys directly. this proved that Sui NFTs are living objects, not static IPFS files! 🦫✨",
+            yetiMood: "excited",
+            chalkboardHeader: "CAPY NFT LIVING OBJECTS"
           }
         ],
         quiz: [
@@ -418,6 +724,73 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 2,
             explanation: "Sui Mainnet successfully went live for the global community on May 3, 2023, initiating a high speed scalable epoch in public ledger history."
+          },
+          {
+            id: "q3",
+            question: "What did the famous 'Sui Capys' demo prove about the network's data architecture?",
+            options: [
+              "That Sui only works for gaming",
+              "That SUI objects are dynamic and composable, allowing on-chain items to be nested, mutated, and changed",
+              "That transactions must remain slow",
+              "That NFTs are stored inside email accounts"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Sui Capys showcased Sui's dynamic parent-child object structures, proving that NFTs can be modified, dressed, or combined directly in standard Move contracts."
+          }
+        ]
+      },
+      {
+        id: "history-future",
+        title: "Sui 2.0 & Future Web3 Scalings",
+        description: "The next phase of high-performance architecture, network expansion, and native integrations.",
+        xpValue: 40,
+        steps: [
+          {
+            id: "step1",
+            title: "Mysticeti: Sub-300ms Consensus",
+            content: "the tech team never stops coding! are sub-second speeds too slow? mysten labs introduced 'Mysticeti', a state-of-the-art consensus engine that slashes consensus latency down to under 300 milliseconds! it's literally the speed of thought. ⚡🏔️",
+            yetiMood: "excited",
+            chalkboardHeader: "BEYOND THE SPEED RECORD"
+          },
+          {
+            id: "step2",
+            title: "Pilot for Web3 Mass Adoption",
+            content: "as we move forward, the focus is about seamless user experiences. combining zkLogin, gas sponsorship (where builders pay user fees), and parallel execution paves the way for standard apps to scale to millions. no hurdles, just pure lo-fi comfort! 🥐🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "INVISIBLE BLOCKCHAIN FUTURE"
+          },
+          {
+            id: "step3",
+            title: "Walrus Protocol & Storage Era",
+            content: "Sui's developers are launching 'Walrus Protocol'—a decentralized storage network for storing heavy assets like movie files, images, and audio directly on decentralized nodes. yes! completely decentralized videos and lo-fi beats, safe forever. 🐻🎹",
+            yetiMood: "proud",
+            chalkboardHeader: "WALRUS STORAGE LANDS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "What performance enhancement does the Mysticeti consensus engine introduce?",
+            options: [
+              "It increases the gas rebate",
+              "It slashes consensus consensus latency to sub-300ms levels",
+              "It converts Move tokens into Bitcoin formats",
+              "It deletes older block registries"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Mysticeti drastically optimizes round trips, enabling validators to settle states much faster, maintaining records under 300ms."
+          },
+          {
+            id: "q2",
+            question: "What is Walrus Protocol designed to store?",
+            options: [
+              "Password seeds",
+              "Heavy decentralized data media files, audio, and documents",
+              "Only private user emails",
+              "Leaderboard spreadsheet sheets"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Walrus Protocol expands Sui's ecosystem with secure distributed storage nodes suited for hosting massive files, media, and images with full blockchain verification."
           }
         ]
       }
