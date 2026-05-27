@@ -619,7 +619,7 @@ export default function App() {
               <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
               <div>
                 <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-                  Lofi Quest: Sui Academy
+                  Lofi Academy
                 </h1>
               </div>
             </div>
@@ -759,10 +759,10 @@ export default function App() {
           </button>
 
           {[
-            { id: "dashboard", label: "Dashboard Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
+            { id: "dashboard", label: "Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
             { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", symbol: "📊", icon: TrendingUp },
-            { id: "leaderboard", label: "CLAY Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
-            { id: "profile", label: "Sui Kiosk Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
+            { id: "leaderboard", label: "Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
+            { id: "profile", label: "Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

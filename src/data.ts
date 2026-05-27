@@ -662,6 +662,80 @@ export const initialTracks: LearningTrack[] = [
             explanation: "ZKP translates your identity token parameters into highly complex mathematical proofs that prove authorized access. Real logins remain totally private and invisible."
           }
         ]
+      },
+      {
+        id: "protocols-ptb",
+        title: "Programmable Transaction Blocks",
+        description: "Learn how Sui chains multiple commands into single atomic executions.",
+        xpValue: 60,
+        steps: [
+          {
+            id: "step1",
+            title: "What are Programmable Transaction Blocks?",
+            content: "Welcome, tech architect! On older blockchains, executing multiple actions (like swapping a token, staking it, and wrapping the remainder) requires separate, sequential transactions. This wastes precious gas and invites dangerous latency. On Sui, you have a superpower: Programmable Transaction Blocks (PTBs)! A PTB allows you to chain up to 1024 unique commands into a single, atomic, and secure transaction execution! Either everything succeeds, or the entire block completely rolls back with zero side effects. 🐻🔗",
+            yetiMood: "excited",
+            chalkboardHeader: "COMPOSE THE FUTURE"
+          },
+          {
+            id: "step2",
+            title: "Input Commands & Output Piping",
+            content: "How does a PTB work under the hood? It functions like a local computing execution pipeline! You can send input parameters, call smart contract functions, and pipe the output of one command directly as the input of the next command. For instance, you can call a swap function, match its output SUI object from the return payload, and immediately send it into a Lending Protocol pool's deposit function—all in the very same block, without any middleman scripts or complex wallet signatures! ⚡🧪",
+            yetiMood: "thinking",
+            chalkboardHeader: "PIPELINE ARGUMENT ROUTING"
+          },
+          {
+            id: "step3",
+            title: "Types of PTB Commands",
+            content: "Within a single PTB, you can mix and match five native, highly optimized commands: MakeMoveVec (creating vectors of elements), MergeCoins (combining coin balances), SplitCoins (slicing precise coin portions), TransferObjects (sending owned entities to custom recipient addresses), and MoveCall (calling any on-chain move smart contract function). This allows you to perform batch transfers, multiple swaps, or complex minting campaigns in one breath! ❄️✨",
+            yetiMood: "proud",
+            chalkboardHeader: "PTB TOOLBOX COMMANDS"
+          },
+          {
+            id: "step4",
+            title: "The Ultimate UX Booster",
+            content: "Why are developers crazy about PTBs? Because of the revolutionary User Experience (UX)! In typical DeFi apps, a user has to sign a transaction to 'Approve' a token limit, then sign another transaction to 'Deposit' the token, and yet another to 'Claim' their bonus. With Sui PTBs, you combine approvals, deposits, transfers, and claims into a single-click signature! This slashes gas costs up to 10x and provides a silky-smooth experience that feels like web2. 🥐🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "SILK-LIKE SINGLE SIGNATURES"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "How many distinct operations can be chained into a single Sui Programmable Transaction Block (PTB)?",
+            options: [
+              "Only 1 operation",
+              "A maximum of 10 operations",
+              "Up to 1024 distinct transaction commands",
+              "Unlimited actions without any gas cap"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Sui supports chaining up to 1024 unique transaction operations cleanly in one atomic block, allowing unprecedented architectural complexity in a single signature execution."
+          },
+          {
+            id: "q2",
+            question: "What does atomic execution mean within the context of a Sui PTB?",
+            options: [
+              "Every command executes slowly to ensure node stability",
+              "If even one command fails, the entire block of actions fails and rolls back, leaving no half-finished states",
+              "Transactions are processed using nuclear quantum clock models",
+              "It forces all user assets to be converted into gas coins"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Atomicity guarantees that all commands in the PTB succeed or fail together as a single cohesive unit, entirely preventing partial execution security issues."
+          },
+          {
+            id: "q3",
+            question: "How can developers feed the output of one Move function into another function inside a PTB?",
+            options: [
+              "They must wait for the next transaction block and read the off-chain index",
+              "They must write a temporary proxy smart contract every time",
+              "They can directly pipe the output of one command as an argument into the next command inside the PTB",
+              "By saving intermediate variables inside the browser's cookies first"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "PTBs support high-performance output piping, allowing the results of prior calls to serve directly as inputs for subsequent calls seamlessly."
+          }
+        ]
       }
     ]
   },
