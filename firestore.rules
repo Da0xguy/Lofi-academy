@@ -9,36 +9,26 @@ service cloud.firestore {
     
     // Validate ID strings (prevents query/parameter injections)
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() <= 128;
     }
     
     // Type and constraint validator for study user profiles
     function isValidUserProfile(data) {
       return data.username is string 
         && data.username.size() >= 1 
-        && data.username.size() <= 64
+        && data.username.size() <= 128
         && data.avatar is string 
         && data.avatar.size() >= 1 
-        && data.avatar.size() <= 16
+        && data.avatar.size() <= 32
         && (data.walletAddress == null || (data.walletAddress is string && data.walletAddress.size() <= 128))
-        && (data.xp is int || data.xp is float) 
-        && data.xp >= 0 
-        && data.xp <= 500000
-        && (data.level is int || data.level is float) 
-        && data.level >= 1 
-        && data.level <= 100
-        && data.completedModules is list 
-        && data.completedModules.size() <= 200
-        && data.completedTracks is list 
-        && data.completedTracks.size() <= 50
-        && data.claimedWelcomeXP is bool
-        && data.mintedBadges is list 
-        && data.mintedBadges.size() <= 100
-        && (data.streak is int || data.streak is float) 
-        && data.streak >= 0 
-        && data.streak <= 10000
-        && data.lastLoginDate is string 
-        && data.lastLoginDate.size() <= 32;
+        && (data.xp is int || data.xp is float || !('xp' in data))
+        && (data.level is int || data.level is float || !('level' in data))
+        && (data.completedModules is list || !('completedModules' in data))
+        && (data.completedTracks is list || !('completedTracks' in data))
+        && (data.claimedWelcomeXP is bool || !('claimedWelcomeXP' in data))
+        && (data.mintedBadges is list || !('mintedBadges' in data))
+        && (data.streak is int || data.streak is float || !('streak' in data))
+        && (data.lastLoginDate is string || !('lastLoginDate' in data));
     }
     
     // Users Collection matched by lowercase wallet address
@@ -50,8 +40,7 @@ service cloud.firestore {
       allow list: if true;
       
       // Allow writes only if structure is perfectly safe and matches validated constraints
-      allow create: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
-      allow update: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
+      allow create, update: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
     }
   }
 }
