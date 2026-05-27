@@ -1,6 +1,5 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import Lofistudy from '../assets/lofistudy.jpg';
 import { ModuleStep } from "../types";
 import { Coffee, MessageSquare, Sparkles, Brain, Zap } from "lucide-react";
 
@@ -44,7 +43,7 @@ export function YetiChalkboard({
       <div className="w-full lg:w-1/3 flex flex-col items-center">
         <div className="relative group p-2 border-2 border-[#3c3c3c] rounded-3xl bg-white shadow-[4px_4px_0px_0px_#3c3c3c] overflow-hidden">
           <img
-            src={Lofistudy}
+            src={yetiStudyAsset}
             alt="Yeti Study Space"
             referrerPolicy="no-referrer"
             className="w-60 h-60 object-cover rounded-2xl group-hover:scale-105 transition-all duration-300 pointer-events-none filter brightness-95"
@@ -128,7 +127,7 @@ export function YetiChalkboard({
                   onClick={onPrev}
                   className="px-3 py-1 bg-white hover:bg-yellow-50 text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-lg text-xs font-bold tracking-wider font-mono cursor-pointer transition-colors"
                 >
-                 Back
+                  &larr; Back
                 </button>
               )}
               
@@ -138,7 +137,7 @@ export function YetiChalkboard({
                 onClick={onNext}
                 className="px-5 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white shadow-[2px_2px_0px_0px_#3c3c3c] font-mono border-2 border-[#3c3c3c] rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer active:translate-y-[1px]"
               >
-                <span>{stepIndex === totalSteps - 1 ? "Start Assessment ✏️" : "Next Part"}</span>
+                <span>{stepIndex === totalSteps - 1 ? "Start Assessment ✏️" : "Next Part &rarr;"}</span>
               </button>
             </div>
           </div>

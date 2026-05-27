@@ -122,7 +122,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
     setIsJumping(true);
     setTimeout(() => {
       setIsJumping(false);
-    }, 450);
+    }, 520);
   };
 
   // Keyboard space key listener helper
@@ -146,7 +146,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
 
     const timer = setInterval(() => {
       setBlockX((prev) => {
-        const next = prev - 1.8;
+        const next = prev - 1.65;
         if (next <= 0) {
           // Cleared barrier successfully! Award point
           setGameScore((s) => {
@@ -161,8 +161,8 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
           return 100;
         }
 
-        // Collision checking parameters
-        if (next >= 10 && next <= 24) {
+        // Highly-forgiving physical bounds collision checking (12% to 18% coordinate zone)
+        if (next >= 12 && next <= 18) {
           if (!isJumping) {
             setGameOver(true);
             clearInterval(timer);
@@ -211,7 +211,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
       {/* Top Utility Nav for Landing Page */}
       <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center z-10 relative">
         <span className="text-sm font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-          <Compass className="text-[#D67B52]" size={18} /> Lofi Academy
+          <Compass className="text-[#D67B52]" size={18} /> Lofi Quest: Sui Academy
         </span>
         {toggleDarkMode && (
           <button
@@ -313,7 +313,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
                 className="w-full sm:w-auto px-10 py-5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-serif font-extrabold text-lg md:text-xl rounded-2xl border-4 border-[#3c3c3c] shadow-[6px_6px_0px_0px_#3c3c3c] hover:shadow-[8px_8px_0px_0px_#3c3c3c] cursor-pointer transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <span>Enter Academy</span>
+                  <span>Enter Academy Questroom</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
                 </span>
                 <div className="absolute top-0 -inset-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-full group-hover:duration-1000 group-hover:translate-x-0 group-hover:transition-all" />
@@ -322,7 +322,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
                 href="#visual-learn-more"
                 className="w-full sm:w-auto px-8 py-5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-mono font-bold text-sm rounded-2xl border-4 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] cursor-pointer text-center"
               >
-                How it works
+                How it works &rarr;
               </a>
             </div>
           ) : (
@@ -643,16 +643,51 @@ public entry fun mint_badge(...) {
               Mysticeti Lanes
             </div>
 
-            {/* Yeti Avatar 🐻 */}
+            {/* Yeti Avatar 🐻 with dynamic fun speech bubble */}
             <motion.div 
-              className="absolute left-10 text-3xl z-10"
+              className="absolute left-10 text-3xl z-10 flex items-center"
               style={{ bottom: "24px" }}
-              animate={isJumping ? { y: -58, rotate: [0, -15, 15, 0] } : { y: 0, rotate: 0 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
+              animate={isJumping ? { 
+                y: -65, 
+                rotate: [0, -12, 12, 0],
+                scale: [1, 1.1, 1] 
+              } : { 
+                y: 0, 
+                rotate: 0,
+                scale: 1 
+              }}
+              transition={isJumping ? {
+                duration: 0.52,
+                ease: [0.25, 1, 0.5, 1] 
+              } : {
+                duration: 0.25,
+                ease: "easeIn"
+              }}
             >
               <span>🐻</span>
               <span className="absolute -top-3 -right-2 text-[10px] animate-bounce">☕</span>
+              
+              {/* Dynamic Bubble status indicators */}
+              <div id="yeti-bubble" className="absolute left-8 -top-8 bg-white text-stone-900 text-[8px] font-bold px-1.5 py-0.5 rounded-lg border border-stone-400 shadow-sm font-sans flex items-center gap-0.5 whitespace-nowrap z-20">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
+                <span>
+                  {gameScore === 0 ? "Jump consensus! 🏔️" : gameScore < 5 ? "Fast parallel Move! ⚡" : "Validation hero! 🏆"}
+                </span>
+                <div className="absolute -left-1 top-2.5 border-t-4 border-t-white border-r-4 border-r-white border-b-4 border-b-transparent border-l-4 border-l-transparent select-none rotate-45 transform"></div>
+              </div>
             </motion.div>
+
+            {/* Decorative Sky coin 🪙 that floats above path */}
+            {gameStarted && !gameOver && (
+              <motion.div 
+                className="absolute text-xs"
+                style={{ bottom: "85px", left: `${(blockX + 22) % 100}%` }}
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <span>🪙</span>
+              </motion.div>
+            )}
 
             {/* Moving Obstacle Block 🧱 (transaction hash) */}
             {gameStarted && !gameOver && (
@@ -661,8 +696,8 @@ public entry fun mint_badge(...) {
                 style={{ bottom: "24px", left: `${blockX}%` }}
               >
                 <span>{obstacleType}</span>
-                <span className="text-[7px] text-rose-400 font-bold bg-stone-950 px-1 border border-rose-500 rounded font-mono">
-                  0xSUI
+                <span className="text-[6.5px] text-rose-400 font-extrabold bg-stone-950 px-1 border border-rose-500/50 rounded font-mono uppercase tracking-wider block">
+                  {obstacleType === "🧱" ? "Block" : obstacleType === "⛽" ? "Gas" : "0xSUI"}
                 </span>
               </motion.div>
             )}

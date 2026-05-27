@@ -86,7 +86,7 @@ export function LeaderboardWidget({
         <div>
           <h2 className="text-xl font-bold font-serif text-[#3c3c3c] flex items-center gap-1.5">
             <Trophy size={20} className="text-[#D67B52]" />
-            <span>Leaderboard</span>
+            <span>CLAY Hackathon Leaderboard</span>
           </h2>
           <p className="text-xs text-[#6D5D6E] mt-1 font-sans">
             Real-time global off-chain leaderboard showing top SUI developers studying on Lofi Quest.

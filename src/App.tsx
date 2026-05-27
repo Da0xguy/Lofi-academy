@@ -29,7 +29,9 @@ import {
   Flame, 
   Gamepad, 
   Lightbulb,
-  ExternalLink
+  ExternalLink,
+  Menu,
+  X
 } from "lucide-react";
 
 // Pre-generated static assets mapped from tools outputs
@@ -105,6 +107,7 @@ export default function App() {
 
   // Navigation Tabs
   const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "leaderboard" | "profile">("dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Lessons curriculum state
   const [tracks, setTracks] = useState<LearningTrack[]>(initialTracks);
@@ -390,6 +393,7 @@ export default function App() {
 
             <div className="space-y-1.5 text-[11px] leading-relaxed select-none">
               <div className="text-stone-400 font-bold flex gap-2">
+                <span className="text-amber-400">&gt;</span> 
                 <span>{loadingStatus}</span>
               </div>
               
@@ -481,24 +485,38 @@ export default function App() {
       
       {/* 1. TOP HEADER & HUD STATUS */}
       <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           
-          {/* Logo Branding */}
-          <div 
-            onClick={handleReturnToLanding}
-            className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
-            title="Return to Guided Introduction"
-          >
-            <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
-            <div>
-              <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-                Lofi Quest: Sui Academy
-              </h1>
+          {/* Logo Branding & Mobile Toggle Row */}
+          <div className="flex items-center justify-between w-full md:w-auto">
+            <div 
+              onClick={handleReturnToLanding}
+              className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
+              title="Return to Guided Introduction"
+            >
+              <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
+              <div>
+                <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
+                  Lofi Quest: Sui Academy
+                </h1>
+                <span className="text-[10px] font-mono uppercase bg-[#89A8B2]/20 text-[#89A8B2] px-2 py-0.5 rounded border-2 border-[#3c3c3c] tracking-widest block mt-0.5 font-bold group-hover:bg-[#89A8B2]/30 transition-colors">
+                  CLAY Hackathon MVP
+                </span>
+              </div>
             </div>
+
+            {/* Mobile menu toggle trigger button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-[#F3EFEA] border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c] font-mono text-xs font-bold active:translate-y-[2px] transition-all"
+            >
+              <span className="text-[10px] tracking-wider uppercase">Menu</span>
+              {mobileMenuOpen ? <X size={14} className="text-[#D67B52]" /> : <Menu size={14} />}
+            </button>
           </div>
  
-          {/* Real-time Developer HUD Score bar */}
-          <div className="flex items-center gap-4 flex-wrap select-none">
+          {/* Real-time Developer HUD Score bar - collapses on mobile */}
+          <div className={`${mobileMenuOpen ? "flex" : "hidden md:flex"} flex-wrap items-center gap-4 select-none w-full md:w-auto pt-3 md:pt-0 border-t border-dashed md:border-t-0 border-[#3c3c3c]/20 justify-start md:justify-end`}>
             {/* XP and Level Indicators */}
             <div id="hud-stats" className="flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
               <div className="flex items-center gap-1.5 font-bold">
@@ -555,10 +573,13 @@ export default function App() {
       </header>
 
       {/* 2. SUB-NAV NAVIGATION TABS PANEL */}
-      <nav id="app-tabs-navigation" className="bg-white border-b-2 border-[#3c3c3c] py-2.5 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-start gap-2 overflow-x-auto text-[13px] font-mono">
+      <nav id="app-tabs-navigation" className={`bg-white border-b-2 border-[#3c3c3c] py-2.5 px-6 ${mobileMenuOpen ? "block" : "hidden md:block"}`}>
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-start gap-2 overflow-x-auto text-[13px] font-mono">
           <button
-            onClick={handleReturnToLanding}
+            onClick={() => {
+              handleReturnToLanding();
+              setMobileMenuOpen(false);
+            }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-[#D67B52] border-dashed border-[#D67B52]/60 hover:border-[#D67B52] hover:bg-[#D67B52]/5"
             title="Read blockchain mechanics & about pages again"
           >
@@ -578,11 +599,14 @@ export default function App() {
               <button
                 key={tab.id}
                 id={`tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  setMobileMenuOpen(false);
+                }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold ${
                   isActive 
-                    ? "bg-[#F3EFEA] text-[#D67B52] border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]" 
-                    : "text-[#6D5D6E] border-transparent hover:border-[#3c3c3c]/40 hover:bg-[#f8f5f2] hover:text-[#3c3c3c]"
+                     ? "bg-[#F3EFEA] text-[#D67B52] border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]" 
+                     : "text-[#6D5D6E] border-transparent hover:border-[#3c3c3c]/40 hover:bg-[#f8f5f2] hover:text-[#3c3c3c]"
                 }`}
               >
                 <Icon size={14} />
@@ -592,13 +616,6 @@ export default function App() {
           })}
         </div>
       </nav>
-
-      {/* 3. CORE CHILL AMBIENT STUDY JAMS DECK BAR */}
-      <div className="bg-[#F3EFEA] border-b-2 border-[#3c3c3c] px-6 py-3">
-        <div className="max-w-7xl mx-auto">
-          <AudioPlayerWidget />
-        </div>
-      </div>
 
       {/* 4. MASTER CONTENT SCREEN DISPLAY ROUTING */}
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto">

@@ -3,6 +3,7 @@ import { UserProfile, MintResult } from "../types";
 import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw } from "lucide-react";
 import { motion } from "motion/react";
 import { ConnectButton } from "@mysten/dapp-kit";
+import { AudioPlayerWidget } from "./AudioPlayerWidget";
 
 interface ProfileWidgetProps {
   user: UserProfile;
@@ -89,7 +90,8 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
   };
 
   return (
-    <div id="profile-deck" className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4 text-[#3c3c3c]">
+    <div className="space-y-6">
+      <div id="profile-deck" className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4 text-[#3c3c3c]">
       
       {/* COLUMN 1: Wallet Connection & Account profile settings */}
       <div className="bg-white border-2 border-[#3c3c3c] rounded-3xl p-5 shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between">
@@ -393,6 +395,15 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
             </div>
           </div>
         )}
+      </div>
+    </div>
+
+      {/* Lofi Jams Music Audio Deck relocated under Profile */}
+      <div className="bg-white border-4 border-[#3c3c3c] rounded-[24px] p-5 shadow-[4px_4px_0px_0px_#3c3c3c]">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono mb-4 flex items-center gap-1.5">
+          <span>🎧 Lofi study jams audio controller</span>
+        </h3>
+        <AudioPlayerWidget />
       </div>
 
     </div>
