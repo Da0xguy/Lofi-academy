@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile containing level, XP, completed tracks, and minted badges keyed by wallet address",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string", "description": "Lofi nickname chosen by the explorer" },
+        "avatar": { "type": "string", "description": "Lofi avatar emoji" },
+        "walletAddress": { "type": "string", "description": "Lowercase SUI public wallet address" },
+        "xp": { "type": "integer", "description": "Total XP earned across study sessions" },
+        "level": { "type": "integer", "description": "Calculated level based on XP values" },
+        "completedModules": { "type": "array", "description": "List of completed module IDs" },
+        "completedTracks": { "type": "array", "description": "List of completed track IDs" },
+        "claimedWelcomeXP": { "type": "boolean", "description": "Whether the welcome bonus was claimed" },
+        "mintedBadges": { "type": "array", "description": "List of minted badges stored in the user Kiosk" },
+        "streak": { "type": "integer", "description": "Consecutive days studies logged in" },
+        "lastLoginDate": { "type": "string", "description": "YYYY-MM-DD format of last study login" }
+      },
+      "required": ["username", "avatar", "xp", "level", "completedModules", "completedTracks", "claimedWelcomeXP", "mintedBadges", "streak", "lastLoginDate"]
+    }
+  },
+  "firestore": {
+    "/users/{walletAddress}": {
+      "schema": "UserProfile",
+      "description": "Student profiles of Sui Lofi Academy tracked by connected SUI wallets"
+    }
+  }
+}

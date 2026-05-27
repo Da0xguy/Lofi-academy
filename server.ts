@@ -4,6 +4,8 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 
 dotenv.config();
 
@@ -11,6 +13,12 @@ const app = express();
 app.use(express.json());
 
 const PORT = 3000;
+
+// Initialize Firebase dynamically from the applet configuration
+const configPath = path.join(process.cwd(), "firebase-applet-config.json");
+const firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 // Initialize GoogleGenAI with explicit user agent and API key setup
 let ai: GoogleGenAI | null = null;
@@ -33,9 +41,6 @@ const initGemini = () => {
   return ai;
 };
 
-// Simple file-based database for persistence state
-const STATE_FILE = path.join(process.cwd(), "lofi_quest_state.json");
-
 interface LeaderboardEntry {
   username: string;
   avatar: string;
@@ -56,91 +61,153 @@ const defaultLeaderboard: LeaderboardEntry[] = [
   { username: "SuilendUser", avatar: "🦁", wallet: "0x4fe...93dd", xp: 210, level: 1, badges: [], rankDirection: "up" },
 ];
 
-function loadState(): { leaderboard: LeaderboardEntry[] } {
-  try {
-    if (fs.existsSync(STATE_FILE)) {
-      const data = fs.readFileSync(STATE_FILE, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (err) {
-    console.error("Error reading state file, resetting to default.", err);
-  }
-  
-  // Write initial state
-  const state = { leaderboard: defaultLeaderboard };
-  try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), "utf-8");
-  } catch (err) {
-    console.error("Error writing default state file", err);
-  }
-  return state;
-}
-
-function saveState(state: { leaderboard: LeaderboardEntry[] }) {
-  try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), "utf-8");
-  } catch (err) {
-    console.error("Error saving state file", err);
-  }
-}
-
 // --------------------------------------------------------
 // API Endpoints
 // --------------------------------------------------------
 
-// 1. Get Leaderboard & Top 10
-app.get("/api/sui/leaderboard", (req, res) => {
-  const state = loadState();
-  // Sort descending by XP
-  const sorted = [...state.leaderboard].sort((a, b) => b.xp - a.xp);
-  res.json({ success: true, leaderboard: sorted });
+// 1. Get Leaderboard & Top 10 with Firestore sync
+app.get("/api/sui/leaderboard", async (req, res) => {
+  try {
+    const usersCol = collection(db, "users");
+    const snapshot = await getDocs(usersCol);
+    const dbUsers: LeaderboardEntry[] = [];
+    
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const badgeIds = Array.isArray(data.mintedBadges)
+        ? data.mintedBadges.map((b: any) => b.trackId)
+        : (Array.isArray(data.completedTracks) ? data.completedTracks : []);
+
+      dbUsers.push({
+        username: data.username || "CozyExplorer",
+        avatar: data.avatar || "🦊",
+        wallet: data.walletAddress || docSnap.id,
+        xp: Number(data.xp ?? 0),
+        level: Number(data.level ?? 1),
+        badges: badgeIds,
+        rankDirection: "same"
+      });
+    });
+
+    const activeWallets = new Set(dbUsers.map(u => u.wallet.toLowerCase()));
+    const finalLeaderboard = [...dbUsers];
+    for (const b of defaultLeaderboard) {
+      if (!activeWallets.has(b.wallet.toLowerCase())) {
+        finalLeaderboard.push(b);
+      }
+    }
+
+    // Sort descending by XP
+    finalLeaderboard.sort((a, b) => b.xp - a.xp);
+    res.json({ success: true, leaderboard: finalLeaderboard });
+  } catch (err) {
+    console.error("Firestore leaderboard retrieval failed:", err);
+    res.json({ success: true, leaderboard: defaultLeaderboard });
+  }
 });
 
 // 2. Submit/Update User Progress & XP on Leaderboard
-app.post("/api/sui/leaderboard", (req, res) => {
+app.post("/api/sui/leaderboard", async (req, res) => {
   const { username, wallet, xp, level, badges, avatar } = req.body;
   if (!wallet) {
     res.status(400).json({ success: false, error: "Missing wallet address" });
     return;
   }
   
-  const state = loadState();
-  const existingIndex = state.leaderboard.findIndex(
-    (item) => item.wallet.toLowerCase() === wallet.toLowerCase()
-  );
+  const cleanWallet = wallet.toLowerCase().trim();
+  const userDocRef = doc(db, "users", cleanWallet);
   
-  const finalUsername = username || `Yeti-${wallet.substring(2, 6)}`;
-  const finalAvatar = avatar || "🐻";
-  
-  if (existingIndex >= 0) {
-    // Keep high scores or accumulate
-    const oldXp = state.leaderboard[existingIndex].xp;
-    const newXp = Math.max(oldXp, xp || 0);
-    const direction = newXp > oldXp ? "up" : (state.leaderboard[existingIndex].rankDirection || "same");
-
-    state.leaderboard[existingIndex].xp = newXp;
-    state.leaderboard[existingIndex].level = Math.max(state.leaderboard[existingIndex].level, level || 1);
-    state.leaderboard[existingIndex].username = finalUsername;
-    state.leaderboard[existingIndex].avatar = finalAvatar;
-    state.leaderboard[existingIndex].rankDirection = direction;
-    if (badges) {
-      state.leaderboard[existingIndex].badges = Array.from(new Set([...(state.leaderboard[existingIndex].badges || []), ...badges]));
+  try {
+    const existingSnap = await getDoc(userDocRef);
+    let finalProfile: any = {};
+    if (existingSnap.exists()) {
+      const data = existingSnap.data();
+      finalProfile = {
+        username: username || data.username || `Yeti-${cleanWallet.substring(2, 6)}`,
+        avatar: avatar || data.avatar || "🐻",
+        walletAddress: cleanWallet,
+        xp: Math.max(Number(data.xp ?? 0), Number(xp ?? 0)),
+        level: Math.max(Number(data.level ?? 1), Number(level ?? 1)),
+        completedModules: data.completedModules || [],
+        completedTracks: data.completedTracks || [],
+        claimedWelcomeXP: data.claimedWelcomeXP || false,
+        mintedBadges: data.mintedBadges || [],
+        streak: Number(data.streak ?? 1),
+        lastLoginDate: data.lastLoginDate || new Date().toISOString().split("T")[0]
+      };
+      
+      if (badges) {
+        const existingTrackIds = new Set((finalProfile.mintedBadges || []).map((b: any) => b.trackId));
+        for (const trackId of badges) {
+          if (!existingTrackIds.has(trackId)) {
+            finalProfile.mintedBadges.push({
+              trackId: String(trackId),
+              tokenId: `token-${Math.random().toString(36).substring(2, 8)}`,
+              txHash: `0x_mock_tx_${Math.random().toString(16).substring(2, 10)}`,
+              mintedAt: new Date().toISOString()
+            });
+          }
+        }
+      }
+    } else {
+      finalProfile = {
+        username: username || `Yeti-${cleanWallet.substring(2, 6)}`,
+        avatar: avatar || "🐻",
+        walletAddress: cleanWallet,
+        xp: Number(xp ?? 0),
+        level: Number(level ?? 1),
+        completedModules: [],
+        completedTracks: [],
+        claimedWelcomeXP: false,
+        mintedBadges: badges ? badges.map((trackId: string) => ({
+          trackId: String(trackId),
+          tokenId: `token-${Math.random().toString(36).substring(2, 8)}`,
+          txHash: `0x_mock_tx_${Math.random().toString(16).substring(2, 10)}`,
+          mintedAt: new Date().toISOString()
+        })) : [],
+        streak: 1,
+        lastLoginDate: new Date().toISOString().split("T")[0]
+      };
     }
-  } else {
-    // Add new user
-    state.leaderboard.push({
-      username: finalUsername,
-      avatar: finalAvatar,
-      wallet: wallet,
-      xp: xp || 0,
-      level: level || 1,
-      badges: badges || [],
-      rankDirection: "up"
+    
+    await setDoc(userDocRef, finalProfile);
+    
+    // Now trigger a refresh of the leaderboard to return to client
+    const usersCol = collection(db, "users");
+    const snapshot = await getDocs(usersCol);
+    const dbUsers: LeaderboardEntry[] = [];
+    
+    snapshot.forEach((snap) => {
+      const data = snap.data();
+      const badgeIds = Array.isArray(data.mintedBadges)
+        ? data.mintedBadges.map((b: any) => b.trackId)
+        : (Array.isArray(data.completedTracks) ? data.completedTracks : []);
+
+      dbUsers.push({
+        username: data.username || "CozyExplorer",
+        avatar: data.avatar || "🦊",
+        wallet: data.walletAddress || snap.id,
+        xp: Number(data.xp ?? 0),
+        level: Number(data.level ?? 1),
+        badges: badgeIds,
+        rankDirection: "same"
+      });
     });
+
+    const activeWallets = new Set(dbUsers.map(u => u.wallet.toLowerCase()));
+    const finalLeaderboard = [...dbUsers];
+    for (const b of defaultLeaderboard) {
+      if (!activeWallets.has(b.wallet.toLowerCase())) {
+        finalLeaderboard.push(b);
+      }
+    }
+    
+    finalLeaderboard.sort((a, b) => b.xp - a.xp);
+    res.json({ success: true, leaderboard: finalLeaderboard });
+  } catch (err) {
+    console.error("Firestore leaderboard save failed:", err);
+    res.json({ success: false, error: "Database save error" });
   }
-  
-  saveState(state);
-  res.json({ success: true, leaderboard: state.leaderboard.sort((a, b) => b.xp - a.xp) });
 });
 
 // 3. AI Tutor Interface / Prompt Chat

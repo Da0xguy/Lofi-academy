@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global safety net - deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Validate ID strings (prevents query/parameter injections)
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    
+    // Type and constraint validator for study user profiles
+    function isValidUserProfile(data) {
+      return data.username is string 
+        && data.username.size() >= 1 
+        && data.username.size() <= 64
+        && data.avatar is string 
+        && data.avatar.size() >= 1 
+        && data.avatar.size() <= 16
+        && (data.walletAddress == null || (data.walletAddress is string && data.walletAddress.size() <= 128))
+        && data.xp is int 
+        && data.xp >= 0 
+        && data.xp <= 500000
+        && data.level is int 
+        && data.level >= 1 
+        && data.level <= 100
+        && data.completedModules is list 
+        && data.completedModules.size() <= 200
+        && data.completedTracks is list 
+        && data.completedTracks.size() <= 50
+        && data.claimedWelcomeXP is bool
+        && data.mintedBadges is list 
+        && data.mintedBadges.size() <= 100
+        && data.streak is int 
+        && data.streak >= 0 
+        && data.streak <= 10000
+        && data.lastLoginDate is string 
+        && data.lastLoginDate.size() <= 32;
+    }
+    
+    // Users Collection matched by lowercase wallet address
+    match /users/{walletAddress} {
+      // Allow read so public profile states are cross-shareable or viewable in dashboard
+      allow get, list: if isValidId(walletAddress);
+      
+      // Allow writes only if structure is perfectly safe and matches validated constraints
+      allow create: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
+      allow update: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
+    }
+  }
+}

@@ -11,6 +11,7 @@ import { LandingPage } from "./components/LandingPage";
 import Background from "./components/Background";
 import { motion, AnimatePresence } from "motion/react";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
+import { getFirebaseUserProfile, saveFirebaseUserProfile } from "./lib/firestoreUtils";
 
 import { 
   Compass, 
@@ -150,34 +151,69 @@ export default function App() {
   });
 
   const currentAccount = useCurrentAccount();
+  const [isSyncingFirebase, setIsSyncingFirebase] = useState<boolean>(false);
+  const loadedFirebaseWalletRef = React.useRef<string | null>(null);
 
-  // Synchronize dApp kit connected wallet address with user profile state
+  // Load and merge user profile from Firebase Firestore when SUI wallet address changes
   useEffect(() => {
-    if (currentAccount) {
-      if (user.walletAddress !== currentAccount.address) {
-        setUser((prev) => {
-          const updated = {
-            ...prev,
-            walletAddress: currentAccount.address,
-            // If connecting for the first time, award welcome bonus
-            xp: prev.claimedWelcomeXP ? prev.xp : prev.xp + 50,
-            claimedWelcomeXP: true
-          };
-          return updated;
-        });
-      }
-    } else {
-      if (user.walletAddress !== null) {
-        setUser((prev) => {
-          const updated = {
+    const syncWalletWithFirebase = async () => {
+      if (currentAccount?.address) {
+        const walletLower = currentAccount.address.toLowerCase();
+        
+        if (loadedFirebaseWalletRef.current === walletLower) {
+          return;
+        }
+        
+        setIsSyncingFirebase(true);
+        try {
+          const cloudProfile = await getFirebaseUserProfile(walletLower);
+          
+          if (cloudProfile) {
+            setUser({
+              username: cloudProfile.username || "CozyExplorer",
+              avatar: cloudProfile.avatar || "🦊",
+              walletAddress: currentAccount.address,
+              xp: Number(cloudProfile.xp ?? 0),
+              level: Number(cloudProfile.level ?? 1),
+              completedModules: Array.isArray(cloudProfile.completedModules) ? cloudProfile.completedModules : [],
+              completedTracks: Array.isArray(cloudProfile.completedTracks) ? cloudProfile.completedTracks : [],
+              claimedWelcomeXP: Boolean(cloudProfile.claimedWelcomeXP),
+              mintedBadges: Array.isArray(cloudProfile.mintedBadges) ? cloudProfile.mintedBadges : [],
+              streak: Number(cloudProfile.streak ?? 1),
+              lastLoginDate: cloudProfile.lastLoginDate || new Date().toISOString().split("T")[0]
+            });
+          } else {
+            // Document doesn't exist yet. Claim welcome gift if not already claimed, and write initial record to Firestore
+            const hasClaimed = user.claimedWelcomeXP || false;
+            const newXp = hasClaimed ? user.xp : user.xp + 50;
+            const updatedProfile = {
+              ...user,
+              walletAddress: currentAccount.address,
+              claimedWelcomeXP: true,
+              xp: newXp
+            };
+            await saveFirebaseUserProfile(walletLower, updatedProfile);
+            setUser(updatedProfile);
+          }
+          loadedFirebaseWalletRef.current = walletLower;
+        } catch (error) {
+          console.error("Firebase syncing failed, relying on local backup:", error);
+        } finally {
+          setIsSyncingFirebase(false);
+        }
+      } else {
+        loadedFirebaseWalletRef.current = null;
+        if (user.walletAddress !== null) {
+          setUser((prev) => ({
             ...prev,
             walletAddress: null
-          };
-          return updated;
-        });
+          }));
+        }
       }
-    }
-  }, [currentAccount, user.walletAddress]);
+    };
+    
+    syncWalletWithFirebase();
+  }, [currentAccount?.address]);
 
   // Streak bonus claim option
   const [claimedStreakBonus, setClaimedStreakBonus] = useState<boolean>(false);
@@ -229,9 +265,26 @@ export default function App() {
     }
   }, [user.xp]);
 
-  // Save profile coordinates onLocalStorage
+  // Save profile coordinates onLocalStorage and Firestore
   useEffect(() => {
     localStorage.setItem("sui_yeti_user", JSON.stringify(user));
+    
+    // Auto-sync profile updates directly into Firestore
+    if (user.walletAddress && loadedFirebaseWalletRef.current === user.walletAddress.toLowerCase()) {
+      const saveToFirestore = async () => {
+        try {
+          await saveFirebaseUserProfile(user.walletAddress!, user);
+        } catch (error) {
+          console.error("Failed to sync profile update to Firebase:", error);
+        }
+      };
+      
+      const timer = setTimeout(() => {
+        saveToFirestore();
+      }, 500); // Debounce to combine rapid consecutive developments
+      
+      return () => clearTimeout(timer);
+    }
   }, [user]);
 
   // Sync user score to the backend leaderboard on any updates to achievements
