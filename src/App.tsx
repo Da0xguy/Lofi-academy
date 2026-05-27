@@ -534,8 +534,7 @@ export default function App() {
           <button 
             onClick={handleReturnToLanding}
             className="text-stone-500 font-mono text-xs hover:text-[#D67B52] underline cursor-pointer mt-4"
-          >
-            &larr; Return to Guided Introduction
+          > Return to Guided Introduction
           </button>
         </motion.div>
       </div>
@@ -566,7 +565,7 @@ export default function App() {
               <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
               <div>
                 <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-                  Lofi Quest: Sui Academy
+                  Lofi Academy
                 </h1>
                 <span className="text-[10px] font-mono uppercase bg-[#89A8B2]/20 text-[#89A8B2] px-2 py-0.5 rounded border-2 border-[#3c3c3c] tracking-widest block mt-0.5 font-bold group-hover:bg-[#89A8B2]/30 transition-colors">
                   CLAY Hackathon MVP
