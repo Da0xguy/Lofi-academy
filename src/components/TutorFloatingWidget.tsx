@@ -1,6 +1,73 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, Send, Sparkles, RefreshCw, X, Coffee, BookOpen } from "lucide-react";
 
+// Client-side customized educational response generator when API server is unavailable/static
+function generateOfflineYetiReply(promptText: string, track?: string, lesson?: string): string {
+  const prompt = promptText.toLowerCase();
+
+  if (prompt.includes("double-spend") || prompt.includes("prevent") || prompt.includes("double spend") || prompt.includes("compiler")) {
+    return `ah! move's type-safety and copy/drop control is legendary! 🛡️ the move compiler strictly enforces rules around resource ownership. 
+
+in move, assets cannot be implicitly copied or discarded unless explicitly permitted by their type abilities (such as "copy" or "drop"). this prevents duplicate asset creations (double spending) and dangling pointers completely at the bytecode/virtual machine runtime level! yeti thinks you are totally secure here. 🐻☕`;
+  }
+
+  if (prompt.includes("object") || prompt.includes("why everything") || prompt.includes("id") || prompt.includes("ownership")) {
+    return `oh, you want to explore sui objects! 📦 unlike traditional blockchains (like EVM) which store global ledger entries inside nested mapping variables, sui represents everything as self-contained, typed structural objects on-chain!
+
+each object has a unique 32-byte hash id. because they have explicit ownership (such as Owned by address, Shared, or Immutable), owned objects bypass global validator voting pipelines entirely! client transactions complete instantly under 100ms. so cozy and fast! ⚡`;
+  }
+
+  if (prompt.includes("storage fund") || prompt.includes("gas") || prompt.includes("rebate") || prompt.includes("stable")) {
+    return `sui's storage fund model is a classic piece of economic engineering! ⛽ when your transactions put new data on-chain, you pay standard storage fees that are added to the general storage fund.
+
+this fund yield stakes rewards to validators to compensate them for storing historic data. and here's the coolest lofi secret: if you delete or clean up your old objects later on, you claim a partial gas rebate refund back! keeps the ledger super lightweight. ❄️✨`;
+  }
+
+  if (prompt.includes("kiosk") || prompt.includes("royalt") || prompt.includes("creator") || prompt.includes("policy")) {
+    return `sui kiosks are secure on-chain houses for trading and lock-bounding digital assets! 🎨 
+
+a kiosk guarantees that creator royalty policies and exchange logic are strictly executed during peer trades. buyers cannot bypass transfer-policy hooks; they must satisfy standard rules to unlock ownership. this provides decentralized, non-custodial safety for creators! 🐻👑`;
+  }
+
+  if (prompt.includes("solidity") || prompt.includes("evm") || prompt.includes("language") || prompt.includes("move vs")) {
+    return `an excellent comparison, my code-crafting friend! ⚔️ solidity uses a legacy account-balance ledger model with global dynamic storage lookups. this makes parallel computation and reentrancy execution highly risky to secure.
+
+move defines objects directly in structures and enforces structural field safety. there is no risk of runtime reentrancy attacks, making move secure by design! grab some hot coffee and relax. 🍵🎧`;
+  }
+
+  if (prompt.includes("cetus") || prompt.includes("navi") || prompt.includes("lend") || prompt.includes("swap") || prompt.includes("defi")) {
+    return `the degy-desk is absolutely buzzing! 🌊 cetus acts as sui's premier concentrated liquidity AMM, routing swap orders in tight price bands to reduce slippage triggers.
+
+navi implements a high-throughput liquidity bridge structure where you deposit collateral (such as SUI) to borrow other assets (like USDC) safely. check out our real-time math-simulations tab just below, it executes the equations live! 📊`;
+  }
+
+  if (prompt.includes("consensus") || prompt.includes("bullshark") || prompt.includes("mysticeti") || prompt.includes("parallel")) {
+    return `the speed of light! 🚀 ordinary blockchains force all transactions to wait in a single, global queue line. sui separates this completely!
+
+it uses Narwhal as a high-throughput parallel mempool, and Bullshark (or Mysticeti) to finalize shared state updates under 300ms! for simple owned-object transfers, it bypasses consensus entirely for absolute instant speeds! yeti wants to dance with you! 🐻💃`;
+  }
+
+  if (prompt.includes("hello") || prompt.includes("hi") || prompt.includes("hey") || prompt.includes("who are you") || prompt.includes("yeti")) {
+    return `hey there, cozy friend! 🐻🍵 grab your blanket and a hot drink. i am yeti the tutor, your helpful code companion here at lofi query space.
+
+ask me anything about move bytecode validation, parallel execution paths, object structures, or economic fee parameters! relax and feel the lofi chord loops playing in your ears. 🎧❄️`;
+  }
+
+  if (prompt.includes("badge") || prompt.includes("mint") || prompt.includes("earn") || prompt.includes("quiz") || prompt.includes("score")) {
+    return `gaining badges is a beautiful milestone! 🎓 once you browse the tracks, study the cozy green chalkboards, and score 70% or more on the interactive evaluations, you unlock souvenir rewards!
+
+you can then click 'mint badge' in your sui kiosk profile tab to record your status. yeti is forever guarding your success achievements! 🐻✨`;
+  }
+
+  const contextStr = (track || lesson) ? ` (pondering deep in ${track || lesson})` : "";
+  return `lofi yeti is meditating on your question${contextStr}:
+"${promptText}" 🐻❄️
+
+that is a beautiful concept! in move and sui, elements are crafted with high-assurance safety and maximum execution throughput in mind. whether it is struct capabilities (key, store, copy, drop), epoch timing, or parallel mempools, everything fits together perfectly.
+
+yeti is super happy you're here. ask another question or enjoy the sweet background ambient line sweeps while you code! 🍵🎧`;
+}
+
 interface Message {
   role: "user" | "model";
   content: string;
@@ -60,20 +127,27 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Response content is not valid JSON");
+      }
+
       const data = await response.json();
       if (data.success) {
         setMessages((prev) => [...prev, { role: "model", content: data.text }]);
       } else {
-        setMessages((prev) => [
-          ...prev,
-          { role: "model", content: "yeti is slipping into a cozy dream... let's take a sip of tea and wait for the code block to clear. try again? 🐻❄️" }
-        ]);
+        throw new Error(data.error || "Unsuccessful backend generation");
       }
     } catch (err) {
-      console.error("Gemini proxy request failed:", err);
+      console.warn("Using offline Yeti fallback tutor engine:", err);
+      const offlineReply = generateOfflineYetiReply(textToSend, currentTrack, currentLesson);
       setMessages((prev) => [
         ...prev,
-        { role: "model", content: "yeti lost the signal in the snow... check your internet or let's try a test swap in Cetus below to warm things up! 🌨️🍵" }
+        { role: "model", content: offlineReply }
       ]);
     } finally {
       setIsTyping(false);
