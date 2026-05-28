@@ -297,6 +297,28 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
           Lofi Quest is a cute Claymorphic space where blockchain concepts feel friendly. Brew warm virtual coffee, chill with procedurally synced chord loops, and master cryptography, parallel consensus, and secure Move contracts under the snowy gaze of Yeti!
         </motion.p>
 
+        {/* Cozy Yeti Cabin Showcase Illustration */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          className="w-full max-w-2xl mt-8 relative group border-4 border-[#3c3c3c] rounded-3xl bg-white shadow-[8px_8px_0px_0px_#3c3c3c] overflow-hidden"
+        >
+          <img
+            src="/src/assets/images/yeti_study_space_1779949789879.png"
+            alt="Yeti Lofi Log Cabin study space"
+            referrerPolicy="no-referrer"
+            className="w-full h-auto aspect-video object-cover group-hover:scale-[1.02] transition-all duration-500 filter brightness-95"
+          />
+          <div className="absolute top-3 left-3 bg-white/95 border-2 border-[#3c3c3c] px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] uppercase tracking-wider">
+            🐻 Yeti's Cozy Study Log
+          </div>
+          <div className="absolute bottom-3 right-3 bg-stone-900/85 backdrop-blur-sm border-2 border-[#3c3c3c] px-3 py-1 rounded-xl text-[9px] font-mono font-extrabold text-amber-300 shadow-[1.5px_1.5px_0px_0px_#3c3c3c] flex items-center gap-1 select-none">
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
+            <span>RADIO ACTIVE: 104.7 LOFI CHILL BEATS</span>
+          </div>
+        </motion.div>
+
         {/* GIGANTIC LAUNCH CALL-TO-ACTION WITH ANIMATION */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}

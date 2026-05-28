@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 
 // Pre-generated static assets mapped from tools outputs
-const YETI_STUDY_ASSET = "/src/assets/images/yeti_study_1779633378264.png";
+const YETI_STUDY_ASSET = "/src/assets/images/yeti_study_space_1779949789879.png";
 const YETI_BADGE_ASSET = "/src/assets/images/yeti_badge_1779633396226.png";
 
 export default function App() {
