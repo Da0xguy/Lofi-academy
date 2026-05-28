@@ -29,6 +29,7 @@ import {
   Sun
 } from "lucide-react";
 import { ConnectButton } from "@mysten/dapp-kit";
+import YETI_STUDY_ASSET from "../assets/images/yeti_study_space_1779949789879.png";
 
 // Interactive Background gaming icons
 const FLOATING_ITEMS = [
@@ -305,7 +306,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
           className="w-full max-w-2xl mt-8 relative group border-4 border-[#3c3c3c] rounded-3xl bg-white shadow-[8px_8px_0px_0px_#3c3c3c] overflow-hidden"
         >
           <img
-            src="/src/assets/images/yeti_study_space_1779949789879.png"
+            src={YETI_STUDY_ASSET}
             alt="Yeti Lofi Log Cabin study space"
             referrerPolicy="no-referrer"
             className="w-full h-auto aspect-video object-cover group-hover:scale-[1.02] transition-all duration-500 filter brightness-95"

@@ -36,8 +36,8 @@ import {
 } from "lucide-react";
 
 // Pre-generated static assets mapped from tools outputs
-const YETI_STUDY_ASSET = "/src/assets/images/yeti_study_space_1779949789879.png";
-const YETI_BADGE_ASSET = "/src/assets/images/yeti_badge_1779633396226.png";
+import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png";
+import YETI_BADGE_ASSET from "./assets/images/yeti_badge_1779633396226.png";
 
 export default function App() {
   // State for landing page vs main app launch
