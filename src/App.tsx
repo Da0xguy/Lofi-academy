@@ -250,12 +250,17 @@ export default function App() {
 
   // Dynamic Level evaluation checking XP progress
   useEffect(() => {
-    // Level calculation formula: Level 1 = 0-99 XP, Level 2 = 100-299 XP, etc.
+    // Level calculation formula: exponentially harder progression
+    // Level 1: 0 - 149 XP
+    // Level 2: 150 - 399 XP (+150 XP)
+    // Level 3: 400 - 799 XP (+250 XP)
+    // Level 4: 800 - 1399 XP (+400 XP)
+    // Level 5: 1400+ XP (+600 XP)
     let targetLevel = 1;
-    if (user.xp >= 700) targetLevel = 5;
-    else if (user.xp >= 500) targetLevel = 4;
-    else if (user.xp >= 300) targetLevel = 3;
-    else if (user.xp >= 100) targetLevel = 2;
+    if (user.xp >= 1400) targetLevel = 5;
+    else if (user.xp >= 800) targetLevel = 4;
+    else if (user.xp >= 400) targetLevel = 3;
+    else if (user.xp >= 150) targetLevel = 2;
 
     if (targetLevel !== user.level) {
       setUser((prev) => ({
@@ -558,7 +563,11 @@ export default function App() {
         onLaunch={handleLaunchApp} 
         userXP={user.xp} 
         isDarkMode={darkMode}
-        toggleDarkMode={() => setDarkMode(!darkMode)}
+        toggleDarkMode={() => {
+          React.startTransition(() => {
+            setDarkMode(!darkMode);
+          });
+        }}
         isWalletConnected={!!currentAccount}
       />
     );
@@ -730,7 +739,11 @@ export default function App() {
               <ConnectButton connectText="Connect Wallet" />
               
               <button
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={() => {
+                  React.startTransition(() => {
+                    setDarkMode(!darkMode);
+                  });
+                }}
                 className="px-3 py-1.5 bg-white border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs font-bold text-[#3c3c3c] hover:scale-102 transition-all cursor-pointer flex items-center gap-1.5 active:translate-y-[1px]"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               >
@@ -771,7 +784,9 @@ export default function App() {
                 key={tab.id}
                 id={`tab-${tab.id}`}
                 onClick={() => {
-                  setActiveTab(tab.id as any);
+                  React.startTransition(() => {
+                    setActiveTab(tab.id as any);
+                  });
                   setMobileMenuOpen(false);
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-xs sm:text-sm ${
@@ -1079,7 +1094,11 @@ export default function App() {
 
                     <div className="flex gap-2">
                       <button
-                        onClick={() => setActiveTab("profile")}
+                        onClick={() => {
+                          React.startTransition(() => {
+                            setActiveTab("profile");
+                          });
+                        }}
                         className="flex-1 py-2.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs font-mono shadow-[2px_2px_0px_0px_#3c3c3c] transition-all cursor-pointer active:translate-y-[1px]"
                       >
                         Go to Profile Kiosk NFT

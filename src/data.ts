@@ -41,6 +41,13 @@ export const initialTracks: LearningTrack[] = [
             content: "the storage fund ensures the network stays slim and validators stay happy. when you buy storage, that mist is staked. and guess what? if you delete your data later, you get a partial gas rebate refund back! yeti thinks this is perfect digital recycling. ♻️🐻",
             yetiMood: "proud",
             chalkboardHeader: "ECONOMIC RECYCLING"
+          },
+          {
+            id: "step5",
+            title: "Sub-Second Ephemeral Finality",
+            content: "why call it instant? because on-chain actions settle in less than 400 milliseconds! by separating simple asset transfers from complex smart contract states, those simple transfers don't need a heavy round-of-agreements between validators. we call this fast-path execution. yeti is sitting comfortably by the fire enjoying this fast-path breeze! ⚡🗻",
+            yetiMood: "excited",
+            chalkboardHeader: "FAST-PATH AGREEMENT"
           }
         ],
         quiz: [
@@ -123,6 +130,22 @@ export const initialTracks: LearningTrack[] = [
             highlightCode: "// Bytecode verification guards the execution stack\n// enforcing runtime-level capabilities strictly",
             yetiMood: "excited",
             chalkboardHeader: "BYTECODE VERIFIER GUARD"
+          },
+          {
+            id: "step4",
+            title: "The Borrow Checker Engine",
+            content: "need to share data without throwing it away? Move uses reference borrowing! you use '&' for read-only access, and '&mut' if you need to mutate fields. the borrow checker ensures that nobody can modify an object while someone else is reading it! this prevents memory race conditions completely under the ice. ⚖️🐻",
+            highlightCode: "fun read_value(coin: &Coin<SUI>): u64 {\n    coin.value\n}",
+            yetiMood: "thinking",
+            chalkboardHeader: "BORROW CHECKER VALUE"
+          },
+          {
+            id: "step5",
+            title: "Strict Module Field Privacy",
+            content: "in Solidity, anyone can modify public variables. in Move, all struct fields are strictly private to the module where they are defined! external modules can only interact with your structs via public function APIs you write. this puts a thick cozy brick wall protecting your treasury from sneaky backdoors! 🧱🏛️",
+            highlightCode: "struct Vault has key {\n    id: UID,\n    balance: u64, // Private field, only accessible by internal funs!\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "FIELD PRIVACY"
           }
         ],
         quiz: [
@@ -190,6 +213,20 @@ export const initialTracks: LearningTrack[] = [
             content: "uncorking your stake is simple but takes some patience. changes to staked delegations register at the boundary of an 'epoch' (which lasts roughly 24 hours on sui). once the epoch spins, your stake is unlocked and ready to flow. 🔄🍵",
             yetiMood: "excited",
             chalkboardHeader: "THE WHEEL OF EPOCHS"
+          },
+          {
+            id: "step4",
+            title: "Validator Selection Rules",
+            content: "who gets to choose the active validator set? you and the staking community! the active 100+ validators are selected based on total delegated stake power. they publish commission rates (the fee they take for operating nodes). yeti advises picking high-performance nodes with cozy, competitive commissions! 🏷️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "COMMISSIONS & HONESTY"
+          },
+          {
+            id: "step5",
+            title: "Compounding APY Power",
+            content: "when you stake SUI, you don't receive daily cash transfers in your wallet. instead, your staking object itself increases in backing value! this means rewards compound automatically in the background under the snow. when you unstake, you retrieve more SUI than you originally deposited! yeti claims this is a legendary passive boost! 📈✨",
+            yetiMood: "proud",
+            chalkboardHeader: "AUTOMATED COMPOUNDING Yield"
           }
         ],
         quiz: [
@@ -254,6 +291,20 @@ export const initialTracks: LearningTrack[] = [
             content: "traditionally, AMM pools spread liquidity across the entire price scale (0 to infinity). but in Concentrated Liquidity (CLMM) like Cetus, you put your capital inside customized price ranges! this creates super thick depth where trading actually happens, boosting your fee yield and minimizing user slippage. smart, isn't it? 🌡️🐻",
             yetiMood: "excited",
             chalkboardHeader: "CONCENTRATED POWER"
+          },
+          {
+            id: "step4",
+            title: "Imperma-frost Loss Paradox",
+            content: "providing liquidity sounds cozy, but warning—prices fluctuate! if token A surges while token B drops, arbitrageurs buy the cheap token. your pool rebalances, leaving you with fewer high-value tokens than if you had just held them in your wallet. this is called Impermanent Loss. yeti says stay frosty and monitor pool ratios! ❄️⚖️",
+            yetiMood: "thinking",
+            chalkboardHeader: "IMPERMANENT LOSS"
+          },
+          {
+            id: "step5",
+            title: "Smart Order Routing",
+            content: "what if you swap Token X for Token Y, but there is no direct pool connecting them? Sui's router executes 'Smart Order Routing'! it splits your swap through multi-pool paths (e.g. X to SUI, then SUI to Y) behind the scenes in a single transaction block. this routes your asset paths cleanly to minimize fees and give you the absolute best rates! 🗺️🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "SMART MULTI-POOL ROUTER"
           }
         ],
         quiz: [
@@ -321,6 +372,20 @@ export const initialTracks: LearningTrack[] = [
             content: "protocols like Suilend don't use fixed interest rates. rates are drawn on a curve! when matching pools are mostly empty (high utilization), interest rates spike up to reward new lenders and nudge borrowers to repay. when money is super abundant (low utilization), rates soften to invite friendly borrowers! curve math keeps the balance. 📈🐻",
             yetiMood: "thinking",
             chalkboardHeader: "RATE EQUILIBRIUM"
+          },
+          {
+            id: "step4",
+            title: "Isolated Market Walls",
+            content: "if a flashy new token with extreme price variance gets listed, does it endanger standard $SUI depositors? no! lending protocols create 'Isolated Pools'. assets inside isolated markets cannot be used as collateral or borrowed in the main pool, keeping risk tightly quarantined under specialized security walls! 🧱🏔️",
+            yetiMood: "chill",
+            chalkboardHeader: "ISOLATED SECURITIES"
+          },
+          {
+            id: "step5",
+            title: "Zero-Collateral Flash Loans",
+            content: "need to borrow 1,000,000 SUI to execute a big price arbitrage, but don't have the cash? use a Flash Loan! you borrow the funds, execute your swap, split the gains, and pay back the original capital—all within a single Programmable Transaction Block! if you can't pay it back by the end of the block, the contract self-aborts as if nothing happened! yeti thinks this is absolute sorcery! ⚡🧙‍♂️",
+            yetiMood: "excited",
+            chalkboardHeader: "FLASH LOAN CHAINS"
           }
         ],
         quiz: [
@@ -388,6 +453,20 @@ export const initialTracks: LearningTrack[] = [
             content: "just bear in mind: the exchange price of your liquid token is bound to the core validator reserves, but market trading pools can experience tiny deviations or price slips during sudden panic cascades. always audit pool slippage thresholds, even in warm lo-fi spaces! 🗺️🐻",
             yetiMood: "thinking",
             chalkboardHeader: "MARKET DEVIATIONS"
+          },
+          {
+            id: "step4",
+            title: "Exchange Rate Appreciation Mechanics",
+            content: "why doesn't 1 sSUI equal exactly 1 SUI forever? because of reward accumulation! as standard validator rewards pool together, the wrapping contract claims them. the exchange rate dynamically adjusts (e.g. 1 sSUI becomes worth 1.05 SUI), allowing you to pull out more SUI upon final redemption! it's like a snowball accumulating size! ☃️ SUI",
+            yetiMood: "proud",
+            chalkboardHeader: "ACCUMULATION CURVE"
+          },
+          {
+            id: "step5",
+            title: "LSD Restaking Pipelines",
+            content: "what's the third floor of this cozy yielding academy cabin? 'Restaking'! you deposit your liquid staking tokens (like sSUI) directly inside secondary restaking engines. this secures secondary infrastructure services on-chain, and rewards you with yet a third layer of passive yields! three yields in one single asset loop. yeti is dancing! 🐻💃",
+            yetiMood: "excited",
+            chalkboardHeader: "RESTAKING LAYER"
           }
         ],
         quiz: [
@@ -445,6 +524,27 @@ export const initialTracks: LearningTrack[] = [
             content: "DeepBook V3 leverages sui's lightning speed to offer flashloans, customizable order structures, and instant taker fills, keeping trading as light as falling snowflakes. plus, anyone can build a visual dashboard or charting interface on top of DeepBook's public pipelines! 🐻📊",
             yetiMood: "excited",
             chalkboardHeader: "DEEPBOOK EVOLVED"
+          },
+          {
+            id: "step3",
+            title: "Maker & Taker Rebate Tier Models",
+            content: "how does DeepBook maintain deep order columns? by rewarding participants! market creators who publish passive orders inside the order column are called 'Makers' and pay tiny or even zero fees. explorers who execute immediate takers are 'Takers' and pay matching fees. this setup attracts massive professional liquidity! 🏷️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "FEE SCHEDULE ENGINE"
+          },
+          {
+            id: "step4",
+            title: "Ultra-Fast Market Maker Hedging",
+            content: "because Sui settles transactions in milliseconds, professional market makers can update bids and asks hundreds of times per second! they run automatic algorithms to hedge coin prices instantly against external exchanges, ensuring that depth columns are always thick and stable even during fast snowstorms. 🌨️⚖️",
+            yetiMood: "thinking",
+            chalkboardHeader: "HEDGING AT WARP SPEED"
+          },
+          {
+            id: "step5",
+            title: "Plugging in the DeepBook SDK",
+            content: "are you a visual app developer? you can interact with DeepBook with zero headaches! by dropping the core DeepBook SDK inside your codebase, you can build full visual limits-dashboards, chart history indices, and trigger swaps with a single click in your app shell. yeti is extremely excited to see your custom exchange layouts! 🐻🎨",
+            yetiMood: "proud",
+            chalkboardHeader: "SDK INTEGRATIONS DIRECT"
           }
         ],
         quiz: [
@@ -493,6 +593,27 @@ export const initialTracks: LearningTrack[] = [
             content: "when you trade an NFT inside a kiosk, the system utilizes a specialized rulebook called a 'TransferPolicy'. the item remains locked in a protective envelope until the matching transaction fulfills the required fees, signatures, or badges. this keeps sales entirely secure, with no trust required between strangers! 🛡️🍵",
             yetiMood: "chill",
             chalkboardHeader: "SECURE COMMERCE SHUTTERS"
+          },
+          {
+            id: "step3",
+            title: "Temporary Borrowing Capabilities",
+            content: "what if you want to wear your sweet NFT hat in a game, but don't want to extract it from the protective Kiosk container? you use Move's borrow command! you can borrow the asset temporarily within a transaction execution, let the game read its attributes, and verify it returns to the Kiosk safely at the end of the transaction. no theft possible! 🛡️🎩",
+            yetiMood: "thinking",
+            chalkboardHeader: "SECURE OBJECT BORROWING"
+          },
+          {
+            id: "step4",
+            title: "Zero-Custody NFT Marketplaces",
+            content: "on traditional blockchains, listing an NFT for sale forces you to transfer it out of your wallet to a marketplace smart contract. on Sui, your item stays in your own Kiosk! marketplaces just look at public listings. when a buyer fulfills the trade, the item transfers directly from your Kiosk to their Kiosk. zero middleman risk! 🤝🏔️",
+            yetiMood: "proud",
+            chalkboardHeader: "TRUSTLESS LISTINGS"
+          },
+          {
+            id: "step5",
+            title: "Bid Placement & Sealed Offers",
+            content: "marketplace collectors don't have to wait for you to list items—they can place bids directly on any NFT inside your Kiosk! they seal their token bids inside an on-chain offer container. if you accept, the swap completes instantly. if you reject, they retrieve their SUI. keeping things extremely tidy and simple under the snow. 🐻💌",
+            yetiMood: "excited",
+            chalkboardHeader: "BIDDING CHANNELS"
           }
         ],
         quiz: [
@@ -555,6 +676,13 @@ export const initialTracks: LearningTrack[] = [
             content: "every transaction specifies a 'Gas Budget'—which is the absolute maximum MIST you are willing to spend. if your contract goes into an infinite loop or runs out of gas, the transaction is rejected, and the unused gas is safely returned to you! no extra draining and no unexpected losses here. 🌨️🐻",
             yetiMood: "proud",
             chalkboardHeader: "PROTECTIVE GAS BUDGETS"
+          },
+          {
+            id: "step5",
+            title: "Dry Runs & Simulation Safety",
+            content: "scared of signing a transaction that robs your wallet? Sui has a built-in safety shield: Dry Runs! before a transaction is broadcast, your wallet performs a simulated run against a validator snapshot. it lists exactly what objects enter and exit your wallet, letting you see exactly what you are approving. yeti says: safety first in the cozy wood! 🐻🛡️",
+            yetiMood: "chill",
+            chalkboardHeader: "DRY-RUN SIMULATION SHIELD"
           }
         ],
         quiz: [
@@ -634,6 +762,20 @@ export const initialTracks: LearningTrack[] = [
             content: "with zkLogin, dynamic gaming dApps and retail apps can onboard billions of mainstream users in seconds! newcomers feel cozy, and their keys are safely managed under high-grade math signatures. let's dance in the snow! 🐻💃",
             yetiMood: "proud",
             chalkboardHeader: "BILLION-USER INTERFACE"
+          },
+          {
+            id: "step4",
+            title: "The Magic of Private Salts",
+            content: "if your web2 email maps directly to your on-chain address, couldn't a snooper look up your wallet by searching your email address? no! zkLogin uses a secret string called a 'Salt'. this random string ensures that no one can associate your email address with your public blockchain address without your authorized login. privacy is beautifully warm here! 🏔️🛡️",
+            yetiMood: "thinking",
+            chalkboardHeader: "THE SALT SHATTER"
+          },
+          {
+            id: "step5",
+            title: "Combining Web2 & Web3 Keys",
+            content: "want the ultimate security configuration? you can combine a zkLogin key with a physical hardware wallet key inside a multi-signature wallet! to spend money, you'd need both a standard web2 Google login AND a click on your hardware ledger keys. yeti says: this is like having a double padlock on your cozy cabin door! 🏰❄️",
+            yetiMood: "excited",
+            chalkboardHeader: "MULTISIG CABIN DOOR"
           }
         ],
         quiz: [
@@ -696,6 +838,13 @@ export const initialTracks: LearningTrack[] = [
             content: "Why are developers crazy about PTBs? Because of the revolutionary User Experience (UX)! In typical DeFi apps, a user has to sign a transaction to 'Approve' a token limit, then sign another transaction to 'Deposit' the token, and yet another to 'Claim' their bonus. With Sui PTBs, you combine approvals, deposits, transfers, and claims into a single-click signature! This slashes gas costs up to 10x and provides a silky-smooth experience that feels like web2. 🥐🐻",
             yetiMood: "chill",
             chalkboardHeader: "SILK-LIKE SINGLE SIGNATURES"
+          },
+          {
+            id: "step5",
+            title: "Zero-Smart-Contract Composability",
+            content: "normally, to combine distinct dApps together, you'd have to write, audit, and deploy a brand new smart contract linking them. with PTBs, you can do this dynamically on the client-side! you just write standard typescript code using the Sui SDK to stitch cetus, suilend, and deepbook together in real-time. yeti calls this zero-code integration magic! 🔮🐾",
+            yetiMood: "proud",
+            chalkboardHeader: "CLIENT-SIDE STITCHING"
           }
         ],
         quiz: [
@@ -772,6 +921,20 @@ export const initialTracks: LearningTrack[] = [
             content: "during early test phases, Mysten Labs launched 'Sui Capys'—cute interactive aquatic creatures that demonstrated the power of dynamic, composable objects! users could purchase clothing items, customize accessories, and breed new Capys directly. this proved that Sui NFTs are living objects, not static IPFS files! 🦫✨",
             yetiMood: "excited",
             chalkboardHeader: "CAPY NFT LIVING OBJECTS"
+          },
+          {
+            id: "step4",
+            title: "Global Ecosystem Partnerships",
+            content: "as the core network matured, world-famous game builders (like NHN and Netmarble), financial innovators, and premium hardware creators began building on-chain products on Sui. these top-tier alliances proved that Sui has the speed, bandwidth, and lofi stability to support massive consumer scale without cracking any ice! 🎮🌨️",
+            yetiMood: "chill",
+            chalkboardHeader: "GLOBAL PARTNERSHIP SHIELDS"
+          },
+          {
+            id: "step5",
+            title: "Academic Cryptographic Foundations",
+            content: "Sui wasn't just built on a developer whim. its consensus, object trees, and safety models undergo academic research peer-review by standard systems teams and cryptographers globally. this scientific rigor ensures the network shields your tokens so you can sleep cozy and sound in our winter cabin! 🔬🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "ACADEMIC PEER REVIEWS"
           }
         ],
         quiz: [
@@ -839,6 +1002,20 @@ export const initialTracks: LearningTrack[] = [
             content: "Sui's developers are launching 'Walrus Protocol'—a decentralized storage network for storing heavy assets like movie files, images, and audio directly on decentralized nodes. yes! completely decentralized videos and lo-fi beats, safe forever. 🐻🎹",
             yetiMood: "proud",
             chalkboardHeader: "WALRUS STORAGE LANDS"
+          },
+          {
+            id: "step4",
+            title: "SuiNS: Nice Digital Handles",
+            content: "tired of looking at ugly keypair addresses like '0x49f2c...'? the Sui Name Service (SuiNS) replaces those cold computer strings with warm, friendly .sui domain handles! (like 'cozyyeti.sui'). this makes sending money or finding your social dashboard profiles simple and familiar! 🏷️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "COZY SUI NAME DOMAINS"
+          },
+          {
+            id: "step5",
+            title: "The Native Sui Bridge",
+            content: "how do assets travel from other blockchains? Sui integrates its own secure, decentralized native 'Sui Bridge' connecting Ethereum directly to the Sui ledger! users can transport their stablecoins or ether cleanly between chains with sub-second speeds and ultra-low slippage overhead. are you ready to bridge? 🌉✨",
+            yetiMood: "excited",
+            chalkboardHeader: "UNIFYING BLOCKCHAIN BRIDGES"
           }
         ],
         quiz: [
@@ -865,6 +1042,259 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "Walrus Protocol expands Sui's ecosystem with secure distributed storage nodes suited for hosting massive files, media, and images with full blockchain verification."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sui-move-coding",
+    title: "Sui Move Coding",
+    description: "Master modules, custom structures, functions, ability modifiers, and ownership rules in the Sui Move smart contract language.",
+    iconName: "Award",
+    difficulty: "Advanced",
+    modules: [
+      {
+        id: "move-basics",
+        title: "Anatomy of a Move Module",
+        description: "Deep dive into module structure, imports, primitive structures, constraints, and initializers.",
+        xpValue: 80,
+        steps: [
+          {
+            id: "move-basic-step1",
+            title: "Declaring Your Move Module",
+            content: "hello, junior scribe! yeti is excited to start coding with you. grab a fresh coffee and take a look at the module declaration! every Move module starts with the 'module' keyword, followed by the package address (or its named alias) and the module name. this sets up a clean sandbox space where your code lives! 🐻📋",
+            highlightCode: "module my_first_package::lofi_yeti_token {\n    // Your code definitions live here!\n}",
+            yetiMood: "chill",
+            chalkboardHeader: "THE MODULE SCOPE"
+          },
+          {
+            id: "move-basic-step2",
+            title: "Importing Core Libraries",
+            content: "you don't have to build everything from scratch! Move uses the 'use' keyword to import structures and helpers from other modules. for example, to create a unique ID for your objects, you import 'UID' and 'TxContext' from the base Sui Framework module 'object' and 'tx_context'. simple and extremely lightweight! 📦❄️",
+            highlightCode: "use sui::object::{Self, UID};\nuse sui::tx_context::{Self, TxContext};",
+            yetiMood: "thinking",
+            chalkboardHeader: "IMPORT STACKS"
+          },
+          {
+            id: "move-basic-step3",
+            title: "Defining Custom Structs",
+            content: "in Sui Move, any custom data type or asset is defined using the 'struct' keyword. unlike traditional languages that let structures float in thin air, structs in Move must specify their abilities (permissions) and fields. let's build a struct representing a warm cup of Coffee! ☕🐻",
+            highlightCode: "struct WarmCoffee has key, store {\n    id: UID,\n    temperature: u8,\n    caffeine_level: u64,\n}",
+            yetiMood: "excited",
+            chalkboardHeader: "CUSTOM STRUCTURES"
+          },
+          {
+            id: "move-basic-step4",
+            title: "Integers, Booleans, and Addresses",
+            content: "Move doesn't support floating-point numbers! instead, we have standard strict integers: u8, u16, u32, u64, u128, and u256. you also have the normal boolean 'bool' (true or false), and unique Web3 'address' representations for users, validators, or packages. this keeps numerical execution completely safe! ❄️🔢",
+            highlightCode: "let temperature: u8 = 75;\nlet is_tasty: bool = true;\nlet yeti_wallet: address = @0x123abc;",
+            yetiMood: "chill",
+            chalkboardHeader: "PRIMITIVE TYPES"
+          },
+          {
+            id: "move-basic-step5",
+            title: "Adding Code Constants",
+            content: "in smart contracts, keeping rules strict is a rule of thumb. you can declare uppercase constants using the 'const' keyword. they are compiled directly inside module bytecode and are mostly used for custom, non-punishing error signals. yeti recommends always prefixing error codes with 'E'! 🐻🛡️",
+            highlightCode: "const E_COFFEE_TOO_HOT: u64 = 1001;\nconst E_OUT_OF_CAFFEINE: u64 = 1002;",
+            yetiMood: "thinking",
+            chalkboardHeader: "CODE CONSTANTS"
+          },
+          {
+            id: "move-basic-step6",
+            title: "The Special init Function",
+            content: "when you publish a package to the Sui blockchain, the network automatically executes a special, optional startup function named 'init' exactly once. it is used to mint native administrator badges, register treasury keys, or configure default initial supplies. are you ready to fire up your cabin? 🏰🌨️",
+            highlightCode: "fun init(ctx: &mut TxContext) {\n    // Code executes automatically upon deployment only\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "INITIALIZATION ROUTINE"
+          },
+          {
+            id: "move-basic-step7",
+            title: "Using the let Keyword",
+            content: "inside functions, you define local local variables using the 'let' keyword. what is super cool? Move is strongly typed, but the compiler can automatically infer types so you don't always have to write them! expressions can also return values without writing explicit return keywords, simply by leaving out the trailing semicolon! 🐻✨",
+            highlightCode: "let a = 10;\nlet b = 20;\na + b // This returns 30!",
+            yetiMood: "excited",
+            chalkboardHeader: "LOCAL EXPRESSIONS"
+          },
+          {
+            id: "move-basic-step8",
+            title: "Managing Vector Collections",
+            content: "need to hold a dynamic list of items under the snow? Move uses 'vector' as the native dynamic array sequence! you can create vectors, push elements inside, pop them out, or borrow values on-chain safely. let's see how yeti tracks a snowpile of cups! ☃️☕",
+            highlightCode: "use std::vector;\n\nlet cups = vector::empty<WarmCoffee>();\nvector::push_back(&mut cups, coffee);",
+            yetiMood: "chill",
+            chalkboardHeader: "VECTORS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "How do you declare a new module in the Sui Move language?",
+            options: [
+              "By writing 'package moduleName'",
+              "By using the keyword 'module' followed by package address and name",
+              "By defining a javascript file with a module export",
+              "By using 'pragma solidity'"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "All Move modules are defined inside named package boundaries using the 'module' keyword."
+          },
+          {
+            id: "q2",
+            question: "What is the purpose of the 'use' keyword in Move?",
+            options: [
+              "To make a transaction block public",
+              "To import structures, types, or helpers from external dependencies",
+              "To delete obsolete objects from memory",
+              "To trigger high speed validator consensus"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "The 'use' keyword imports dependency namespaces to resolve types and helper functions at compile time."
+          },
+          {
+            id: "q3",
+            question: "Which of the following is NOT a native numerical primitive in Move?",
+            options: [
+              "u8",
+              "u64",
+              "float32",
+              "u256"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Move does not support floats (like float32/double) to ensure exact, deterministic mathematical operations across different CPU architectures on-chain."
+          },
+          {
+            id: "q4",
+            question: "When is the special startup 'init' function executed in Sui?",
+            options: [
+              "On every transaction request",
+              "Exactly once automatically when the package is published on-chain",
+              "Only when validators go offline for rebooting",
+              "At the boundary of every single epoch"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "The 'init' function is executed exactly once by the Sui VM when the package is published, which makes it perfect for setting up initial capital rules or administrators."
+          }
+        ]
+      },
+      {
+        id: "move-functions",
+        title: "Functions, Abilities & Object Ownership",
+        description: "Master visibility types, reference borrowing, struct capabilities (abilities), and native transfers.",
+        xpValue: 100,
+        steps: [
+          {
+            id: "move-func-step1",
+            title: "Visibilities: Private, Public, & Entry",
+            content: "functions in Move are private by default (only callable within the same module). use 'public' to allow other modules or packages to call them, and 'entry' to allow users to trigger them directly from a transaction Block! entry functions cannot return values, but public functions can. let's check it out under yeti's magnifying glass! 🐻🔍",
+            highlightCode: "public fun brew_coffee(): WarmCoffee { ... }\npublic entry fun drink_coffee(coffee: WarmCoffee) { ... }",
+            yetiMood: "chill",
+            chalkboardHeader: "FUNCTION VISIBILITIES"
+          },
+          {
+            id: "move-func-step2",
+            title: "The Transaction Context Shield",
+            content: "every smart contract transaction needs a sender. Move passes a special system-level reference called 'TxContext' as the final parameter to mutable functions. it tracks who initiated the transaction block, provides a unique pseudo-random hash generator for generating new UID objects, and keeps transaction details perfectly verified! 🛡️⚡",
+            highlightCode: "use sui::tx_context::{Self, TxContext};\n// Passes &mut TxContext to verify senders",
+            yetiMood: "thinking",
+            chalkboardHeader: "TXCONTEXT HOOKS"
+          },
+          {
+            id: "move-func-step3",
+            title: "Immutable and Mutable References",
+            content: "passing parameters by value transfers or consumes them completely. but what if you just want to read some data without taking ownership? you use 'References'! use '&' for an immutable read-only view, and '&mut' to let the function modify the internal properties. yeti keeps things beautifully synchronized! ⚖️🐻",
+            highlightCode: "public fun read_temp(c: &WarmCoffee): u8 { c.temperature }\npublic fun heat_up(c: &mut WarmCoffee) { c.temperature = 90; }",
+            yetiMood: "excited",
+            chalkboardHeader: "REFERENCE BORROWING"
+          },
+          {
+            id: "move-func-step4",
+            title: "Abilities: Key and Store",
+            content: "let's dive deeper into abilities! the 'key' ability allows a struct to be saved as a high-performance Sui Object. it MUST have a first field named exactly 'id: UID'. the 'store' ability allows that object to be nested inside other objects or transferred in programmatic transactions. this forms the block foundation of object ownership! 📦🔐",
+            highlightCode: "struct Mug has key, store {\n    id: UID,\n    capacity: u64\n}",
+            yetiMood: "chill",
+            chalkboardHeader: "KEY & STORE"
+          },
+          {
+            id: "move-func-step5",
+            title: "Abilities: Copy and Drop",
+            content: "need to duplicate a struct? use the 'copy' ability! need a struct to be discarded automatically at the end of a function scope without active manual deletion? use the 'drop' ability. wait! assets representing money, loans, or credentials will NEVER have copy or drop. this compile-level guard guarantees that nobody can vaporize or counterfeit items on-chain! ❄️🛡️",
+            highlightCode: "struct Receipt has copy, drop {\n    serial_id: u32,\n    payment_amount: u64\n}",
+            yetiMood: "thinking",
+            chalkboardHeader: "COPY & DROP"
+          },
+          {
+            id: "move-func-step6",
+            title: "The Four Types of Ownership",
+            content: "objects on Sui have distinct ownership rules! they can be: Address Owned (accessible only by the owner single key, e.g., your NFT), Parent-Child Nested (contained inside another object), Shared (callable or mutable by anyone simultaneously, e.g., AMMs), or Immutable (read-only forever, e.g., published code). yeti thinks this separation rules! 🗺️🐻",
+            highlightCode: "// Address-owned, Parent-child, Shared, or Immutable\n// Determines who is allowed to sign transactions",
+            yetiMood: "proud",
+            chalkboardHeader: "OBJECT OWNERSHIP TYPES"
+          },
+          {
+            id: "move-func-step7",
+            title: "Sui's Native Transfer Functions",
+            content: "moving objects around is incredibly fast because it's built directly into the Sui Framework! the 'sui::transfer' module allows you to 'transfer' an address-owned object, 'share_object' to make an object globally accessible, or make it 'public_freeze_object' for reading only. let's pass a sweet warm coffee to a friend! 🤝🥐",
+            highlightCode: "use sui::transfer;\n\ntransfer::public_transfer(coffee, recipient_address);",
+            yetiMood: "excited",
+            chalkboardHeader: "ON-CHAIN TRANSFERS"
+          },
+          {
+            id: "move-func-step8",
+            title: "The Golden Rules of Move",
+            content: "yeti is super proud of your progress! to write pristine, safe contracts: (1) check preconditions early with 'assert!', (2) keep state mutable strictly within required borders, and (3) always verify abilities before launching into production. you are now ready to compile real Move modules under the cozy sub-zero sky! 🌨️🎖️",
+            highlightCode: "public entry fun brew(ctx: &mut TxContext) {\n    let new_mug = Mug {\n        id: object::new(ctx),\n        capacity: 250\n    };\n    transfer::transfer(new_mug, tx_context::sender(ctx));\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "CRAFTING CONTRACTS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "Which keyword allows a smart contract function to be directly invoked in program transaction blocks by users?",
+            options: [
+              "public",
+              "private",
+              "entry",
+              "external"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "The 'entry' modifier indicates a function can be triggered as a starting execution point in an external transaction command."
+          },
+          {
+            id: "q2",
+            question: "What is the difference between passing '&WarmCoffee' versus '&mut WarmCoffee'?",
+            options: [
+              "& is mutable, whereas &mut is frozen",
+              "& is for read-only immutable access, whereas &mut allows modifications",
+              "& deletes the object, and &mut copies it",
+              "There is no functional difference"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Reference borrowing maintains high performance; '&' provides read-only views, while '&mut' provides read-and-write permissions."
+          },
+          {
+            id: "q3",
+            question: "Which ability modifier must a struct have to exist as a top-level standalone Sui Object?",
+            options: [
+              "drop",
+              "copy",
+              "key",
+              "store"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "To serve as a standard Sui Object, a struct must have the 'key' ability, and its first field must be 'id: UID'."
+          },
+          {
+            id: "q4",
+            question: "How does 'sui::transfer' handle making a database object publicly queryable & writable by multiple parallel users?",
+            options: [
+              "By using transfer::transfer()",
+              "By using transfer::share_object()",
+              "By using transfer::public_freeze_object()",
+              "It cannot be done; all objects are private"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "The 'transfer::share_object()' function turns an address-owned object into a shared global state, and anyone can then reference it."
           }
         ]
       }
