@@ -255,6 +255,177 @@ export const initialTracks: LearningTrack[] = [
             explanation: "Slashing ensures validators remain financially accountable; any hostile deviation forfeits their staked capital."
           }
         ]
+      },
+      {
+        id: "basics-parallel",
+        title: "Parallel Transaction Execution",
+        description: "How Sui moves beyond typical sequential block queue limits.",
+        xpValue: 40,
+        steps: [
+          {
+            id: "para1",
+            title: "The Single Queue Problem",
+            content: "on older blockchains like Ethereum, every single transaction must stand in one long, single-file line (mempool) to be processed sequential. if someone is buying a hyped NFT, your simple money transfer gets stuck behind them! why should unrelated trades block each other? they shouldn't! 🐻😤",
+            yetiMood: "thinking",
+            chalkboardHeader: "SEQUENTIAL BLOCKADES"
+          },
+          {
+            id: "para2",
+            title: "Sui's Multi-Lane Highway",
+            content: "sui works like a massive multi-lane highway! if you are sending coffee money to your friend, and another user is buying a virtual hat, those transactions are completely independent. sui's nodes execute both transactions at the exact same time in parallel. no waiting, no queues! 🏎️❄️",
+            yetiMood: "excited",
+            chalkboardHeader: "PARALLEL LANES"
+          },
+          {
+            id: "para3",
+            title: "State Access Declarations",
+            content: "how does the validator know which transactions are independent? thanks to Move's type structure, transactions declare exactly which objects they will read or write beforehand. if two transactions don't touch any of the same objects, they are automatically designated as independent and parallelism activates! 🛠️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "STATE COUPLING"
+          },
+          {
+            id: "para4",
+            title: "Multi-Engine Validation",
+            content: "Sui validators don't just use one CPU core; they scale across multiple servers and CPU threads! as transaction volume spikes, validators simply add more cloud cores dynamically. this keeps gas fees cheap and fast even with massive traffic! 🖥️🏔️",
+            yetiMood: "proud",
+            chalkboardHeader: "DYNAMIC HARDWARE SCALE"
+          },
+          {
+            id: "para5",
+            title: "Bypassing Consensus",
+            content: "what is the best part? for simple transactions (like direct peer-to-peer asset transfers), Sui completely bypasses the full agreement consensus phase! this is called 'fast-path validation', resulting in instant sub-300ms execution. yeti is in absolute awe! 🐻⚡",
+            yetiMood: "excited",
+            chalkboardHeader: "FAST-PATH AGREEMENT"
+          }
+        ],
+        quiz: [
+          {
+            id: "pq1",
+            question: "Why do independent transactions execute in parallel on Sui?",
+            options: [
+              "Because they do not touch the same on-chain objects",
+              "Because they use different internet browsers",
+              "Because validator fees are randomized",
+              "Because they are written in JavaScript"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Because independent transactions modify distinct objects, there is no risk of editing overlap, allowing them to execute in parallel safely."
+          }
+        ]
+      },
+      {
+        id: "basics-objects-explained",
+        title: "Sui Object Types & Metadata",
+        description: "Explore owned, shared, immutable, and child objects on-chain.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "obj1",
+            title: "Object Identifiers (UIDs)",
+            content: "every single object on Sui has its own permanent 32-byte cryptographic identifier called a 'UID'. this ID is generated randomly during structure creation, ensuring no two objects anywhere on the ledger can ever overwrite each other! 🐻🔑",
+            yetiMood: "chill",
+            chalkboardHeader: "UNIQUE ON-CHAIN ID"
+          },
+          {
+            id: "obj2",
+            title: "Owned Objects",
+            content: "the most common category on Sui is 'Owned Objects'. these are registered directly to a user's wallet address. only the person holding the private keys to that wallet can sign transactions modifying, transferring, or deleting that specific object! 📦🏔️",
+            yetiMood: "proud",
+            chalkboardHeader: "ADDRESS OWNERSHIP COZY"
+          },
+          {
+            id: "obj3",
+            title: "Shared Objects",
+            content: "what if we need a liquidity pool where hundreds of users swap coins at the same time? we make it a 'Shared Object'! anyone can read or mutate shared objects, but because of competing access, they require sequential validation consensus. 🌡️🐻",
+            yetiMood: "thinking",
+            chalkboardHeader: "SHARED HIGHWAYS"
+          },
+          {
+            id: "obj4",
+            title: "Immutable Objects",
+            content: "once an object is frozen or marked immutable, it is permanently locked. nobody can ever change its data, transfer its ownership, or delete it! published smart contract pack bytecode is a perfect example of an immutable object, safe for eternity! ❄️🛡️",
+            yetiMood: "excited",
+            chalkboardHeader: "FROZEN STATUS"
+          },
+          {
+            id: "obj5",
+            title: "Dynamic Fields & Child Objects",
+            content: "what if your Yeti object wants to carry an item, like a backpack? you can attach a child object directly inside a parent object as a 'Dynamic Field'! if you sell the parent, the child properties automatically migrate along. it's clean and extremely nested! 🎒🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "DYNAMIC NESTING"
+          }
+        ],
+        quiz: [
+          {
+            id: "oq1",
+            question: "Which object type requires consensus coordination among validators to execute?",
+            options: [
+              "Immutable Objects",
+              "Shared Objects",
+              "Address Owned Objects",
+              "Pruned Objects"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Shared objects allow simultaneous concurrent access from multiple users, meaning validators must agree on the sequence order of modifications."
+          }
+        ]
+      },
+      {
+        id: "basics-gas-fees",
+        title: "Sui Gas Pricing & Gas Budgets",
+        description: "How predictable fees protect users from on-chain surprises.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "gas1",
+            title: "Gas Unit Pricing",
+            content: "smart contracts require processor power to execute. gas fees on Sui represent this cost. gas pricing on Sui is calculated by multiplying gas units consumed by the gas price per unit (measured in MIST). keeping it completely predictable! 🐻⛽",
+            yetiMood: "chill",
+            chalkboardHeader: "COMPUTATION ENERGY"
+          },
+          {
+            id: "gas2",
+            title: "Gas Price Surveys",
+            content: "how is gas kept stable on Sui? at the start of every 24-hour epoch, validators complete a reference gas price survey. they commit to a reference price, and as long as they stick to it, they are rewarded. this keeps gas pricing stable all day! ⏰❄",
+            yetiMood: "thinking",
+            chalkboardHeader: "EPOCH GAS PRICING"
+          },
+          {
+            id: "gas3",
+            title: "The Gas Budget Safety",
+            content: "whenever you sign a transaction, your wallet sends a hard limit called 'Gas Budget'. if the contract runs into errors or complex paths requiring more gas than your budget, the transaction safely aborts and returns the unused portion! 🛡️🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "BUDGET OVERFLOW PROTECTION"
+          },
+          {
+            id: "gas4",
+            title: "Sponsored Transactions",
+            content: "Imagine playing a game or using an app where you don't even need to hold SUI tokens to pay for gas! on Sui, developers can choose to 'Sponsor' the gas fees of their users. the app pays the validator quietly behind the scenes, making onboarding flawless! 🎁🏔️",
+            yetiMood: "excited",
+            chalkboardHeader: "INVISIBLE USER GATES"
+          },
+          {
+            id: "gas5",
+            title: "Storage Gas Deposit",
+            content: "every transaction includes a tiny deposit to cover the cost of hosting physical bytes on validators' SSD drives. as we discussed before, if you delete the object, this deposit is returned to you. it is the industry's first on-chain recycling refund! 🌌🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "REFUND RESERVES"
+          }
+        ],
+        quiz: [
+          {
+            id: "gq1",
+            question: "What does Gas Sponsorship enable?",
+            options: [
+              "It imports assets from other networks",
+              "It allows developers to pay the gas fees on behalf of their users",
+              "It forces users to buy more tokens",
+              "It turns off the blockchain consensus"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Gas sponsorship allows an external address to pay transaction gas fees, offering a completely frictionless Web2-like user onboarding flow."
+          }
+        ]
       }
     ]
   },
@@ -493,6 +664,177 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 0,
             explanation: "Though exchange redemption rates are on-chain guaranteed, high sell pressure in open liquidity pools may drag down immediate spot prices for quick sellers."
+          }
+        ]
+      },
+      {
+        id: "defi-derivatives",
+        title: "Perpetuals & Synthetic Assets",
+        description: "How leverage and trading markets operate on high-speed Sui infrastructure.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "deriv1",
+            title: "What are Perpetual Swaps?",
+            content: "Welcome, risk navigator! Unlike standard spot swaps where you buy and hold the physical coin, Perpetual Swaps (Perps) let you trade are mock-contracts bound to the price of an asset. this allows you to go 'Long' (profit when prices rise) or 'Short' (profit when prices drop) with leverage up to 50x! 📈🐻",
+            yetiMood: "thinking",
+            chalkboardHeader: "THE TRADING FUTURES"
+          },
+          {
+            id: "deriv2",
+            title: "Margin & Leverage Systems",
+            content: "leverage is a powerful double-edged sword. you deposit a small amount of 'Margin' collateral, and borrow the rest to trade larger positions. if the market goes against your prediction and your collateral falls below maintenance margins, the position faces instant liquidation under the snow! ⚖️❄️",
+            yetiMood: "thinking",
+            chalkboardHeader: "LEVERAGE LIMITS"
+          },
+          {
+            id: "deriv3",
+            title: "Funding Rate Equilibrium",
+            content: "how do perpetual contract prices stay tied to actual index prices? via the 'Funding Rate'! if too many traders are open-long, longs pay shorts a hourly fee. if too many are short, shorts pay longs. this continuous balancing fee shifts traders back to real-world averages automatically! ⏱️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "FUNDING RATE CRUCIBLE"
+          },
+          {
+            id: "deriv4",
+            title: "Decentralized Perpetuals DEXs",
+            content: "on Sui, high-performance perpetual platforms (like Bluefin and Kriya) offer instant trading that feels like a centralized trading desk, yet is entirely non-custodial and secure. sub-second execution speeds make front-running bots irrelevant! ⚡🏔",
+            yetiMood: "excited",
+            chalkboardHeader: "BLUEFIN SPEED RUN"
+          },
+          {
+            id: "deriv5",
+            title: "Synthetic Asset Creation",
+            content: "what if you want to trade Google stocks or silver on-chain? synthetic protocols wrap these real-world prices inside move collateral buckets! you lock SUI as backing, and mint synthetic dollars or commodities that mimic the price index perfectly. yeti claims this unlocks global financial access! 🎁✨",
+            yetiMood: "proud",
+            chalkboardHeader: "SYNTHETIC WRAPPING"
+          }
+        ],
+        quiz: [
+          {
+            id: "dq1",
+            question: "How do Perpetual Swaps differ from Spot swaps?",
+            options: [
+              "Spot swaps involve custody of the actual asset, whereas Perps allow long/short betting with leverage on price differences",
+              "Perps are illegal on blockchain networks",
+              "Spot swaps require email verification keys",
+              "Perps do not use blockchain technology"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Spot swaps immediately transfer ownership of the actual tokens. Perps are contract positions that settle collateral balances based on price indices."
+          }
+        ]
+      },
+      {
+        id: "defi-aggregators",
+        title: "Liquidity & Yield Aggregators",
+        description: "How routing layers secure the absolute best interest and swap rates.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "agg1",
+            title: "The Fragmented Liquidity Problem",
+            content: "as an ecosystem matures, capital spreads out across different DEX pools (Cetus, Turbos, Kriya, etc.). if you execute a massive swap on a single DEX, the slippage can eat your profits alive! we need a way to combine everything into one visual channel. 🐻🗂",
+            yetiMood: "thinking",
+            chalkboardHeader: "LP SPLITTING DEBACLES"
+          },
+          {
+            id: "agg2",
+            title: "Enter Route Optimizers",
+            content: "dex aggregators (like 7K and Hop) act as the ecosystem's ultimate compass! they read the depth of every swap pool on Sui simultaneously, and automatically split your single trade across multiple systems to give you the absolute lowest slippage and maximum return! 🗺️🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "SMART MULTI-HOP PATHS"
+          },
+          {
+            id: "agg3",
+            title: "Yield Optimizers & Vaults",
+            content: "what about passive lenders? instead of manually searching which lending pool (Navi, Suilend, Scallop) pays the highest APY every hour, Yield Aggregators do it for you! you deposit to a single vault, and smart routers automatically move your tokens to the best-yielding pool under the ice. 📈❄",
+            yetiMood: "chill",
+            chalkboardHeader: "AUTO-COMPOUNDING HOVER"
+          },
+          {
+            id: "agg4",
+            title: "Auto-Reinvesting Harvests",
+            content: "normally, to compound your LP rewards, you'd have to physically claim reward tokens, swap them to pool ratios, and re-add liquidity. yield vaults execute this sequence automatically several times a day in single-click transaction batches, driving compounding yields to the maximum level! 🐻⏳",
+            yetiMood: "proud",
+            chalkboardHeader: "HARVEST STRATAGEM"
+          },
+          {
+            id: "agg5",
+            title: "Security & Router Exploits",
+            content: "aggregating code introduces another layer of smart contract risk. if an underlying pool has an error, the aggregator's vaults are affected as well. yeti safety rule: always verify that your favorite aggregators are thoroughly audited and battle-tested! 🧱🛡",
+            yetiMood: "thinking",
+            chalkboardHeader: "RISK EXPOSURE"
+          }
+        ],
+        quiz: [
+          {
+            id: "aq1",
+            question: "What is the primary benefit of a DEX Aggregator?",
+            options: [
+              "It automatically splits order routing across multiple swap pools to minimize slippage",
+              "It makes blockchain transactions private",
+              "It stores user data on local drives",
+              "It allows users to print money out of thin air"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Aggregators survey entire network liquidity charts, mapping multi-pool splits to preserve maximum token values for swap users."
+          }
+        ]
+      },
+      {
+        id: "defi-oracles",
+        title: "DeFi Oracles & Pricing Feeds",
+        description: "How on-chain protocols query true off-chain market prices.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "orc1",
+            title: "The Block Sandbox Barrier",
+            content: "blockchain smart contracts are completely isolated from the open internet—they can't do Google searches or make API requests on their own! if a lending contract needs to know the exact price of SUI in US dollars, how does it find it? it needs an Oracle! 🐻🏗",
+            yetiMood: "thinking",
+            chalkboardHeader: "COZY ISOLATION GATE"
+          },
+          {
+            id: "orc2",
+            title: "Oracle Network Publishers",
+            content: "decentralized Oracles (like Pyth and Redstone) use a web of professional data publishers (like financial exchanges and institutions) who continuously sign and submit real-time crypto index updates directly to the blockchain. keeping it completely decentralized! 📡🏂",
+            yetiMood: "chill",
+            chalkboardHeader: "PUBLICATION WEBS"
+          },
+          {
+            id: "orc3",
+            title: "Pyth VAA Pricing Model",
+            content: "Pyth utilizes an innovative 'On-Demand pull' design. instead of wasting infinite gas sending data to the chain every second, prices are published off-chain. when a trader initiates a swap, Pyth pulls the latest verified pricing certificate and drops it inside the same transaction block! ⚡🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "PULL-MODEL ORACLES"
+          },
+          {
+            id: "orc4",
+            title: "Oracle Manipulation & Shields",
+            content: "what if a sneaky whale attempts to manipulate the spot price on one tiny exchange to trigger false liquidations? Oracles protect against this by using Median Pricing algorithms! they ignore extreme price deviations, keeping our loan thresholds perfectly secure and warm. 🛡️🏔️",
+            yetiMood: "proud",
+            chalkboardHeader: "MEDIAN OUTLIER PROTECTION"
+          },
+          {
+            id: "orc5",
+            title: "Multi-Oracle Assemblies",
+            content: "for million-dollar vaults, relying on a single oracle setup is a single point of failure risk. top-tier protocols aggregate multiple distinct oracle networks (e.g. Pyth + Chainlink) to provide foolproof redemptive pricing guarantees. yeti sleeps beautifully with dual security locks! 🌌🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "AGGREGATED SENSOR WEB"
+          }
+        ],
+        quiz: [
+          {
+            id: "oq1",
+            question: "Why do smart contracts need Oracle systems?",
+            options: [
+              "They do not natively have access to real-time off-chain data or price feeds",
+              "To create standard web2 logins",
+              "To reduce on-chain block sizes",
+              "To replace smart contract developers"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Blockchains run in deterministic sandboxes. Oracle feeds bridge off-chain asset indices into on-chain Move contracts safely."
           }
         ]
       }
@@ -885,6 +1227,63 @@ export const initialTracks: LearningTrack[] = [
             explanation: "PTBs support high-performance output piping, allowing the results of prior calls to serve directly as inputs for subsequent calls seamlessly."
           }
         ]
+      },
+      {
+        id: "protocols-multisig",
+        title: "Sui Multi-Signature Accounts",
+        description: "How shared cryptography secures collective assets and multi-user accounts.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "multi1",
+            title: "What is a Multi-Signature Address?",
+            content: "Welcome, team security leader! On chains, standard accounts are controlled by one single private key. if that key leaks, your assets vanish! a Multi-Signature (Multisig) account combines multiple distinct public keys into one single deposit address. to sign any transaction, several owners must approve it together under the snow! 🗝️👥",
+            yetiMood: "proud",
+            chalkboardHeader: "COLLECTIVE PRIVATE Vaults"
+          },
+          {
+            id: "multi2",
+            title: "Configuring Weight & Thresholds",
+            content: "multisigs are extremely flexible. each individual key is assigned a custom approval 'Weight' (e.g. 1 point each). you then declare a minimum 'Threshold' (e.g. 2 points total) required to execute transactions. a setup with 3 owners and a threshold of 2 ensures that even if one key gets lost, you can still access deposits! ⚖️🛡️",
+            yetiMood: "thinking",
+            chalkboardHeader: "QUORUM WEIGHT INDEX"
+          },
+          {
+            id: "multi3",
+            title: "Corporate Treasury Pipelines",
+            content: "for commercial web3 protocols, maintaining project treasuries on a single developer's key is a recipe for disaster. multisigs act as a strict corporate shield. any funding release, upgrade, or parameters shift must be verified and signed by team leaders in a fully transparent on-chain manner! 🏔️🏦",
+            yetiMood: "chill",
+            chalkboardHeader: "MANAGED CORPORATE TREASURY"
+          },
+          {
+            id: "multi4",
+            title: "Native On-Chain Combining",
+            content: "Sui has native built-in support for multisig serialization. instead of running complex off-chain calculation bridges, Sui validators parse multisig schemas directly! they check each sub-signature's weight and verify threshold fulfillment instantly with absolute performance! 🌩️🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "NATIVE COMPILER PARSING"
+          },
+          {
+            id: "multi5",
+            title: "Cozy Multisig Security Tips",
+            content: "yeti advises: (1) never store multisig keys on the same physical server, (2) keep individual backup words safe across separate geographical coordinates, and (3) always perform a tiny trial transaction before sending heavy balances. sleep warm and stay locked! ☃️🏰",
+            yetiMood: "proud",
+            chalkboardHeader: "THE TRIPLE LOCK CADENCE"
+          }
+        ],
+        quiz: [
+          {
+            id: "mq1",
+            question: "What is a signature Threshold in a Multisig wallet?",
+            options: [
+              "The maximum gas budget allowed for executing transactions",
+              "The minimum sum of key weights required to authorize a transaction",
+              "The number of users currently reading the profile",
+              "A validator physical server coordinate limit"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "To execute any action, the combined weight of the signing keys must meet or exceed the predefined mathematical threshold limit."
+          }
+        ]
       }
     ]
   },
@@ -1042,6 +1441,234 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "Walrus Protocol expands Sui's ecosystem with secure distributed storage nodes suited for hosting massive files, media, and images with full blockchain verification."
+          }
+        ]
+      },
+      {
+        id: "history-founders",
+        title: "The Pioneers of Move at Meta",
+        description: "How Diem and Move were created and transferred to open source engines.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "found1",
+            title: "The Libra/Diem Project",
+            content: "In 2019, Meta (formerly Facebook) unveiled an ambitious project called Libra to build a global digital currency. To power this, they needed a completely new type of programming language that treated assets as absolute resource. They called it 'Move'! 🐻📖",
+            yetiMood: "thinking",
+            chalkboardHeader: "THE GENESIS OF LIQUID COINS"
+          },
+          {
+            id: "found2",
+            title: "Designing Move Language",
+            content: "Sam Blackshear and other Meta cryptographers noticed that traditional smart contract languages had structural flaws that allowed easy hacks (like double spending). They designed Move to have bytecode verification preventing these flaws completely at compilation time! 🛡️❄",
+            yetiMood: "proud",
+            chalkboardHeader: "SAFETY BY DECREE"
+          },
+          {
+            id: "found3",
+            title: "Diem's Retraction & Open Source",
+            content: "Due to political and regulatory pushback globally, Meta decided to wind down the Diem project. But the technology was too premium to hide away! The core developers open-sourced Move, setting up foundation models for others to build upon. 🏛️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "UNSHACKLING THE Move"
+          },
+          {
+            id: "found4",
+            title: "The Spawning of Mysten Labs",
+            content: "In 2021, Diem's top architects formed Mysten Labs. Their vision was to build an entirely new L1 network around Move, but optimized with an object-oriented paradigm. This dream was named Sui, representing liquid, flowing simplicity! 🌌🏃‍♂️",
+            yetiMood: "excited",
+            chalkboardHeader: "A FRESH OBJECT PATHWAYS"
+          },
+          {
+            id: "found5",
+            title: "Sui's Unique Object Shift",
+            content: "While standard Move stores code inside global addresses, Mysten Labs rewritten Sui Move to store values in independent objects. This crucial design change unlocked parallel transaction capabilities, paving the way for millions of transactions! ⚡🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "THE OBJECT BREAKTHROUGH"
+          }
+        ],
+        quiz: [
+          {
+            id: "fq1",
+            question: "Where was the Move language originally invented before Mysten Labs was formed?",
+            options: [
+              "Inside Meta's Diem/Libra blockchain research team",
+              "At a cryptography division inside Ethereum",
+              "In a university physics department",
+              "In an retro arcade game shop"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Meta created Diem and designed Move as a premium, secure asset-focused programming language before developers spun out into Mysten Labs."
+          }
+        ]
+      },
+      {
+        id: "history-capy-breakout",
+        title: "Sui Capys & Composable NFTs",
+        description: "The viral Testnet game that proved Move's object-centric capabilities.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "capy1",
+            title: "Testnet Launch Phenomenon",
+            content: "In late 2022, during Sui's Testnet, Mysten Labs launched 'Sui Capys'. It wasn't just a simple collector game—it was a deep mechanical showcase demonstrating that SUI tokens and NFTs are living, breathing object structures! 🐻✨",
+            yetiMood: "excited",
+            chalkboardHeader: "COZY CAPY BREEDING"
+          },
+          {
+            id: "capy2",
+            title: "Dynamic Attaching & Accessories",
+            content: "Traditional NFTs are static, flat image files stored on centralized servers. With Sui Capys, users could breed Capys, buy clothing items (such as a lofi scarf), and attach them directly as child objects under the parent Capy! The scarf is owned by the Capy itself! 🧣🦫",
+            yetiMood: "chill",
+            chalkboardHeader: "PARENT-CHILD NESTING COZY"
+          },
+          {
+            id: "capy3",
+            title: "Bidding & Social Commerce",
+            content: "Capys spawned a massive community market. Buyers placed offers on nested Capys directly, trading complex bundles (like a Capy with 3 accessories and matching traits) in single atomic blocks on-chain with no marketplace intermediator holding custody! 🛍️❄",
+            yetiMood: "thinking",
+            chalkboardHeader: "BIDS DIRECT FOR ITEMS"
+          },
+          {
+            id: "capy4",
+            title: "Breeding Genetics Code",
+            content: "Breeding two Capys combined their cryptographic on-chain properties to spawn a completely unique child object. This entire genetic simulation executed entirely on-chain inside Move modules, showing off Sui's speed and low computation overhead! 🧬🏔",
+            yetiMood: "proud",
+            chalkboardHeader: "GENE SELECTION CONTRACTS"
+          },
+          {
+            id: "capy5",
+            title: "Legacy of Sui Capys",
+            content: "Capys proved to game designers around the world that web3 games could offer true gameplay and asset customization without frustrating web3 delays. It set the gold standard for all Sui NFT and game protocols looking forward under the snow! 🏆🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "ESTABLISHING THE GOLD STANDARD"
+          }
+        ],
+        quiz: [
+          {
+            id: "cq1",
+            question: "What architectural feature of Sui made 'Sui Capys' possible?",
+            options: [
+              "Parent-Child Object nesting, allowing NFTs to directly own other objects",
+              "A high speed printer setup",
+              "Having global shared file directories in raw text",
+              "The ability to make gas cost zero"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Sui's object model allows objects to own other objects, letting a Capy NFT directly hold its own clothing items as on-chain nested entities."
+          }
+        ]
+      },
+      {
+        id: "history-defi-spring",
+        title: "Sui DeFi Summer & TVL Breakouts",
+        description: "The rapid ascend of Sui into the top 10 TVL blockchains in 2024.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "defi_sp1",
+            title: "The Sleepy Awakening",
+            content: "After Mainnet launched in May 2023, Sui's DeFi landscape was a quiet, cozy winter forest. But behind the scenes, elite builders were assembling deep swapping, lending, and liquid staking layers that were about to burst into life! ❄️🐻",
+            yetiMood: "chill",
+            chalkboardHeader: "QUIET RECRUITING SEEDS"
+          },
+          {
+            id: "defi_sp2",
+            title: "The TVL Surge in 2024",
+            content: "Starting in early 2024, Sui experienced a spectacular surge in Total Value Locked (TVL). Within months, TVL skyrocketed from under $100 million to over $700 million, surpassing older layer 1 networks such as Cardano, Aptos, and Base! 🚀🏔",
+            yetiMood: "proud",
+            chalkboardHeader: "THE VERTICAL ESCAPE"
+          },
+          {
+            id: "defi_sp3",
+            title: "Cetus and Navi leading the Charge",
+            content: "Protocols like Cetus (the concentrated liquidity AMM) and Navi (the primary lending market) served as the turbine engines of this growth. Their high-performance Move contracts handled millions of daily trades with sub-second finality. 🛡️⚡",
+            yetiMood: "excited",
+            chalkboardHeader: "CORE ENGINE FLOWS"
+          },
+          {
+            id: "defi_sp4",
+            title: "The Inflow of Institutional Assets",
+            content: "Why did capital flock to Sui? Because of predictability and security. Institutional traders locked in millions, realizing Sui's Move compiler provides absolute safety against standard hacks, while sub-300ms consensus ensures no slippage decay! 💼✨",
+            yetiMood: "thinking",
+            chalkboardHeader: "THE TRUST ADVANTAGE"
+          },
+          {
+            id: "defi_sp5",
+            title: "Entering top 10 status",
+            content: "Today, Sui is positioned as a powerhouse ecosystem, holding a prominent place among the top 10 DeFi networks in the world. yeti is extremely proud to see this magnificent lofi academy expanding its digital reach into every territory! 🗺️🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "CLAY TOP METRICS"
+          }
+        ],
+        quiz: [
+          {
+            id: "dq1",
+            question: "Which of the following describes Sui's DeFi expansion in 2024?",
+            options: [
+              "Sui TVL surged massively, pushing it into the top 10 DeFi blockchains globally",
+              "The network was shut down forever",
+              "All tokens were locked into centralized web2 accounts",
+              "Sui disabled all swap protocols"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Sui's high speeds and robust smart contracts attracted massive capital flows, launching it into the top 10 DeFi chains worldwide."
+          }
+        ]
+      },
+      {
+        id: "history-academics",
+        title: "The Academic Roots of Mysticeti Consensus",
+        description: "Explore the peer-reviewed research behind Sui's sub-300ms state engine.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "acad1",
+            title: "Scientific Peer-Review Core",
+            content: "Sui wasn't just built by slapping speculative code blocks together. Mysten's systems teams include decorated cryptographers and academic professors who design networks that undergo rigorous peer-reviews! 🔬🐻",
+            yetiMood: "thinking",
+            chalkboardHeader: "SOLID SCIENTIFIC BASE"
+          },
+          {
+            id: "acad2",
+            title: "The Narwhal Mempool Ledger",
+            content: "Historically, blockchains mixed data storage sorting and voting confirmation inside the same loop. Mysten's researchers separated them! They developed 'Narwhal'—a localized mempool that purely organizes data, dramatically improving validation speed! 🐳❄",
+            yetiMood: "chill",
+            chalkboardHeader: "MEMPOOL SPECIFICATIONS"
+          },
+          {
+            id: "acad3",
+            title: "The Bullshark Consensus Voting",
+            content: "Once Narwhal arranges the transaction queue, an ultra-fast consensus engine called 'Bullshark' handles the validator voting process. Bullshark agrees on the sorted transaction records without adding latency, keeping CPU cores moving at full efficiency! 🦈⚡",
+            yetiMood: "excited",
+            chalkboardHeader: "VOTING FLIGHT LANES"
+          },
+          {
+            id: "acad4",
+            title: "The Mysticeti latency breakthrough",
+            content: "In 2024, Mysten researchers published 'Mysticeti', a revolutionary consensus update. Mysticeti slashes validator round trips by utilizing a DAG (Directed Acyclic Graph) architecture, achieving sub-300ms records. Literally the fastest block processing in human history! 🌌🐾",
+            yetiMood: "proud",
+            chalkboardHeader: "THE LATENCY MILESTONE"
+          },
+          {
+            id: "acad5",
+            title: "Secure Academy Vaults",
+            content: "This scientific foundation guarantees that every token stored, lent, or staked inside our cabin's DeFi simulator is shielded by verifiable cryptographic proofs, keeping our winter home extremely cozy! 🏔️🛡️",
+            yetiMood: "excited",
+            chalkboardHeader: "THE SECURE ACADEMY SHIELD"
+          }
+        ],
+        quiz: [
+          {
+            id: "aq1",
+            question: "What breakthrough represents Mysticeti's primary contribution to consensus science?",
+            options: [
+              "It utilizes DAG structures to cut down consensus latency to sub-300ms levels",
+              "It forces all nodes to use solar panels",
+              "It disables typing on computers",
+              "It converts cryptography into basic text files"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Mysticeti leverages specialized Directed Acyclic Graph (DAG) protocols to reduce execution round trips, enabling sub-300ms transaction confirmations."
           }
         ]
       }
@@ -1297,7 +1924,352 @@ export const initialTracks: LearningTrack[] = [
             explanation: "The 'transfer::share_object()' function turns an address-owned object into a shared global state, and anyone can then reference it."
           }
         ]
+      },
+      {
+        id: "move-objects-creation",
+        title: "Sui Object Creation & Unique Identifiers",
+        description: "Learn how to mint new UID instances using TxContext, assign properties, and handle ownership lifecycle.",
+        xpValue: 90,
+        steps: [
+          {
+            id: "moc1",
+            title: "Understanding UID Generatives",
+            content: "Welcome, developer scribe! Ever wondered how new objects get their lifetime passport IDs? In Sui Move, every standalone object structure requires its first field to be exactly 'id: UID'. To generate a brand new UID, you must call 'object::new(ctx)' and pass high-grade transaction context. Let's inspect the setup! 🐻🔑",
+            highlightCode: "use sui::object::{Self, UID};\n\nstruct Snowball has key {\n    id: UID,\n    diameter: u64\n}",
+            yetiMood: "chill",
+            chalkboardHeader: "THE COMPILER PROTOCOL"
+          },
+          {
+            id: "moc2",
+            title: "Sourcing Transaction Context",
+            content: "Where does this ctx environment handle come from? Whenever a player executes an entry function, the blockchain VM injects a mutable reference to the runtime state sequence '&mut TxContext'. This contains cryptographic metadata required to seed new addresses! 🛡️⚡",
+            highlightCode: "public entry fun roll_snowball(\n    diameter: u64,\n    ctx: &mut TxContext\n) { ... }",
+            yetiMood: "thinking",
+            chalkboardHeader: "MUTABLE CONTEXT HOOKS"
+          },
+          {
+            id: "moc3",
+            title: "Instantiating the Struct",
+            content: "Let's perform the actual creation! In Move, you instantiate structs by specifying values for all declared fields. If you skip even one property or misname a variable, the compiler halts compile targets instantly to guard structural integrity under the ice! ❄️💻",
+            highlightCode: "let ball = Snowball {\n    id: object::new(ctx),\n    diameter: diameter\n};",
+            yetiMood: "excited",
+            chalkboardHeader: "STRUCT CREATION ENGINE"
+          },
+          {
+            id: "moc4",
+            title: "Address-Owned Default Routing",
+            content: "Now that we have created our cold snowball object, what happens if we just let the function end? It will fail! In Move, objects cannot be ignored or vaporized if they do not have the 'drop' ability. We must send it somewhere! By default, we transfer it to the sender's address. 📬🐻",
+            highlightCode: "let sender_addr = tx_context::sender(ctx);\ntransfer::transfer(ball, sender_addr);",
+            yetiMood: "chill",
+            chalkboardHeader: "TRANSFER PROTOCOLS"
+          },
+          {
+            id: "moc5",
+            title: "Parent-Child Attachment Life",
+            content: "Instead of locking the item to a user key, what if we want to nest objects inside other structures? Move handles this securely using parent-child hooks! We can attach items as child objects, meaning the parent owns them directly under SUI. 🎒🏔",
+            highlightCode: "use sui::dynamic_field;\n\n// Attach a custom hat to the snowball parent object!\ndynamic_field::add(&mut ball.id, b\"hat\", hat_object);",
+            yetiMood: "thinking",
+            chalkboardHeader: "DYNAMIC NESTING FIELDS"
+          },
+          {
+            id: "moc6",
+            title: "Unpacking and Destructuring Structs",
+            content: "What if you need to destroy an object and retrieve its fields? Move uses 'Destructuring'! To unpack a struct, you must specify its fields using pattern-matching binding. This is the only way to release stored values from memory back to local variables! 🐻🔨",
+            highlightCode: "let Snowball { id, diameter } = ball;\nobject::delete(id); // Clean up UID immediately!\n// diameter is now a standard u64!",
+            yetiMood: "proud",
+            chalkboardHeader: "DESTRUCTURING MEMORY"
+          },
+          {
+            id: "moc7",
+            title: "UID Clean-up Protocols",
+            content: "Sui rewards efficiency! When you destroy an object, you cannot let its UID remain floating. You must actively delete it from validator registers using 'object::delete()'. This frees up storage space and returns some recycled MIST to your wallet reserves! ♻️❄️",
+            highlightCode: "use sui::object;\n\n// Consuming UID prevents state bloating\nobject::delete(id);",
+            yetiMood: "excited",
+            chalkboardHeader: "EFFICIENT STATE CLEANING"
+          },
+          {
+            id: "moc8",
+            title: "Object Creation Golden Loop",
+            content: "Let's put all modules together into a complete, bulletproof Move entry function! We grab the sender, mint a snowball UID, assign its properties, and deposit it cleanly inside their wallet sequence in one atomic sequence. Yeti has certified your creation blueprints! 🌨️🏆",
+            highlightCode: "public entry fun roll_and_save(\n    diameter: u64,\n    ctx: &mut TxContext\n) {\n    let ball = Snowball { id: object::new(ctx), diameter };\n    transfer::transfer(ball, tx_context::sender(ctx));\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "blueprints verified"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "What function must be invoked to initialize a brand new UID instance in Sui Move?",
+            options: [
+              "object::new(ctx)",
+              "object::create_id()",
+              "tx_context::sender(ctx)",
+              "transfer::transfer()"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Sui's standard library provides high-performance ID allocations via 'object::new(ctx)', utilizing cryptographically derived entropy."
+          }
+        ]
+      },
+      {
+        id: "move-shared-managed",
+        title: "Managing Shared State & Shared Objects",
+        description: "Master shared object patterns, consensus implications, and coordinate multi-user contract variables.",
+        xpValue: 100,
+        steps: [
+          {
+            id: "msm1",
+            title: "What is Shared State on Sui?",
+            content: "Welcome, coordinator! Standard address-owned objects are highly performant but completely exclusive. If we are building a collaborative drawing board, a DEX swap liquidity pool, or a game lobby, multiple players must interact with the state simultaneously. We need Shared State! 🐻👥",
+            highlightCode: "use sui::transfer;\n\n// share_object(obj) makes it globally accessible",
+            yetiMood: "chill",
+            chalkboardHeader: "MULTIPLAYER HIGHWAYS"
+          },
+          {
+            id: "msm2",
+            title: "The share_object Framework Call",
+            content: "How do you make an object shared? By passing it inside the standard function 'transfer::share_object()'! Once an object is designated as shared, it belongs to the network itself. Anyone is permitted to read or mutate its internally public fields via smart contracts! 🌨️⚡",
+            highlightCode: "struct GameLobby has key {\n    id: UID,\n    player_count: u64\n}\n\n// transfer::share_object(lobby); // Shared forever!",
+            yetiMood: "thinking",
+            chalkboardHeader: "GLOBAL ACCESSIBILITY ENGINES"
+          },
+          {
+            id: "msm3",
+            title: "Consensus Pipeline Constraints",
+            content: "Warning: sharing objects impacts transaction speeds! Because multi-user access is prone to editing overlaps, compilers cannot use fast-path validation. Instead, shared objects require validator consensus (Bullshark) to synchronize execute order sequences. Use them wisely! ⏱️🐻",
+            highlightCode: "// Shared objects trigger sequential consensus\n// Owned objects bypass consensus pathways",
+            yetiMood: "thinking",
+            chalkboardHeader: "SPEED CONSIDERATIONS"
+          },
+          {
+            id: "msm4",
+            title: "Frozen Immutable States",
+            content: "What if you want to share data, but want to make sure nobody can ever modify its contents? You freeze it using 'transfer::freeze_object()'! This turns it into an Immutable Object. Because it can never be mutated, readers can access it in parallel without consensus delay! ❄️🛡️",
+            highlightCode: "transfer::public_freeze_object(immutable_profile);",
+            yetiMood: "excited",
+            chalkboardHeader: "IMMUTABLE COLD STORAGE"
+          },
+          {
+            id: "msm5",
+            title: "Designing Shared State Upgrades",
+            content: "When writing modules for shared objects, managing version fields is crucial. By enforcing assertions checking matching protocol versions, you prevent older client versions from executing outdated strategies against treasury balances! 🧱🏛",
+            highlightCode: "assert!(lobby.version == NEW_VERSION, E_VERSION_OUTDATED);",
+            yetiMood: "chill",
+            chalkboardHeader: "VERSION CHECKS"
+          },
+          {
+            id: "msm6",
+            title: "Owner-Controlled Administration",
+            content: "How do you prevent malicious strangers from resetting your shared game state parameters? You write helper validations that require an Admin Cap (Badge) object owned by your trusted administrators to be passed as a transaction parameter! 🛡️👑",
+            highlightCode: "struct AdminCap has key { id: UID }\n\npublic entry fun reset_lobby(\n    _admin: &AdminCap, // Ensures owner validation!\n    lobby: &mut GameLobby\n) { ... }",
+            yetiMood: "proud",
+            chalkboardHeader: "BADGE REGISTRY CHECKS"
+          },
+          {
+            id: "msm7",
+            title: "Object Wrapping Tactics",
+            content: "Another powerful pattern on Sui is 'Object Wrapping'! You can nest a whole object structure inside another module's structure fields. This encapsulates internal data layers cleanly under strict control rules governed by the parent module. 🎁🐻",
+            highlightCode: "struct Vault has key {\n    id: UID,\n    inside_coin: Coin<SUI> // Wrapped inside the vault container!\n}",
+            yetiMood: "excited",
+            chalkboardHeader: "CAPSULE WRAPPING"
+          },
+          {
+            id: "msm8",
+            title: "Complete Shared State Module Blueprint",
+            content: "Let's inspect a complete, highly-secure Move module initialization! We create a game board, designate it as shared, and mint an Admin Cap sent directly to the publisher's wallet. Yeti is dancing by the fireplace celebrating your architectural genius! 🐻💃",
+            highlightCode: "fun init(ctx: &mut TxContext) {\n    let lobby = GameLobby { id: object::new(ctx), player_count: 0 };\n    transfer::share_object(lobby);\n    let admin = AdminCap { id: object::new(ctx) };\n    transfer::transfer(admin, tx_context::sender(ctx));\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "MULTIPLAYER Blueprints"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "Why do Shared Objects require full validation consensus on Sui?",
+            options: [
+              "To make transactions expensive",
+              "To coordinate edit sequences and prevent simultaneous write conflicts",
+              "To convert them into NFTs",
+              "Because the compiler is written in JavaScript"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Because multiple players can access a shared object concurrently, nodes must agree on the sequence ordering of updates."
+          }
+        ]
+      },
+      {
+        id: "move-events-errors",
+        title: "Debugging, Assertions, and Events in Move",
+        description: "Prevent code faults, use pre-condition assertions, emit custom on-chain logs, and debug errors.",
+        xpValue: 90,
+        steps: [
+          {
+            id: "mee1",
+            title: "The Sandbox Defense Line",
+            content: "Greetings, safety engineer! In on-chain financial environments, checking inputs is vital. We must prevent operations with invalid states (such as overdrafts) from executing. Move enforces this defensive barrier using custom asserts and assertions! 🐻🧱",
+            highlightCode: "const E_INSUFFICIENT_BALANCE: u64 = 1001;",
+            yetiMood: "thinking",
+            chalkboardHeader: "COZY SANDBOX DEFENSE"
+          },
+          {
+            id: "mee2",
+            title: "The assert! Pre-condition Assertion",
+            content: "How do you enforce pre-conditions in Move? You utilize the native macro 'assert!'. It accepts a boolean condition and a custom numerical error code. If the condition evaluates to false, execution aborts instantly and resets all states! ⚖️❄️",
+            highlightCode: "assert!(balance >= amount, E_INSUFFICIENT_BALANCE);",
+            yetiMood: "chill",
+            chalkboardHeader: "ASSERT ACTIONS"
+          },
+          {
+            id: "mee3",
+            title: "Numerical Error Standards",
+            content: "Move error codes are u64 constants. Yeti recommends structural grouping: prefixing error definitions with 'E_'. This makes tracking compiler failures across deep project modules incredibly straightforward and neat under the snow! ❄️🔢",
+            highlightCode: "const E_NOT_AUTHORIZED: u64 = 403;\nconst E_OUT_OF_BOUNDS: u64 = 404;",
+            yetiMood: "thinking",
+            chalkboardHeader: "GROUPED CONSTANTS"
+          },
+          {
+            id: "mee4",
+            title: "On-Chain Event Logs",
+            content: "How does your web app or indexer find out when an action occurs on-chain? It views Event logs! In Sui Move, we define custom events as structs possessing the 'copy' and 'drop' capability modifiers. Yeti likes to emit them during major executions! 🐻📡",
+            highlightCode: "use sui::event;\n\nstruct CoffeeBrewed has copy, drop {\n    brew_strength: u8,\n    maker: address\n}",
+            yetiMood: "excited",
+            chalkboardHeader: "on-chain log transmissions"
+          },
+          {
+            id: "mee5",
+            title: "The event::emit Instruction",
+            content: "To broadcast your custom event across validator networks, you instantiate the event structure and send it using 'event::emit()'. Client web applications can listen to these logs in real-time to trigger responsive UI notifications! 🏔️☕",
+            highlightCode: "event::emit(CoffeeBrewed {\n    brew_strength: 50,\n    maker: tx_context::sender(ctx)\n});",
+            yetiMood: "chill",
+            chalkboardHeader: "EMITTING REAL TIME LOGS"
+          },
+          {
+            id: "mee6",
+            title: "Tracking Compiler Panic Runs",
+            content: "What happens if a transaction aborts? The entire block of modifications rolls back. Any SUI tokens transferred or dynamic values mutated revert back to their original states instantly, leaving zero dirty traces in the registry footprint! 🛡️⚡",
+            highlightCode: "// Aborted transactions roll back completely\n// Unused gas budget is returned safely",
+            yetiMood: "thinking",
+            chalkboardHeader: "THE TRANSACTION UNDO SHIELD"
+          },
+          {
+            id: "mee7",
+            title: "Using custom logging functions",
+            content: "While debugging inside your local framework environments, we can set up modular debug structures that print simple string vectors. This coordinates developer views elegantly before publishing contracts into production nodes! 💻🐻",
+            highlightCode: "// std::debug::print(&variable_to_inspect);",
+            yetiMood: "excited",
+            chalkboardHeader: "LOCAL VERBATIM"
+          },
+          {
+            id: "mee8",
+            title: "A Complete Secure Entry Blueprint",
+            content: "Let's review a robust design combining errors and events! We perform balance validations, execute state adjustments, emit the event log certificate, and complete the transfer cleanly. Yeti says: high-grade engineering right here! 🏔️🎖️",
+            highlightCode: "public entry fun brew_premium_coffee(\n    ctx: &mut TxContext\n) {\n    assert!(true, E_NOT_AUTHORIZED);\n    event::emit(CoffeeBrewed { brew_strength: 100, maker: tx_context::sender(ctx) });\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "SAFE SECURE LOOPS"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "What happens on-chain if a Move assert! condition evaluates to false?",
+            options: [
+              "The transaction continues with warnings",
+              "The blockchain resets validator nodes",
+              "Execution aborts instantly, resetting all state changes and logging the error code",
+              "It deletes the user's wallet accounts"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Move transactions are fully atomic. An assertion failure aborts all execution cleanly, reverting intermediate states safely."
+          }
+        ]
+      },
+      {
+        id: "move-advanced-design",
+        title: "Sui Move Security & Reentrancy-Free Patterns",
+        description: "Avoid classic smart contract exploits, manage asset capabilities, and build reentrancy-free vaults.",
+        xpValue: 100,
+        steps: [
+          {
+            id: "mad1",
+            title: "The Reentrancy Shield Native to Move",
+            content: "Welcome, master sentinel! On older networks, reentrancy attacks (where standard attackers drain contracts by recursively calling external withdrawal loops before states update) caused billions in damages. sui Move is completely immune to this by default! 🐻🛡️",
+            highlightCode: "// Compiler structural definitions prevent external re-entry hooks",
+            yetiMood: "proud",
+            chalkboardHeader: "REENTRANCY RESISTANT"
+          },
+          {
+            id: "mad2",
+            title: "Capabilities as Access Guardians",
+            content: "Instead of maintaining massive public access control lists on-chain, Move utilizes Capabilities! If a function can only be triggered by developers, require a unique 'DevCap' badge object to be sent as a parameter limit. No badge, no access! 🏷️🐻",
+            highlightCode: "public entry fun update_pricing(\n    _dev: &DevCap, // Required access key!\n    lobby: &mut GameLobby\n) { ... }",
+            yetiMood: "chill",
+            chalkboardHeader: "CAPABILITY GUARDIANS"
+          },
+          {
+            id: "mad3",
+            title: "The Hot Potato Struct Pattern",
+            content: "Want to guarantee that a sequence of operations is completed in a single block without skipping steps? You write a 'Hot Potato' struct! This is a struct with absolutely NO abilities (no key, store, copy, drop). It must be destrustured before the block ends! 🥔⚡",
+            highlightCode: "struct Receipt {\n    amount_to_pay: u64\n} // No abilities! Must be handled in function execution!",
+            yetiMood: "excited",
+            chalkboardHeader: "HOT POTATO CHAINS"
+          },
+          {
+            id: "mad4",
+            title: "Resolving the Hot Potato Potato",
+            content: "Because the Receipt has no ability parameters, a transaction cannot discard it. The user has to pass it back to a matching 'pay_balances' execution function in your module to destructure it. This secures flash-loan repayments completely! 🏰🏔",
+            highlightCode: "public fun pay_balances(\n    payment: Coin<SUI>,\n    receipt: Receipt // Deconstruct here!\n) { ... }",
+            yetiMood: "thinking",
+            chalkboardHeader: "POTATO DESTRUCTION ENTRANCE"
+          },
+          {
+            id: "mad5",
+            title: "Enforcing Integer Safety Limits",
+            content: "Always check for mathematical overflows! When performing compounding interest calculations or asset distributions, convert smaller integers to u128 or u256 ranges before multiplication checks to verify zero parameter leakage under the cold ice! 📈❄",
+            highlightCode: "let reward = ((staked as u128) * apr) / 10000;",
+            yetiMood: "thinking",
+            chalkboardHeader: "INTEGER MULTIPLICATIONS"
+          },
+          {
+            id: "mad6",
+            title: "Storage Fund Leakage Defenses",
+            content: "When updating dynamic fields frequently, be aware of gas storage dynamics. Design models that recycle obsolete indexes cleanly to prevent capital locked up on validator disks, ensuring your code remains extremely light and clean! ♻️🐻",
+            highlightCode: "dynamic_field::remove<bdf>(&mut parent.id, key);",
+            yetiMood: "chill",
+            chalkboardHeader: "RECYCLING MANAGEMENT"
+          },
+          {
+            id: "mad7",
+            title: "Module Upgradability Limits",
+            content: "When publishing a Move package, Sui generates an upgrade cap badge. By defining safe, progressive migration functions inside your initializers, you secure version upgrades from malicious actors and maintain community trust forever! 🛡️✨",
+            highlightCode: "struct UpgradeCap has key { id: UID }",
+            yetiMood: "proud",
+            chalkboardHeader: "UPGRADE SAFEGUARDS"
+          },
+          {
+            id: "mad8",
+            title: "Graduation Blueprints with Yeti",
+            content: "You did it! You have unlocked all 6 elite tracks of this lofi Move Academy. Yeti is incredibly proud of your deep progress on parallel speed, objects, capability assertions, and beautiful designs. Go forth and craft cozy code on Sui! 🎖️🐻🎓",
+            highlightCode: "// You have graduated!\n// Go construct the on-chain future, master creator!",
+            yetiMood: "proud",
+            chalkboardHeader: "GRADUATION DEGREE ACHIEVED"
+          }
+        ],
+        quiz: [
+          {
+            id: "q1",
+            question: "Why is Sui Move inherently safe against reentrancy attacks?",
+            options: [
+              "Because it uses high speed servers",
+              "Sui's compilation module structure forbids re-entry execution recursively before current execution finishes",
+              "Because it is written in assembly",
+              "Because it does not allow functions"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Sui Move's resource model and strict linear execution prevents re-entry loops natively, cutting out the leading vector of DeFi hacks."
+          }
+        ]
       }
     ]
   }
 ];
+
