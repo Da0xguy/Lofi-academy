@@ -1141,8 +1141,27 @@ export default function App() {
 
             {/* Live custom project overview cards as bottom widget row */}
             {flowState === "syllabus" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white border-2 border-[#3c3c3c] p-5 rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex items-start gap-3 text-[#3c3c3c]">
+              <motion.div 
+                initial="hidden" 
+                animate="show" 
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.15
+                    }
+                  }
+                }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                <motion.div 
+                  variants={{
+                    hidden: { opacity: 0, y: 15 },
+                    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+                  }}
+                  className="bg-white border-2 border-[#3c3c3c] p-5 rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex items-start gap-3 text-[#3c3c3c]"
+                >
                   <div className="p-2 bg-amber-100 text-[#D67B52] border-2 border-[#3c3c3c] rounded-xl shadow-[1px_1px_0px_0px_#3c3c3c]">
                     <Coffee size={18} />
                   </div>
@@ -1152,9 +1171,15 @@ export default function App() {
                       Lofi Quest combines the high speed parallel execution of Sui with the relaxing workspace style of lofitheyeti.com. Learn complex Move semantics easily while listening to cozy procedurally synched chord progressions.
                     </p>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="bg-white border-2 border-[#3c3c3c] p-5 rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex items-start gap-3 text-[#3c3c3c]">
+                <motion.div 
+                  variants={{
+                    hidden: { opacity: 0, y: 15 },
+                    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+                  }}
+                  className="bg-white border-2 border-[#3c3c3c] p-5 rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex items-start gap-3 text-[#3c3c3c]"
+                >
                   <div className="p-2 bg-blue-100 text-[#89A8B2] border-2 border-[#3c3c3c] rounded-xl shadow-[1px_1px_0px_0px_#3c3c3c]">
                     <Lightbulb size={18} />
                   </div>
@@ -1164,8 +1189,8 @@ export default function App() {
                       Sui validators run epochs that shift every 24 hours. At each epoch change, gas baseline target values are adjusted, staking nodes compile performance metrics, and pending rewards are distributed to the stakeholders!
                     </p>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
 
           </div>
