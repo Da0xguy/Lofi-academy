@@ -100,10 +100,27 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
     return Number(localStorage.getItem("sui_yeti_gamer_hs") || "0");
   });
   const [isJumping, setIsJumping] = useState<boolean>(false);
+
+  // Real Sui Multi-Lane Parallel Execution States
+  const [activeLane, setActiveLane] = useState<0 | 1>(0); // 0 = upper road (Fast-Path), 1 = lower road (Shared Consensus)
   const [blockX, setBlockX] = useState<number>(100);
+  const [blockLane, setBlockLane] = useState<0 | 1>(0);
   const [obstacleType, setObstacleType] = useState<string>("🧱");
 
+  const [coinX, setCoinX] = useState<number>(140);
+  const [coinLane, setCoinLane] = useState<0 | 1>(1);
+  const [hasShield, setHasShield] = useState<boolean>(false);
+
+  const [gameLogs, setGameLogs] = useState<string[]>([
+    "[SYSTEM] Narwhal memory pool initialized. Ready with sub-300ms pipelines.",
+    "[SYSTEM] Standby status: INSERT COIN to begin validating transaction paths."
+  ]);
+
   const obstacles = ["🧱", "⛓️", "⛽", "👾", "📈"];
+
+  const appendGameLog = (msg: string) => {
+    setGameLogs((prev) => [msg, ...prev.slice(0, 9)]);
+  };
 
   const handleJump = () => {
     if (!gameStarted) {
@@ -111,71 +128,160 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
       setGameOver(false);
       setGameScore(0);
       setBlockX(100);
+      setCoinX(140);
+      setHasShield(false);
+      setGameLogs([
+        "[BOOT] Narwhal validator pool successfully synchronised! Running DAG sequence...",
+        "[LANES] 🟢 Lane 0: Fast-Path (Owned states) | 🟡 Lane 1: Shared-Consensus (Shared states)",
+        "[RULES] Tap arrow keys (Or click lanes) to swap tracks. Space to Jump!"
+      ]);
       return;
     }
     if (gameOver) {
       setGameOver(false);
       setGameScore(0);
       setBlockX(100);
+      setCoinX(140);
+      setHasShield(false);
+      setGameLogs([
+        "[BOOT] Pipeline restarted. Cleared collision cache.",
+        "[INFO] Initializing new consensus epoch sequence. Go yeti!"
+      ]);
       return;
     }
     if (isJumping) return;
     setIsJumping(true);
+    appendGameLog(`[INPUT] fast_path::execute_owned_object jump command triggered.`);
     setTimeout(() => {
       setIsJumping(false);
-    }, 520);
+    }, 540);
   };
 
-  // Keyboard space key listener helper
+  const handleSwapLane = (targetLane: 0 | 1) => {
+    if (!gameStarted || gameOver) return;
+    if (activeLane === targetLane) return;
+    setActiveLane(targetLane);
+    appendGameLog(
+      targetLane === 0 
+        ? "[ROUTE] Swapping to Lane 0: Fast-Path Owned Object (Instant execution bypass)" 
+        : "[ROUTE] Swapping to Lane 1: Shared Object (Sequential consensus queue)"
+    );
+  };
+
+  // Keyboard space & arrow keys listener helper
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space") {
-        // Only prevent default on landing screen so we don't block main page scrolling if not active game
         if (gameStarted && !gameOver) {
           e.preventDefault();
           handleJump();
+        }
+      } else if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+        if (gameStarted && !gameOver) {
+          e.preventDefault();
+          handleSwapLane(0);
+        }
+      } else if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
+        if (gameStarted && !gameOver) {
+          e.preventDefault();
+          handleSwapLane(1);
         }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameStarted, gameOver, isJumping]);
+  }, [gameStarted, gameOver, isJumping, activeLane]);
 
   // Mini-game clock intervals scheduler
   useEffect(() => {
     if (!gameStarted || gameOver) return;
 
     const timer = setInterval(() => {
+      // Dynamic speed scaling with score
+      const speed = 1.65 + Math.min(gameScore * 0.12, 1.95);
+
+      // 1. Move Block
       setBlockX((prev) => {
-        const next = prev - 1.65;
+        const next = prev - speed;
+        
+        // Block is offscreen
         if (next <= 0) {
-          // Cleared barrier successfully! Award point
           setGameScore((s) => {
             const val = s + 1;
             if (val > highScore) {
               setHighScore(val);
               localStorage.setItem("sui_yeti_gamer_hs", String(val));
             }
+            
+            // Checkpoint log notification every epoch transition
+            if (val % 5 === 0) {
+              const epochNum = Math.floor(val / 5) + 1;
+              const names = ["Narwhal Mempool", "Bullshark Consensus", "Mysticeti Engine", "Super Cluster", "Sovereign Mainnet"];
+              const currentName = names[Math.min(epochNum - 1, names.length - 1)];
+              appendGameLog(`[EPOCH SUCCESS] Transited to Epoch #${epochNum} [${currentName}]! Consensus latency slashes further.`);
+            } else {
+              appendGameLog(`[BLOCK] Block index #${val + 1045} certified and finalized successfully! (+1 score)`);
+            }
             return val;
           });
+          setBlockLane(Math.random() > 0.45 ? 1 : 0);
           setObstacleType(obstacles[Math.floor(Math.random() * obstacles.length)]);
           return 100;
         }
 
-        // Highly-forgiving physical bounds collision checking (12% to 18% coordinate zone)
-        if (next >= 12 && next <= 18) {
-          if (!isJumping) {
-            setGameOver(true);
-            clearInterval(timer);
+        // Parallel collision check zone (12% to 19% coordinate range)
+        if (next >= 12 && next <= 19) {
+          // Both Yeti and block must be on the same lane
+          if (activeLane === blockLane && !isJumping) {
+            if (hasShield) {
+              setHasShield(false);
+              appendGameLog("[SHIELD DETONATED] Gas shield absorbed the transaction conflict! 🛡️⚡");
+              return 100; // Reset block offscreen
+            } else {
+              setGameOver(true);
+              appendGameLog(`[FATAL COLLISION] Spent transaction collision on Lane ${activeLane === 0 ? '0' : '1'}!`);
+              clearInterval(timer);
+            }
           }
         }
 
         return next;
       });
-    }, 40);
+
+      // 2. Move Coin
+      setCoinX((prevCoin) => {
+        const nextCoin = prevCoin - speed;
+
+        if (nextCoin <= 0) {
+          setCoinLane(Math.random() > 0.5 ? 0 : 1);
+          return 140; // Spawn further back than the block
+        }
+
+        // Collection detection zone (12% to 19% coordinate range)
+        if (nextCoin >= 12 && nextCoin <= 19) {
+          if (activeLane === coinLane) {
+            setGameScore((s) => {
+              const val = s + 2;
+              if (val > highScore) {
+                setHighScore(val);
+                localStorage.setItem("sui_yeti_gamer_hs", String(val));
+              }
+              return val;
+            });
+            setHasShield(true);
+            appendGameLog("[GAS REVENUE] Collected MIST Coin! (+2 Score) Safe shielding activated! 🧊🪙");
+            setCoinLane(Math.random() > 0.5 ? 0 : 1);
+            return 140; // Reset offscreen
+          }
+        }
+
+        return nextCoin;
+      });
+
+    }, 45);
 
     return () => clearInterval(timer);
-  }, [gameStarted, gameOver, isJumping, highScore]);
+  }, [gameStarted, gameOver, isJumping, activeLane, blockLane, coinLane, hasShield, gameScore, highScore]);
 
   const triggerBrewCoffee = () => {
     if (coffeeBrewing) return;
@@ -635,138 +741,228 @@ public entry fun mint_badge(...) {
         </motion.div>
       </motion.div>
 
-      {/* 5B. PLAYABLE MINI-ARCADE: YETI'S BLOCK CONSENSUS JUMP RUNNER */}
-      <div className="max-w-4xl mx-auto px-6 py-6 text-center z-10 relative">
+      {/* 5B. PLAYABLE MINI-ARCADE: YETI'S PARALLEL CONSENSUS MULTI-LANE ARCADE */}
+      <div id="retro-arcade-panel" className="max-w-4xl mx-auto px-6 py-6 text-center z-10 relative">
         <div className="bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 shadow-[5px_5px_0px_0px_#3c3c3c] max-w-xl mx-auto">
-          <Gamepad size={36} className="mx-auto text-indigo-600 mb-3 animate-pulse" />
+          <Gamepad size={36} className="mx-auto text-indigo-600 mb-2 animate-pulse" />
           
-          <h4 className="text-lg font-bold font-serif text-[#3c3c3c] uppercase tracking-wide">Yeti's Consensus Block Runner</h4>
-          <p className="text-xs text-[#6D5D6E] font-semibold mt-1 mb-4 max-w-sm mx-auto">
-            Interactive background game: Make Yeti jump over unconfirmed block obstacles! Press <strong>[Spacebar]</strong> or click jump!
+          <h4 className="text-lg font-bold font-serif text-[#3c3c3c] uppercase tracking-wide">Yeti's Parallel Consensus Arcade</h4>
+          <p className="text-xs text-[#6D5D6E] font-semibold mt-1 mb-4 max-w-md mx-auto">
+            Sui processes simple transactions in parallel (Fast Path) and shared transactions sequentially. Switch lanes to escape congestion surges!
           </p>
 
-          {/* Arcade Cabinet Screen */}
+          <div className="flex justify-between items-center bg-[#FAF8F5] px-3.5 py-1.5 border-2 border-[#3c3c3c] rounded-2xl mb-3.5 text-xs font-mono select-none">
+            <span className="font-bold flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>NETWORK STATUS: ACTIVE</span>
+            </span>
+            <span className="text-[#D67B52] font-black uppercase">
+              EPOCH {Math.floor(gameScore / 5) + 1}
+            </span>
+          </div>
+
+          {/* Arcade Cabinet Screen with Multi-Lane visual tracks */}
           <div 
-            onClick={handleJump}
-            className="relative h-44 w-full bg-stone-900 border-4 border-[#3c3c3c] rounded-2xl overflow-hidden shadow-inner font-mono cursor-pointer select-none group"
-            title="Click screen zone to Jump!"
+            onClick={(e) => {
+              if (!gameStarted || gameOver) {
+                handleJump();
+                return;
+              }
+              // Switch lanes based on click height inside container
+              const rect = e.currentTarget.getBoundingClientRect();
+              const relativeY = e.clientY - rect.top;
+              if (relativeY < rect.height / 2) {
+                handleSwapLane(0);
+              } else {
+                handleSwapLane(1);
+              }
+            }}
+            className="relative h-48 w-full bg-stone-900 border-4 border-[#3c3c3c] rounded-2xl overflow-hidden shadow-inner font-mono cursor-pointer select-none group"
+            title="Click Top half for Fast-Path, Bottom half for Consensus!"
           >
-            {/* Ambient grid scanlines effect */}
-            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.22)_50%)] bg-[size:100%_4px] opacity-20"></div>
+            {/* Ambient scanlines overlay */}
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.22)_50%)] bg-[size:100%_4px] opacity-25 z-20"></div>
 
-            {/* Score HUD Overlay */}
+            {/* Score HUD Display */}
             <div className="absolute top-2 left-3 right-3 flex justify-between text-[11px] font-bold z-20">
-              <span className="text-amber-400">SCORE: {gameScore}</span>
-              <span className="text-stone-400">HI-SCORE: {highScore}</span>
+              <span className="text-amber-400">LEDGER SCORE: {gameScore}</span>
+              <span className="text-emerald-400 font-mono">
+                {hasShield ? "🛡️ GAS SHIELD CHARGED" : "⚡ PARALLEL PIPELINE"}
+              </span>
+              <span className="text-stone-400">HIGH: {highScore}</span>
             </div>
 
-            {/* Parallax Star fields and mountain outlines */}
-            <div className="absolute bottom-6 left-0 right-0 h-0.5 bg-stone-700"></div>
-            <div className="absolute bottom-1 right-2 text-stone-600 text-[8px] tracking-widest font-bold uppercase select-none pointer-events-none">
-              Mysticeti Lanes
+            {/* Track 0 Segment Line (Fast Path) */}
+            <div className="absolute bottom-24 left-0 right-0 h-0.5 border-t border-dashed border-cyan-800/60 z-0"></div>
+            <div className="absolute bottom-26 left-3 text-cyan-500/40 text-[8px] font-black uppercase tracking-wider">
+              LANE 0: FAST-PATH (OWNED OBJECTS BYPASS)
             </div>
 
-            {/* Yeti Avatar 🐻 with dynamic fun speech bubble */}
+            {/* Track 1 Segment Line (Shared Consensus) */}
+            <div className="absolute bottom-8 left-0 right-0 h-0.5 border-t border-dashed border-amber-800/60 z-0"></div>
+            <div className="absolute bottom-10 left-3 text-amber-500/40 text-[8px] font-black uppercase tracking-wider">
+              LANE 1: SHARED METADATA CONSENSUS
+            </div>
+
+            {/* Ground separator bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-2 bg-stone-950 z-10"></div>
+
+            {/* Yeti Avatar 🐻 with dynamic vertical lane alignment */}
             <motion.div 
-              className="absolute left-10 text-3xl z-10 flex items-center"
-              style={{ bottom: "24px" }}
+              className={`absolute left-10 text-3xl z-10 flex items-center transition-all duration-250`}
+              style={{ 
+                bottom: activeLane === 0 ? "46px" : "12px",
+                filter: hasShield ? "drop-shadow(0 0 8px rgba(34, 211, 238, 0.8))" : "none"
+              }}
               animate={isJumping ? { 
-                y: -65, 
-                rotate: [0, -12, 12, 0],
-                scale: [1, 1.1, 1] 
+                y: -36, 
+                rotate: [0, -10, 10, 0],
+                scale: [1, 1.15, 1] 
               } : { 
                 y: 0, 
                 rotate: 0,
                 scale: 1 
               }}
-              transition={isJumping ? {
-                duration: 0.52,
-                ease: [0.25, 1, 0.5, 1] 
-              } : {
-                duration: 0.25,
-                ease: "easeIn"
-              }}
+              transition={{ duration: 0.52 }}
             >
               <span>🐻</span>
+              {hasShield && (
+                <span className="absolute -inset-1 rounded-full border-2 border-cyan-400 animate-ping opacity-60"></span>
+              )}
               <span className="absolute -top-3 -right-2 text-[10px] animate-bounce">☕</span>
               
-              {/* Dynamic Bubble status indicators */}
-              <div id="yeti-bubble" className="absolute left-8 -top-8 bg-white text-stone-900 text-[8px] font-bold px-1.5 py-0.5 rounded-lg border border-stone-400 shadow-sm font-sans flex items-center gap-0.5 whitespace-nowrap z-20">
-                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
+              {/* Floating bubble text above yeti */}
+              <div className="absolute left-8 -top-8 bg-white text-stone-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-stone-400 shadow-sm font-sans flex items-center gap-0.5 whitespace-nowrap z-20">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                 <span>
-                  {gameScore === 0 ? "Jump consensus! 🏔️" : gameScore < 5 ? "Fast parallel Move! ⚡" : "Validation hero! 🏆"}
+                  {gameScore === 0 ? "Dodge congestion! 🏔️" : gameScore < 5 ? "Epoch 1: Narwhal ⚡" : gameScore < 10 ? "Epoch 2: Bullshark 🦈" : "Epoch 3: Mysticeti 🔥"}
                 </span>
-                <div className="absolute -left-1 top-2.5 border-t-4 border-t-white border-r-4 border-r-white border-b-4 border-b-transparent border-l-4 border-l-transparent select-none rotate-45 transform"></div>
               </div>
             </motion.div>
 
-            {/* Decorative Sky coin 🪙 that floats above path */}
+            {/* Collectible GAS MIST Refund Coin 🪙 */}
             {gameStarted && !gameOver && (
               <motion.div 
-                className="absolute text-xs"
-                style={{ bottom: "85px", left: `${(blockX + 22) % 100}%` }}
-                animate={{ y: [0, -4, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute text-lg z-10"
+                style={{ 
+                  bottom: coinLane === 0 ? "48px" : "14px", 
+                  left: `${coinX}%` 
+                }}
+                animate={{ y: [0, -3, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <span>🪙</span>
+                <span className="filter drop-shadow-md">🪙</span>
               </motion.div>
             )}
 
-            {/* Moving Obstacle Block 🧱 (transaction hash) */}
+            {/* Obstacle Hazard representing transaction congestions 🧱 */}
             {gameStarted && !gameOver && (
-              <motion.div 
+              <div 
                 className="absolute text-xl z-10 flex flex-col items-center"
-                style={{ bottom: "24px", left: `${blockX}%` }}
+                style={{ 
+                  bottom: blockLane === 0 ? "48px" : "14px", 
+                  left: `${blockX}%` 
+                }}
               >
                 <span>{obstacleType}</span>
-                <span className="text-[6.5px] text-rose-400 font-extrabold bg-stone-950 px-1 border border-rose-500/50 rounded font-mono uppercase tracking-wider block">
-                  {obstacleType === "🧱" ? "Block" : obstacleType === "⛽" ? "Gas" : "0xSUI"}
+                <span className={`text-[6px] font-extrabold px-1 border rounded font-mono uppercase tracking-wider block ${
+                  blockLane === 0 ? "text-cyan-400 border-cyan-500/50 bg-stone-950" : "text-amber-400 border-amber-500/50 bg-stone-950"
+                }`}>
+                  {blockLane === 0 ? "Owned Hack" : "Queue Jam"}
                 </span>
-              </motion.div>
+              </div>
             )}
 
-            {/* Non-Started state indicator overlay */}
+            {/* Standby screen layer */}
             {!gameStarted && (
-              <div className="absolute inset-0 bg-stone-900/90 flex flex-col items-center justify-center p-4">
-                <span className="text-indigo-400 text-xs font-bold blink animate-pulse mb-1">
-                  [ STANDBY STATUS READY ]
+              <div className="absolute inset-0 bg-stone-900/95 flex flex-col items-center justify-center p-4 z-20">
+                <span className="text-[#D67B52] text-xs font-black tracking-widest animate-pulse mb-1">
+                  [ MULTI-LANE CONSENSUS ENGAGED ]
                 </span>
-                <p className="text-stone-400 text-[10px] max-w-xs leading-normal">
-                  Tap anywhere on the arcade machine screen or click button below to activate Yeti consensus!
+                <p className="text-stone-400 text-[10px] max-w-xs leading-normal font-sans">
+                  Use Up/Down Arrow keys or click tracks to alter lanes between Fast-Path and Consensus tracks. Avoid blockades & collect MIST gas 🪙!
                 </p>
-                <button className="mt-3 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-semibold shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer">
-                  INSERT COIN 🪙
+                <button className="mt-3.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-bold shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer uppercase">
+                  INSERT PROTOCOL COIN 🪙
                 </button>
               </div>
             )}
 
-            {/* Game Over state layout */}
+            {/* Crash gameover state layer */}
             {gameOver && (
-              <div className="absolute inset-0 bg-[#e74c3c]/15 backdrop-blur-[1px] bg-stone-950/90 flex flex-col items-center justify-center p-4 z-30">
-                <span className="text-red-500 text-xs font-black uppercase tracking-widest mb-1.5 animate-bounce">
-                  💥 Ledger Collision! GAME OVER 💥
+              <div className="absolute inset-0 bg-red-950/90 flex flex-col items-center justify-center p-4 z-30">
+                <span className="text-red-400 text-xs font-black uppercase tracking-widest mb-1 animate-bounce">
+                  💥 TRANSACTION COLLISION CRASH 💥
                 </span>
-                <p className="text-stone-400 text-[9px] max-w-xs mb-3">
-                  Score: <strong className="text-amber-400">{gameScore}</strong> | High Score: <strong className="text-white">{highScore}</strong>
+                <p className="text-stone-300 text-[10px] max-w-xs font-serif leading-none mt-1">
+                  Ledger aborted. Score: <strong className="text-amber-400">{gameScore}</strong> | Highest Verified Score: <strong className="text-white">{highScore}</strong>
                 </p>
-                <button className="px-4 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-black shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer uppercase">
-                  RESTART LEDGER LOOP 🔄
+                <button className="mt-3.5 px-4 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-extrabold shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer">
+                  REPLAY LEDGER SYMPOSIUM 🔄
                 </button>
               </div>
             )}
-
           </div>
 
-          {/* Physical Gamepad controls style */}
-          <div className="mt-4 flex items-center justify-center gap-4">
+          {/* Parallel controls feedback bar */}
+          <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 bg-[#FAF8F5] p-3 border-2 border-[#3c3c3c] rounded-2xl text-left">
+            <div>
+              <span className="text-[#3c3c3c] text-[10px] font-bold block">ACTIVE LANE SELECTOR:</span>
+              <div className="flex gap-2 mt-1">
+                <button
+                  onClick={() => handleSwapLane(0)}
+                  disabled={!gameStarted || gameOver}
+                  className={`px-2.5 py-1 text-[9px] font-mono font-black border-2 border-[#3c3c3c] rounded-lg shadow-[1px_1px_0px_0px_#3c3c3c] transition-all cursor-pointer ${
+                    activeLane === 0 
+                      ? "bg-cyan-100 text-cyan-800" 
+                      : "bg-white text-stone-500 opacity-60"
+                  }`}
+                >
+                  🟢 LANE 0: FAST PATH
+                </button>
+                <button
+                  onClick={() => handleSwapLane(1)}
+                  disabled={!gameStarted || gameOver}
+                  className={`px-2.5 py-1 text-[9px] font-mono font-black border-2 border-[#3c3c3c] rounded-lg shadow-[1px_1px_0px_0px_#3c3c3c] transition-all cursor-pointer ${
+                    activeLane === 1 
+                      ? "bg-amber-100 text-[#D67B52]" 
+                      : "bg-white text-stone-500 opacity-60"
+                  }`}
+                >
+                  🟡 LANE 1: CONSENSUS
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={handleJump}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 hover:scale-103 transition-transform text-white border-2 border-[#3c3c3c] font-mono text-xs font-bold rounded-xl shadow-[3px_3px_0px_0px_#3c3c3c] cursor-pointer flex items-center gap-2 select-none"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white border-2 border-[#3c3c3c] font-mono text-[10px] font-extrabold rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#3c3c3c] max-height-[32px] self-end"
             >
-              <span>{gameStarted && !gameOver ? "JUMP YETI! ⬆️" : "START LEDGER GAME 🎮"}</span>
-              <span className="bg-indigo-800 text-[9px] px-1 rounded">Space</span>
+              🚀 JUMP YETI [Space]
             </button>
           </div>
+
+          {/* REAL TIME TRANSACTION MONITOR LOG WINDOW */}
+          <div className="bg-stone-900 border-2 border-[#3c3c3c] rounded-2xl p-3.5 mt-3 text-left font-mono text-[9px] text-stone-300 shadow-[2px_2px_0px_0px_#3c3c3c]">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-1.5 mb-2 select-none text-[8px] text-stone-400 font-extrabold uppercase">
+              <span className="flex items-center gap-1">
+                <Cpu size={10} className="text-cyan-400 animate-spin" />
+                <span>Validator Node Ledger Stream</span>
+              </span>
+              <span className="text-[#D67B52]">Latency: 280ms (Mysticeti)</span>
+            </div>
+            <div className="space-y-1 max-h-[85px] overflow-y-auto font-mono scrollbar-none scroll-smooth">
+              {gameLogs.map((log, idx) => (
+                <div key={idx} className="truncate select-text">
+                  <span className="text-stone-500">[{new Date().toLocaleTimeString().split(" ")[0]}]:</span>{" "}
+                  <span className={log.includes("[FATAL]") || log.includes("[CRASH]") ? "text-red-400" : log.includes("[GAS]") || log.includes("[EPOCH]") ? "text-cyan-300 font-bold" : "text-stone-300"}>
+                    {log}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
 

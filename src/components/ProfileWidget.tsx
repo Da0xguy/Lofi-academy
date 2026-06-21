@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { UserProfile, MintResult } from "../types";
-import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw } from "lucide-react";
+import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw, Calendar, Hash, Lock, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { AudioPlayerWidget } from "./AudioPlayerWidget";
@@ -20,6 +20,72 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
   const [isMinting, setIsMinting] = useState<string | null>(null);
   const [activeMintReceipt, setActiveMintReceipt] = useState<MintResult | null>(null);
   const [copyFeedback, setCopyFeedback] = useState<boolean>(false);
+  const [hoveredBadge, setHoveredBadge] = useState<string | null>(null);
+  const [copiedTx, setCopiedTx] = useState<string | null>(null);
+
+  const ALL_BADGE_TEMPLATES = [
+    {
+      id: "sui-basics",
+      title: "Sui Basics Badge",
+      emoji: "🌊",
+      description: "Mastered object storage, parallel pipelines, and consensus systems.",
+      borderColor: "border-blue-300",
+      glowColor: "shadow-blue-500/10",
+      bgClass: "bg-[#B9D7EA]/25 text-blue-900 border-blue-400/80",
+    },
+    {
+      id: "sui-defi",
+      title: "Sui DeFi Badge",
+      emoji: "📈",
+      description: "Mastered Cetus pool structures, Suilend loans, and multi-oracle pairs.",
+      borderColor: "border-amber-300",
+      glowColor: "shadow-amber-500/10",
+      bgClass: "bg-[#E8E1D9]/70 text-amber-900 border-amber-400/80",
+    },
+    {
+      id: "sui-protocols",
+      title: "Sui Protocols Badge",
+      emoji: "🛡️",
+      description: "Mastered DeepBook CLOB orders, Kiosk transfer policies, and zkLogin.",
+      borderColor: "border-purple-300",
+      glowColor: "shadow-purple-500/10",
+      bgClass: "bg-[#E8A0BF]/25 text-purple-900 border-purple-400/80",
+    },
+    {
+      id: "sui-history",
+      title: "Sui History Badge",
+      emoji: "📖",
+      description: "Mastered Diem origins, Mysten Labs founders, and Capy benchmarks.",
+      borderColor: "border-[#89A8B2]",
+      glowColor: "shadow-teal-500/10",
+      bgClass: "bg-[#89A8B2]/25 text-slate-800 border-[#89A8B2]/80",
+    },
+    {
+      id: "sui-move-coding",
+      title: "Sui Move Coding Badge",
+      emoji: "🎓",
+      description: "Mastered abilities (key, store, copy, drop) and module structures.",
+      borderColor: "border-yellow-400",
+      glowColor: "shadow-yellow-500/10",
+      bgClass: "bg-yellow-50/70 text-amber-900 border-yellow-400/80",
+    },
+    {
+      id: "worthless-nft",
+      title: "Certified Worthless Shard",
+      emoji: "🥫",
+      description: "A gorgeous, guaranteed 0.0% economic utility item for testing Kiosks.",
+      borderColor: "border-stone-400",
+      glowColor: "shadow-stone-500/10",
+      bgClass: "bg-stone-50 text-stone-900 border-stone-400/80",
+    }
+  ];
+
+  const handleCopyTx = (txHash: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(txHash);
+    setCopiedTx(txHash);
+    setTimeout(() => setCopiedTx(null), 2000);
+  };
 
   // Simulated SUI Wallet Connection
   const handleConnectWallet = () => {
@@ -334,6 +400,18 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
               walletConnected={!!user.walletAddress}
               color="text-[#3c3c3c] bg-[#89A8B2]/20 border-2 border-[#3c3c3c]"
             />
+
+            {/* Move coding badge */}
+            <BadgeMintRow
+              id="sui-move-coding"
+              title="Sui Move Coding"
+              isCompleted={user.completedTracks.includes("sui-move-coding")}
+              mintedData={user.mintedBadges.find((b) => b.trackId === "sui-move-coding")}
+              onMint={() => handleMintBadge("sui-move-coding", "Sui Move Coding Badge")}
+              isMinting={isMinting === "sui-move-coding"}
+              walletConnected={!!user.walletAddress}
+              color="text-[#3c3c3c] bg-yellow-50/40 border-2 border-[#3c3c3c]"
+            />
           </div>
 
           {/* Divider and Claimable Worthless NFT Section */}
@@ -397,6 +475,142 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
         )}
       </div>
     </div>
+
+      {/* SUI KIOSK: CERTIFIED BADGE SHOWCASE GRID */}
+      <div id="badge-showcase-panel" className="bg-white border-2 border-[#3c3c3c] rounded-[24px] p-6 shadow-[4px_4px_0px_0px_#3c3c3c] text-[#3c3c3c]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b-2 border-dashed border-[#3c3c3c]/15">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono flex items-center gap-2">
+              <Award className="text-[#D67B52]" size={18} />
+              <span>Sui Kiosk: Certified Badge Showcase</span>
+            </h3>
+            <p className="text-xs text-[#6D5D6E] mt-1 font-sans">
+              Displaying verified NFT medals minted from the educational move package executions. Hover any unlocked badge to view its acquisition details.
+            </p>
+          </div>
+          <div className="bg-[#FAF8F5] px-3.5 py-1.5 border-2 border-[#3c3c3c] rounded-2xl flex items-center gap-2 font-mono text-xs shadow-[2px_2px_0px_0px_#3c3c3c] self-start sm:self-auto select-none">
+            <span className="text-[#6D5D6E] uppercase font-bold text-[10px]">Kiosk Inventory:</span>
+            <span className="font-bold text-[#D67B52] bg-amber-50 px-2.2 py-0.5 border border-[#D67B52]/30 rounded">
+              {user.mintedBadges.length} / {ALL_BADGE_TEMPLATES.length}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5">
+          {ALL_BADGE_TEMPLATES.map((badge) => {
+            const mintedInstance = user.mintedBadges.find((b) => b.trackId === badge.id);
+            const isMinted = !!mintedInstance;
+
+            return (
+              <div 
+                key={badge.id}
+                className="relative"
+                onMouseEnter={() => setHoveredBadge(badge.id)}
+                onMouseLeave={() => setHoveredBadge(null)}
+              >
+                <motion.div 
+                  whileHover={isMinted ? { y: -6, scale: 1.02 } : {}}
+                  className={`relative p-4 rounded-2xl border-2 border-[#3c3c3c] text-center flex flex-col justify-between items-center h-48 transition-all ${
+                    isMinted 
+                      ? `${badge.bgClass} shadow-[3px_3px_0px_0px_#3c3c3c]` 
+                      : "bg-[#fafafa]/50 border-dashed opacity-50 select-none"
+                  }`}
+                >
+                  {/* Status Indicator bubble */}
+                  <div className="absolute top-2.5 right-2.5">
+                    {isMinted ? (
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block shadow-sm border border-white" title="Minted in Kiosk"></span>
+                    ) : (
+                      <Lock size={11} className="text-[#3c3c3c]/40" />
+                    )}
+                  </div>
+
+                  {/* Icon Medallion Badge circle */}
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 border-[#3c3c3c] ${
+                    isMinted ? "bg-white shadow-[2px_2px_0px_0px_#3c3c3c]" : "bg-[#E8E1D9]/40"
+                  } mb-3`}>
+                    <span className="text-3xl filter drop-shadow">{badge.emoji}</span>
+                  </div>
+
+                  {/* Descriptions */}
+                  <div className="w-full">
+                    <span className="text-xs font-bold block text-[#3c3c3c] leading-tight truncate px-1">
+                      {badge.title}
+                    </span>
+                    <span className="text-[9px] font-mono uppercase font-bold text-[#6D5D6E] block mt-1.5 bg-white/70 py-0.5 px-1.5 rounded border border-[#3c3c3c]/10 truncate">
+                      {isMinted ? "Verified NFT" : "Locked Slot"}
+                    </span>
+                  </div>
+
+                  {/* Hover visual CTA */}
+                  <div className="text-[10px] text-[#D67B52] font-mono mt-1 font-bold cursor-help flex items-center gap-1 select-none">
+                    {isMinted ? "Hover details ✨" : "Study to unlock"}
+                  </div>
+                </motion.div>
+
+                {/* RELATIVE POSITIONED FLOATING TOOLTIP CARD */}
+                {hoveredBadge === badge.id && isMinted && mintedInstance && (
+                  <div className="absolute bottom-full mb-3 left-1/2 transform -translate-x-1/2 z-[99] w-64 bg-[#232323] text-stone-100 p-4 rounded-2xl border-2 border-[#3c3c3c] shadow-[6px_6px_0px_0px_#3c3c3c] text-xs font-mono animate-in fade-in slide-in-from-bottom-2 duration-150">
+                    <div className="font-extrabold text-[#89A8B2] border-b border-stone-700/60 pb-2 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
+                      <ShieldCheck size={14} className="text-emerald-400" />
+                      <span>{badge.title} Details</span>
+                    </div>
+                    
+                    <p className="text-[11px] text-stone-300 leading-normal font-sans font-medium mb-3">
+                      {badge.description}
+                    </p>
+
+                    <div className="space-y-2.5 border-t border-stone-800 pt-3">
+                      <div>
+                        <div className="flex items-center gap-1 text-[10px] text-stone-400 mb-1">
+                          <Calendar size={11} className="text-[#D67B52]" />
+                          <span className="font-bold uppercase tracking-wider text-[9px]">Minted Date:</span>
+                        </div>
+                        <div className="bg-[#141414] px-2 py-1 rounded-lg text-[10px] text-stone-200 select-all font-mono border border-stone-800">
+                          {mintedInstance.mintedAt || "2026-06-04 15:47 UTC"}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-1 text-[10px] text-stone-400 mb-1">
+                          <Hash size={11} className="text-[#89A8B2]" />
+                          <span className="font-bold uppercase tracking-wider text-[9px]">Transaction Hash:</span>
+                        </div>
+                        <div className="bg-[#141414] px-2 py-1 rounded-lg text-[10px] text-stone-200 font-mono flex items-center justify-between border border-stone-800">
+                          <span className="truncate pr-1 font-mono select-all text-stone-300" title={mintedInstance.txHash}>
+                            {mintedInstance.txHash}
+                          </span>
+                          <button
+                            onClick={(e) => handleCopyTx(mintedInstance.txHash, e)}
+                            className="p-1 hover:bg-[#2c2c2c] rounded text-[#89A8B2] hover:text-[#89A8B2]/80 transition-all cursor-pointer flex-shrink-0"
+                            title="Copy Tx Hash"
+                          >
+                            {copiedTx === mintedInstance.txHash ? (
+                              <span className="text-[9px] text-[#D67B52] font-semibold">Copied!</span>
+                            ) : (
+                              <Clipboard size={11} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center text-[10px] text-stone-400 pt-1.5 border-t border-stone-800">
+                        <span className="uppercase text-[9px] font-bold">Object ID:</span>
+                        <span className="text-emerald-400 font-mono bg-[#141414] px-1.5 py-0.5 border border-stone-800 rounded text-[9px]">
+                          {mintedInstance.tokenId}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Tooltip arrow pointer */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-t-8 border-t-[#232323] border-x-8 border-x-transparent" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Lofi Jams Music Audio Deck relocated under Profile */}
       <div className="bg-white border-4 border-[#3c3c3c] rounded-[24px] p-5 shadow-[4px_4px_0px_0px_#3c3c3c]">

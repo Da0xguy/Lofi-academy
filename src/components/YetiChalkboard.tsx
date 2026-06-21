@@ -21,6 +21,35 @@ export function YetiChalkboard({
   yetiStudyAsset
 }: YetiChalkboardProps) {
 
+  // Global accessibility keyboard listener to toggle pages using ArrowLeft & ArrowRight
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Avoid navigating if the user is currently typing in an input field, text area, or chat
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          activeEl.hasAttribute("contenteditable"))
+      ) {
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        if (stepIndex > 0) {
+          onPrev();
+        }
+      } else if (e.key === "ArrowRight") {
+        onNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [stepIndex, onPrev, onNext]);
+
   // Dynamic chalk status quotes depending on mood
   const getMoodDecoration = (mood: string) => {
     switch (mood) {

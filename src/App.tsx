@@ -32,8 +32,11 @@ import {
   Lightbulb,
   ExternalLink,
   Menu,
-  X
+  X,
+  Tv
 } from "lucide-react";
+
+import { SuiVlogWidget } from "./components/SuiVlogWidget";
 
 // Pre-generated static assets mapped from tools outputs
 import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png";
@@ -107,7 +110,7 @@ export default function App() {
   };
 
   // Navigation Tabs
-  const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "leaderboard" | "profile">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "vlog" | "leaderboard" | "profile">("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Lessons curriculum state
@@ -774,6 +777,7 @@ export default function App() {
           {[
             { id: "dashboard", label: "Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
             { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", symbol: "📊", icon: TrendingUp },
+            { id: "vlog", label: "Sui Cozy Vlog", shortLabel: "Cozy Vlog", symbol: "📹", icon: Tv },
             { id: "leaderboard", label: "Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
             { id: "profile", label: "Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
           ].map((tab) => {
@@ -1225,6 +1229,11 @@ export default function App() {
             completedTracks={user.completedTracks}
             onMintSuccess={handleMintSuccess}
           />
+        )}
+
+        {/* =============== SUI COZY VLOG TAB AREA =============== */}
+        {activeTab === "vlog" && (
+          <SuiVlogWidget />
         )}
 
 
