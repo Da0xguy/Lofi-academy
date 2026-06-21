@@ -15,9 +15,11 @@
         "claimedWelcomeXP": { "type": "boolean", "description": "Whether the welcome bonus was claimed" },
         "mintedBadges": { "type": "array", "description": "List of minted badges stored in the user Kiosk" },
         "streak": { "type": "integer", "description": "Consecutive days studies logged in" },
-        "lastLoginDate": { "type": "string", "description": "YYYY-MM-DD format of last study login" }
+        "lastLoginDate": { "type": "string", "description": "YYYY-MM-DD format of last study login" },
+        "yetiHighScore": { "type": "integer", "description": "Verified maximum consensus arcade game score reached by user" },
+        "yetiGamesPlayed": { "type": "integer", "description": "Total number of completed validation arcade starts for this user" }
       },
-      "required": ["username", "avatar", "xp", "level", "completedModules", "completedTracks", "claimedWelcomeXP", "mintedBadges", "streak", "lastLoginDate"]
+      "required": ["username", "avatar", "xp", "level", "completedModules", "completedTracks", "claimedWelcomeXP", "mintedBadges", "streak", "lastLoginDate", "yetiHighScore", "yetiGamesPlayed"]
     }
   },
   "firestore": {

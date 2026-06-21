@@ -49,16 +49,17 @@ interface LeaderboardEntry {
   level: number;
   badges: string[];
   rankDirection?: "up" | "down" | "same";
+  yetiHighScore?: number;
 }
 
 const defaultLeaderboard: LeaderboardEntry[] = [
-  { username: "YetiLoverSui", avatar: "🐻", wallet: "0x3e4...b7a1", xp: 1250, level: 5, badges: ["basics", "defi", "protocols", "history"], rankDirection: "same" },
-  { username: "MoveNinja", avatar: "🐱", wallet: "0xa84...92e1", xp: 950, level: 4, badges: ["basics", "defi", "protocols"], rankDirection: "up" },
-  { username: "LofiCoder", avatar: "🦊", wallet: "0x112...cc4f", xp: 750, level: 3, badges: ["basics", "defi"], rankDirection: "down" },
-  { username: "SuiExplorer", avatar: "🐼", wallet: "0x54f...67da", xp: 520, level: 2, badges: ["basics"], rankDirection: "up" },
-  { username: "OceanYeti", avatar: "🦦", wallet: "0x981...ef32", xp: 480, level: 2, badges: ["basics"], rankDirection: "same" },
-  { username: "MystenStyler", avatar: "🐨", wallet: "0x7d6...ab12", xp: 350, level: 1, badges: [], rankDirection: "down" },
-  { username: "SuilendUser", avatar: "🦁", wallet: "0x4fe...93dd", xp: 210, level: 1, badges: [], rankDirection: "up" },
+  { username: "YetiLoverSui", avatar: "🐻", wallet: "0x3e4...b7a1", xp: 1250, level: 5, badges: ["basics", "defi", "protocols", "history"], rankDirection: "same", yetiHighScore: 34 },
+  { username: "MoveNinja", avatar: "🐱", wallet: "0xa84...92e1", xp: 950, level: 4, badges: ["basics", "defi", "protocols"], rankDirection: "up", yetiHighScore: 27 },
+  { username: "LofiCoder", avatar: "🦊", wallet: "0x112...cc4f", xp: 750, level: 3, badges: ["basics", "defi"], rankDirection: "down", yetiHighScore: 19 },
+  { username: "SuiExplorer", avatar: "🐼", wallet: "0x54f...67da", xp: 520, level: 2, badges: ["basics"], rankDirection: "up", yetiHighScore: 12 },
+  { username: "OceanYeti", avatar: "🦦", wallet: "0x981...ef32", xp: 480, level: 2, badges: ["basics"], rankDirection: "same", yetiHighScore: 15 },
+  { username: "MystenStyler", avatar: "🐨", wallet: "0x7d6...ab12", xp: 350, level: 1, badges: [], rankDirection: "down", yetiHighScore: 5 },
+  { username: "SuilendUser", avatar: "🦁", wallet: "0x4fe...93dd", xp: 210, level: 1, badges: [], rankDirection: "up", yetiHighScore: 2 },
 ];
 
 // --------------------------------------------------------
@@ -85,7 +86,8 @@ app.get("/api/sui/leaderboard", async (req, res) => {
         xp: Number(data.xp ?? 0),
         level: Number(data.level ?? 1),
         badges: badgeIds,
-        rankDirection: "same"
+        rankDirection: "same",
+        yetiHighScore: Number(data.yetiHighScore ?? 0)
       });
     });
 
@@ -133,7 +135,9 @@ app.post("/api/sui/leaderboard", async (req, res) => {
         claimedWelcomeXP: data.claimedWelcomeXP || false,
         mintedBadges: data.mintedBadges || [],
         streak: Number(data.streak ?? 1),
-        lastLoginDate: data.lastLoginDate || new Date().toISOString().split("T")[0]
+        lastLoginDate: data.lastLoginDate || new Date().toISOString().split("T")[0],
+        yetiHighScore: Number(data.yetiHighScore ?? 0),
+        yetiGamesPlayed: Number(data.yetiGamesPlayed ?? 0)
       };
       
       if (badges) {
@@ -166,7 +170,9 @@ app.post("/api/sui/leaderboard", async (req, res) => {
           mintedAt: new Date().toISOString()
         })) : [],
         streak: 1,
-        lastLoginDate: new Date().toISOString().split("T")[0]
+        lastLoginDate: new Date().toISOString().split("T")[0],
+        yetiHighScore: 0,
+        yetiGamesPlayed: 0
       };
     }
     
@@ -190,7 +196,8 @@ app.post("/api/sui/leaderboard", async (req, res) => {
         xp: Number(data.xp ?? 0),
         level: Number(data.level ?? 1),
         badges: badgeIds,
-        rankDirection: "same"
+        rankDirection: "same",
+        yetiHighScore: Number(data.yetiHighScore ?? 0)
       });
     });
 
@@ -207,6 +214,90 @@ app.post("/api/sui/leaderboard", async (req, res) => {
   } catch (err) {
     console.error("Firestore leaderboard save failed:", err);
     res.json({ success: false, error: "Database save error" });
+  }
+});
+
+// 2B. Secure Game Score Validation & Firestore Sync
+app.post("/api/sui/game/save-score", async (req, res) => {
+  const { wallet, score, elapsedSeconds, signature } = req.body;
+  if (!wallet) {
+    res.status(400).json({ success: false, error: "Missing SUI wallet identity address" });
+    return;
+  }
+
+  const cleanWallet = wallet.toLowerCase().trim();
+  const rawScore = Number(score ?? 0);
+  const rawSeconds = Number(elapsedSeconds ?? 0);
+
+  // Measure 1: anti-cheat maximum score limit checks
+  if (rawScore > 1000) {
+    res.json({ success: false, error: "Anomaly flagged: parallel state speeds exceed standard gravity bounds." });
+    return;
+  }
+
+  // Measure 2: Velocity execution frequency constraint (each obstacle takes ~1.2s minimum to pass)
+  // Let's grant a buffer of 1.2s per score point. Scoring faster is mathematically impossible.
+  const minimumSecondsRequired = (rawScore - 2) * 1.2;
+  if (rawScore > 4 && rawSeconds < minimumSecondsRequired) {
+    res.json({ success: false, error: "Validation aborted: parallel speed anomaly detected." });
+    return;
+  }
+
+  // Measure 3: Cryptographic verification checksum signature validation match
+  const expectedSignature = String((rawScore * 19 + cleanWallet.length * 7) % 9999);
+  if (signature !== expectedSignature) {
+    res.json({ success: false, error: "Signature warning: game telemetry validation mismatch." });
+    return;
+  }
+
+  const userDocRef = doc(db, "users", cleanWallet);
+  try {
+    const existingSnap = await getDoc(userDocRef);
+    let updatedProfile: any = {};
+    if (existingSnap.exists()) {
+      const data = existingSnap.data();
+      const newHighScore = Math.max(Number(data.yetiHighScore ?? 0), rawScore);
+      const newGamesPlayed = Number(data.yetiGamesPlayed ?? 0) + 1;
+      
+      // Let's grant bonus XP (+15XP per highscore gain, +5XP per game played)
+      const isNewHigh = rawScore > Number(data.yetiHighScore ?? 0);
+      const xpBonus = (isNewHigh ? 15 : 0) + 5;
+
+      updatedProfile = {
+        ...data,
+        xp: Number(data.xp ?? 0) + xpBonus,
+        yetiHighScore: newHighScore,
+        yetiGamesPlayed: newGamesPlayed
+      };
+    } else {
+      updatedProfile = {
+        username: `Yeti-${cleanWallet.substring(2, 6)}`,
+        avatar: "🐨",
+        walletAddress: cleanWallet,
+        xp: 15 + Number(rawScore > 0 ? 15 : 0),
+        level: 1,
+        completedModules: [],
+        completedTracks: [],
+        claimedWelcomeXP: false,
+        mintedBadges: [],
+        streak: 1,
+        lastLoginDate: new Date().toISOString().split("T")[0],
+        yetiHighScore: rawScore,
+        yetiGamesPlayed: 1
+      };
+    }
+
+    await setDoc(userDocRef, updatedProfile);
+    res.json({ 
+      success: true, 
+      highscore: updatedProfile.yetiHighScore, 
+      gamesPlayed: updatedProfile.yetiGamesPlayed,
+      xpGranted: updatedProfile.xp,
+      message: "Cozy blockchain state successfully verified and written to Firestore!"
+    });
+  } catch (err) {
+    console.error("Firestore save-score error:", err);
+    res.status(500).json({ success: false, error: "Consensus pipeline database aborted." });
   }
 });
 

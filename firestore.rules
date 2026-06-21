@@ -28,7 +28,9 @@ service cloud.firestore {
         && (data.claimedWelcomeXP is bool || !('claimedWelcomeXP' in data))
         && (data.mintedBadges is list || !('mintedBadges' in data))
         && (data.streak is int || data.streak is float || !('streak' in data))
-        && (data.lastLoginDate is string || !('lastLoginDate' in data));
+        && (data.lastLoginDate is string || !('lastLoginDate' in data))
+        && (data.yetiHighScore is int || !('yetiHighScore' in data))
+        && (data.yetiGamesPlayed is int || !('yetiGamesPlayed' in data));
     }
     
     // Users Collection matched by lowercase wallet address

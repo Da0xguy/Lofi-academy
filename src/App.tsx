@@ -33,10 +33,12 @@ import {
   ExternalLink,
   Menu,
   X,
-  Tv
+  Tv,
+  BookOpen,
+  Twitter
 } from "lucide-react";
 
-import { SuiVlogWidget } from "./components/SuiVlogWidget";
+import { SuiArticlesWidget } from "./components/SuiArticlesWidget";
 
 // Pre-generated static assets mapped from tools outputs
 import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png";
@@ -110,7 +112,7 @@ export default function App() {
   };
 
   // Navigation Tabs
-  const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "vlog" | "leaderboard" | "profile">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "simulator" | "articles" | "leaderboard" | "profile">("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Lessons curriculum state
@@ -135,7 +137,12 @@ export default function App() {
     const saved = localStorage.getItem("sui_yeti_user");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          yetiHighScore: Number(parsed.yetiHighScore ?? 0),
+          yetiGamesPlayed: Number(parsed.yetiGamesPlayed ?? 0)
+        };
       } catch (err) {}
     }
     return {
@@ -149,7 +156,9 @@ export default function App() {
       claimedWelcomeXP: false,
       mintedBadges: [],
       streak: 1,
-      lastLoginDate: new Date().toISOString().split("T")[0]
+      lastLoginDate: new Date().toISOString().split("T")[0],
+      yetiHighScore: 0,
+      yetiGamesPlayed: 0
     };
   });
 
@@ -183,7 +192,9 @@ export default function App() {
               claimedWelcomeXP: Boolean(cloudProfile.claimedWelcomeXP),
               mintedBadges: Array.isArray(cloudProfile.mintedBadges) ? cloudProfile.mintedBadges : [],
               streak: Number(cloudProfile.streak ?? 1),
-              lastLoginDate: cloudProfile.lastLoginDate || new Date().toISOString().split("T")[0]
+              lastLoginDate: cloudProfile.lastLoginDate || new Date().toISOString().split("T")[0],
+              yetiHighScore: Number(cloudProfile.yetiHighScore ?? 0),
+              yetiGamesPlayed: Number(cloudProfile.yetiGamesPlayed ?? 0)
             });
           } else {
             // Document doesn't exist yet. Claim welcome gift if not already claimed, and write initial record to Firestore
@@ -564,6 +575,8 @@ export default function App() {
     return (
       <LandingPage 
         onLaunch={handleLaunchApp} 
+        user={user}
+        setUser={setUser}
         userXP={user.xp} 
         isDarkMode={darkMode}
         toggleDarkMode={() => {
@@ -777,7 +790,7 @@ export default function App() {
           {[
             { id: "dashboard", label: "Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
             { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", symbol: "📊", icon: TrendingUp },
-            { id: "vlog", label: "Sui Cozy Vlog", shortLabel: "Cozy Vlog", symbol: "📹", icon: Tv },
+            { id: "articles", label: "Cozy Gazette", shortLabel: "Cozy Gazette", symbol: "📰", icon: BookOpen },
             { id: "leaderboard", label: "Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
             { id: "profile", label: "Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
           ].map((tab) => {
@@ -1096,6 +1109,20 @@ export default function App() {
                       </div>
                     )}
 
+                    <div className="pt-2">
+                      <a
+                        href={`https://x.com/intent/tweet?text=${encodeURIComponent(
+                          `just completed the "${activeModule?.title}" module on Sui Cozy Lofi Quest! 🏔️\n\n🎯 Score: ${correctAnswersCount}/${activeModule?.quiz.length} (${Math.round((correctAnswersCount / activeModule?.quiz.length) * 100)}%)\n✨ XP Granted: +${quizXPAccumulated} XP\n\n${user.completedTracks.includes(activeTrackId) ? `🏆 Unlocked the "${activeTrack.title}" Study Badge Accomplishment!` : "🐻 Cozy coding approved by Yeti!"}\n\nJoin the learning chalet over here:`
+                        )}&url=${encodeURIComponent(window.location.href)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2 bg-black hover:bg-stone-900 border-2 border-[#3c3c3c] text-white font-bold rounded-xl text-xs font-mono shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      >
+                        <Twitter size={13} className="fill-white text-white" />
+                        <span>Post Accomplishment on X</span>
+                      </a>
+                    </div>
+
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
@@ -1130,6 +1157,20 @@ export default function App() {
                     <div className="flex bg-[#F3EFEA] border-2 border-[#3c3c3c] p-2 rounded-xl text-xs font-mono justify-between text-[#6D5D6E] font-bold shadow-[1px_1px_0px_0px_#3c3c3c]">
                       <span>XP Earned (Correct Questions):</span>
                       <strong className="text-[#D67B52] font-extrabold">+{correctAnswersCount * 10} XP</strong>
+                    </div>
+
+                    <div className="pt-1">
+                      <a
+                        href={`https://x.com/intent/tweet?text=${encodeURIComponent(
+                          `currently studying the "${activeModule?.title}" module on Sui Cozy Lofi Quest! 🌨️\n\n🎯 Level: ${user.level} | XP: ${user.xp}\n🐻 Yeti is helping me learn on-chain logic!\n\nJoin me at the learning chalet:`
+                        )}&url=${encodeURIComponent(window.location.href)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2 bg-stone-100 hover:bg-stone-200 border-2 border-[#3c3c3c] text-[#3c3c3c] font-extrabold rounded-xl text-xs font-mono shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      >
+                        <Twitter size={13} className="fill-current text-[#3c3c3c]" />
+                        <span>Share Progress on X</span>
+                      </a>
                     </div>
 
                     <button
@@ -1231,9 +1272,9 @@ export default function App() {
           />
         )}
 
-        {/* =============== SUI COZY VLOG TAB AREA =============== */}
-        {activeTab === "vlog" && (
-          <SuiVlogWidget />
+        {/* =============== SUI COZY ARTICLES TAB AREA =============== */}
+        {activeTab === "articles" && (
+          <SuiArticlesWidget />
         )}
 
 

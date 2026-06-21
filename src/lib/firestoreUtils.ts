@@ -78,7 +78,9 @@ export async function saveFirebaseUserProfile(wallet: string, profileData: any) 
         mintedAt: String(b.mintedAt || "")
       })) : [],
       streak: Number(profileData.streak ?? 1),
-      lastLoginDate: profileData.lastLoginDate || new Date().toISOString().split("T")[0]
+      lastLoginDate: profileData.lastLoginDate || new Date().toISOString().split("T")[0],
+      yetiHighScore: Number(profileData.yetiHighScore ?? 0),
+      yetiGamesPlayed: Number(profileData.yetiGamesPlayed ?? 0)
     };
     
     await setDoc(userDocRef, sanitizedPayload);

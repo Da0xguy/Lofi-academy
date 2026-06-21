@@ -50,6 +50,8 @@ export interface UserProfile {
   }[];
   streak: number;
   lastLoginDate: string;
+  yetiHighScore: number;
+  yetiGamesPlayed: number;
 }
 
 export interface LeaderboardEntry {
@@ -60,6 +62,7 @@ export interface LeaderboardEntry {
   level: number;
   badges: string[];
   rankDirection?: "up" | "down" | "same";
+  yetiHighScore?: number;
 }
 
 export interface MintResult {

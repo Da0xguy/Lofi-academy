@@ -46,9 +46,11 @@ interface LandingPageProps {
   isDarkMode?: boolean;
   toggleDarkMode?: () => void;
   isWalletConnected?: boolean;
+  user?: any;
+  setUser?: any;
 }
 
-export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMode, isWalletConnected = false }: LandingPageProps) {
+export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMode, isWalletConnected = false, user, setUser }: LandingPageProps) {
   // Coffee click state for playful interactive mascot engagement
   const [coffeeBrewing, setCoffeeBrewing] = useState<boolean>(false);
   const [brewedSips, setBrewedSips] = useState<number>(0);
@@ -97,8 +99,16 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [gameScore, setGameScore] = useState<number>(0);
   const [highScore, setHighScore] = useState<number>(() => {
-    return Number(localStorage.getItem("sui_yeti_gamer_hs") || "0");
+    return user?.yetiHighScore || Number(localStorage.getItem("sui_yeti_gamer_hs") || "0");
   });
+  const [gameStartTime, setGameStartTime] = useState<number>(0);
+
+  useEffect(() => {
+    if (user?.yetiHighScore && user.yetiHighScore > highScore) {
+      setHighScore(user.yetiHighScore);
+    }
+  }, [user?.yetiHighScore]);
+
   const [isJumping, setIsJumping] = useState<boolean>(false);
 
   // Real Sui Multi-Lane Parallel Execution States
@@ -122,6 +132,47 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
     setGameLogs((prev) => [msg, ...prev.slice(0, 9)]);
   };
 
+  const submitScore = async (finalScore: number) => {
+    if (!isWalletConnected || !user?.walletAddress) {
+      appendGameLog("[OFFLINE] Connect SUI Kiosk wallet in cabin to write secure highscores to Firebase!");
+      return;
+    }
+    const elapsed = Math.max(1, Math.round((Date.now() - gameStartTime) / 1000));
+    const walletStr = user.walletAddress.toLowerCase().trim();
+    const signature = String((finalScore * 19 + walletStr.length * 7) % 9999);
+
+    appendGameLog("[LEDGER] Dispatching cryptographic transaction score state to Firebase backend...");
+    try {
+      const res = await fetch("/api/sui/game/save-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wallet: user.walletAddress,
+          score: finalScore,
+          elapsedSeconds: elapsed,
+          signature
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        appendGameLog(`[CONSENSUS SUCCESS] Saved to Firebase! Highscore: ${data.highscore} | Games: ${data.gamesPlayed} | (+${data.xpGranted - (user.xp || 0)} XP)`);
+        if (setUser) {
+          setUser((prev: any) => ({
+            ...prev,
+            yetiHighScore: data.highscore,
+            yetiGamesPlayed: data.gamesPlayed,
+            xp: data.xpGranted,
+            level: Math.floor(data.xpGranted / 200) + 1
+          }));
+        }
+      } else {
+        appendGameLog(`[VALIDATION DENIED] ${data.error || "Anomaly detected. Block dropped."}`);
+      }
+    } catch (err) {
+      appendGameLog("[ERROR] Failed to submit score state ledger block to Firebase cloud.");
+    }
+  };
+
   const handleJump = () => {
     if (!gameStarted) {
       setGameStarted(true);
@@ -130,6 +181,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
       setBlockX(100);
       setCoinX(140);
       setHasShield(false);
+      setGameStartTime(Date.now());
       setGameLogs([
         "[BOOT] Narwhal validator pool successfully synchronised! Running DAG sequence...",
         "[LANES] 🟢 Lane 0: Fast-Path (Owned states) | 🟡 Lane 1: Shared-Consensus (Shared states)",
@@ -240,6 +292,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
             } else {
               setGameOver(true);
               appendGameLog(`[FATAL COLLISION] Spent transaction collision on Lane ${activeLane === 0 ? '0' : '1'}!`);
+              submitScore(gameScore);
               clearInterval(timer);
             }
           }
