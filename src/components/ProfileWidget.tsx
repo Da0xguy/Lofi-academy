@@ -211,175 +211,183 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono mb-4 flex items-center gap-1.5">
             <Wallet size={16} className="text-[#D67B52]" />
-            <span>Developer Account</span>
+            <span>{user.walletAddress ? "Developer Account" : "Challenger Account"}</span>
           </h3>
 
-          {user.walletAddress ? (
-            <div className="space-y-4">
-              {/* Account Card details */}
-              <div className="bg-[#F3EFEA] p-4 rounded-2xl border-2 border-[#3c3c3c] text-center relative overflow-hidden shadow-[2px_2px_0px_0px_#3c3c3c]">
+          <div className="space-y-4">
+            {/* Account Card details */}
+            <div className="bg-[#F3EFEA] p-4 rounded-2xl border-2 border-[#3c3c3c] text-center relative overflow-hidden shadow-[2px_2px_0px_0px_#3c3c3c]">
+              {user.walletAddress ? (
                 <div className="absolute right-2 top-2 text-[#89A8B2] text-[9px] font-mono bg-[#89A8B2]/10 border border-[#3c3c3c]/30 px-2 py-0.5 rounded-full flex items-center gap-1 font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#89A8B2] animate-ping"></span>
                   CONNECTED
                 </div>
-
-                {/* Avatar select */}
-                <div className="flex justify-center mb-2.5 mt-2">
-                  {user.avatar && (user.avatar.startsWith("data:") || user.avatar.startsWith("http") || user.avatar.startsWith("/") || user.avatar.startsWith("blob:")) ? (
-                    <img
-                      src={user.avatar}
-                      alt="Avatar"
-                      className="w-16 h-16 rounded-full border-2 border-[#3c3c3c] object-cover shadow-[2px_2px_0px_0px_#3c3c3c]"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span className="text-4xl filter drop-shadow">{user.avatar}</span>
-                  )}
+              ) : (
+                <div className="absolute right-2 top-2 text-[#D67B52] text-[9px] font-mono bg-[#D67B52]/10 border border-[#3c3c3c]/35 px-2 py-0.5 rounded-full flex items-center gap-1 font-bold">
+                  GUEST MODE
                 </div>
+              )}
 
-                <div className="space-y-1">
-                  <span className="text-xs font-mono text-[#6D5D6E] block">Active Nickname</span>
-                  <input
-                    type="text"
-                    value={customUsername}
-                    onChange={(e) => {
-                      setCustomUsername(e.target.value);
-                      onChangeUser({ username: e.target.value });
-                    }}
-                    className="bg-white text-center font-bold font-mono text-sm py-1 px-3 border-2 border-[#3c3c3c] rounded-xl max-w-full focus:border-[#89A8B2] focus:outline-none text-[#3c3c3c]"
-                    placeholder="Set nickname"
+              {/* Avatar select */}
+              <div className="flex justify-center mb-2.5 mt-2">
+                {user.avatar && (user.avatar.startsWith("data:") || user.avatar.startsWith("http") || user.avatar.startsWith("/") || user.avatar.startsWith("blob:")) ? (
+                  <img
+                    src={user.avatar}
+                    alt="Avatar"
+                    className="w-16 h-16 rounded-full border-2 border-[#3c3c3c] object-cover shadow-[2px_2px_0px_0px_#3c3c3c]"
+                    referrerPolicy="no-referrer"
                   />
-                </div>
+                ) : (
+                  <span className="text-4xl filter drop-shadow">{user.avatar}</span>
+                )}
+              </div>
 
-                <div className="mt-4 pt-2 border-t border-dashed border-[#3c3c3c]/30 text-left font-mono">
-                  <span className="text-[10px] text-[#6D5D6E] block">Sui Wallet Address</span>
+              <div className="space-y-1">
+                <span className="text-xs font-mono text-[#6D5D6E] block">Active Nickname</span>
+                <input
+                  type="text"
+                  value={customUsername}
+                  onChange={(e) => {
+                    setCustomUsername(e.target.value);
+                    onChangeUser({ username: e.target.value });
+                  }}
+                  className="bg-white text-center font-bold font-mono text-sm py-1 px-3 border-2 border-[#3c3c3c] rounded-xl max-w-full focus:border-[#89A8B2] focus:outline-none text-[#3c3c3c]"
+                  placeholder="Set nickname"
+                />
+              </div>
+
+              <div className="mt-4 pt-2 border-t border-dashed border-[#3c3c3c]/30 text-left font-mono">
+                <span className="text-[10px] text-[#6D5D6E] block">Sui Wallet Address</span>
+                {user.walletAddress ? (
                   <span className="text-[11px] text-[#D67B52] break-all select-all font-bold font-mono">
                     {user.walletAddress}
                   </span>
-                </div>
-
-                {/* Manual Photo File Upload */}
-                <div className="pt-2 border-t border-dashed border-[#3c3c3c]/30 mt-3 flex flex-col gap-1.5">
-                  <label className="w-full h-8 flex items-center justify-center gap-1.5 bg-white hover:bg-stone-100 border-2 border-[#3c3c3c] text-[#3c3c3c] font-bold font-mono rounded-xl text-[10px] shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer transition-all active:translate-y-[1px]">
-                    <Upload size={12} className="text-[#D67B52]" />
-                    <span>Upload Custom Photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
+                ) : (
+                  <span className="text-[10px] text-gray-500 italic block font-sans">
+                    No wallet connected.
+                  </span>
+                )}
               </div>
 
-              {/* Avatar Switcher */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-mono text-[#6D5D6E] block">Choose Cute Buddy Mascot</span>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {avatars.map((av) => (
-                    <button
-                      key={av}
-                      onClick={() => onChangeUser({ avatar: av })}
-                      className={`text-xl p-1.5 rounded-xl border-2 transition-all hover:scale-110 cursor-pointer ${
-                        user.avatar === av ? "bg-[#89A8B2]/20 border-[#3c3c3c]" : "bg-[#f8f5f2] border-transparent"
-                      }`}
-                    >
-                      {av}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* AI Avatar Studio */}
-              <div className="space-y-3 bg-[#FAF8F5] p-3.5 border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c]">
-                <div className="flex items-center gap-1.5 text-xs font-bold font-mono">
-                  <Sparkles size={14} className="text-[#D67B52] animate-pulse" />
-                  <span>AI Yeti Avatar Studio</span>
-                </div>
-                <p className="text-[10px] text-[#6D5D6E] leading-relaxed">
-                  Describe any animal companion theme or pick a standard preset to generate custom vector graphics instantly via Gemini!
-                </p>
-
-                <div className="flex gap-1.5">
+              {/* Manual Photo File Upload */}
+              <div className="pt-2 border-t border-dashed border-[#3c3c3c]/30 mt-3 flex flex-col gap-1.5">
+                <label className="w-full h-8 flex items-center justify-center gap-1.5 bg-white hover:bg-stone-100 border-2 border-[#3c3c3c] text-[#3c3c3c] font-bold font-mono rounded-xl text-[10px] shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer transition-all active:translate-y-[1px]">
+                  <Upload size={12} className="text-[#D67B52]" />
+                  <span>Upload Custom Photo</span>
                   <input
-                    type="text"
-                    value={avatarPrompt}
-                    onChange={(e) => setAvatarPrompt(e.target.value)}
-                    placeholder="e.g. snowy coding rabbit..."
-                    className="flex-1 px-2.5 py-1.5 text-[11px] font-mono border-2 border-[#3c3c3c] rounded-xl focus:border-[#89A8B2] focus:outline-none bg-white text-[#3c3c3c]"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
                   />
-                  <button
-                    onClick={() => handleGenerateAIAvatar()}
-                    disabled={isGeneratingAvatar}
-                    className="px-3 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold text-[10px] rounded-xl border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer flex items-center justify-center gap-1 min-w-[70px] disabled:opacity-50"
-                  >
-                    {isGeneratingAvatar ? "Drawing..." : "Generate"}
-                  </button>
-                </div>
-
-                {/* Preset tags */}
-                <div className="flex flex-wrap gap-1">
-                  {[
-                    { label: "🦊 Panda Beanie", p: "a cute cozy red panda wearing a sleepy winter beanie, pastel vector" },
-                    { label: "🐻 Wizard Yeti", p: "a lofi magic cute junior yeti holding a warm mug of cocoa, vector pastel" },
-                    { label: "🐧 Pink Penguin", p: "a happy baby pink penguin wearing a thick woolen blue scarf, minimalist flat" },
-                    { label: "🎧 Space Coding", p: "a tiny fuzzy space puppy wearing cozy purple headphones, modern flat design" }
-                  ].map((tag) => (
-                    <button
-                      key={tag.label}
-                      onClick={() => handleGenerateAIAvatar(tag.p)}
-                      disabled={isGeneratingAvatar}
-                      className="text-[9px] font-mono font-bold border border-[#3c3c3c]/35 px-1.5 py-0.5 rounded-lg bg-white hover:bg-stone-100 text-[#3c3c3c]/80 cursor-pointer disabled:opacity-40"
-                    >
-                      {tag.label}
-                    </button>
-                  ))}
-                </div>
-
-                {avatarError && (
-                  <div className="text-[9px] font-mono font-bold text-red-600 bg-red-50 p-1.5 rounded border border-red-200">
-                    ⚠ {avatarError}
-                  </div>
-                )}
-
-                {/* Created collection preview picker */}
-                {generatedAvatars.length > 0 && (
-                  <div className="space-y-1.5 pt-1.5 border-t border-dashed border-[#3c3c3c]/20">
-                    <span className="text-[9px] font-mono text-[#6D5D6E] block font-semibold">Your Studio Creations:</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {generatedAvatars.map((url, index) => (
-                        <button
-                          key={index}
-                          onClick={() => onChangeUser({ avatar: url })}
-                          className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all cursor-pointer hover:scale-105 ${
-                            user.avatar === url ? "border-[#D67B52] ring-2 ring-[#D67B52]/20 shadow-sm" : "border-[#3c3c3c]"
-                          }`}
-                        >
-                          <img src={url} alt={`Creation ${index}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </label>
               </div>
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 rounded-full bg-[#F3EFEA] flex items-center justify-center mx-auto mb-4 border-2 border-[#3c3c3c]">
-                <Wallet className="text-[#D67B52] animate-pulse" size={28} />
-              </div>
 
-              <h4 className="font-bold text-sm text-[#3c3c3c] mb-1">Unauthenticated Explorer</h4>
-              <p className="text-xs text-[#6D5D6E] max-w-xs mx-auto mb-5 leading-relaxed">
-                Connect your developer or personal Sui Wallet to track your track progress, badges, and claim your starter XP.
+            {/* Avatar Switcher */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-mono text-[#6D5D6E] block">Choose Cute Buddy Mascot</span>
+              <div className="grid grid-cols-5 gap-1.5">
+                {avatars.map((av) => (
+                  <button
+                    key={av}
+                    onClick={() => onChangeUser({ avatar: av })}
+                    className={`text-xl p-1.5 rounded-xl border-2 transition-all hover:scale-110 cursor-pointer ${
+                      user.avatar === av ? "bg-[#89A8B2]/20 border-[#3c3c3c]" : "bg-[#f8f5f2] border-transparent"
+                    }`}
+                  >
+                    {av}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Avatar Studio */}
+            <div className="space-y-3 bg-[#FAF8F5] p-3.5 border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c]">
+              <div className="flex items-center gap-1.5 text-xs font-bold font-mono">
+                <Sparkles size={14} className="text-[#D67B52] animate-pulse" />
+                <span>AI Yeti Avatar Studio</span>
+              </div>
+              <p className="text-[10px] text-[#6D5D6E] leading-relaxed">
+                Describe any animal companion theme or pick a standard preset to generate custom vector graphics instantly via Gemini!
               </p>
 
-              <div className="flex justify-center">
-                <ConnectButton connectText="Connect dApp Wallet" />
+              <div className="flex gap-1.5">
+                <input
+                  type="text"
+                  value={avatarPrompt}
+                  onChange={(e) => setAvatarPrompt(e.target.value)}
+                  placeholder="e.g. snowy coding rabbit..."
+                  className="flex-1 px-2.5 py-1.5 text-[11px] font-mono border-2 border-[#3c3c3c] rounded-xl focus:border-[#89A8B2] focus:outline-none bg-white text-[#3c3c3c]"
+                />
+                <button
+                  onClick={() => handleGenerateAIAvatar()}
+                  disabled={isGeneratingAvatar}
+                  className="px-3 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold text-[10px] rounded-xl border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer flex items-center justify-center gap-1 min-w-[70px] disabled:opacity-50"
+                >
+                  {isGeneratingAvatar ? "Drawing..." : "Generate"}
+                </button>
               </div>
+
+              {/* Preset tags */}
+              <div className="flex flex-wrap gap-1">
+                {[
+                  { label: "🦊 Panda Beanie", p: "a cute cozy red panda wearing a sleepy winter beanie, pastel vector" },
+                  { label: "🐻 Wizard Yeti", p: "a lofi magic cute junior yeti holding a warm mug of cocoa, vector pastel" },
+                  { label: "🐧 Pink Penguin", p: "a happy baby pink penguin wearing a thick woolen blue scarf, minimalist flat" },
+                  { label: "🎧 Space Coding", p: "a tiny fuzzy space puppy wearing cozy purple headphones, modern flat design" }
+                ].map((tag) => (
+                  <button
+                    key={tag.label}
+                    onClick={() => handleGenerateAIAvatar(tag.p)}
+                    disabled={isGeneratingAvatar}
+                    className="text-[9px] font-mono font-bold border border-[#3c3c3c]/35 px-1.5 py-0.5 rounded-lg bg-white hover:bg-stone-100 text-[#3c3c3c]/80 cursor-pointer disabled:opacity-40"
+                  >
+                    {tag.label}
+                  </button>
+                ))}
+              </div>
+
+              {avatarError && (
+                <div className="text-[9px] font-mono font-bold text-red-600 bg-red-50 p-1.5 rounded border border-red-200">
+                  ⚠ {avatarError}
+                </div>
+              )}
+
+              {/* Created collection preview picker */}
+              {generatedAvatars.length > 0 && (
+                <div className="space-y-1.5 pt-1.5 border-t border-dashed border-[#3c3c3c]/20">
+                  <span className="text-[9px] font-mono text-[#6D5D6E] block font-semibold">Your Studio Creations:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {generatedAvatars.map((url, index) => (
+                      <button
+                        key={index}
+                        onClick={() => onChangeUser({ avatar: url })}
+                        className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all cursor-pointer hover:scale-105 ${
+                          user.avatar === url ? "border-[#D67B52] ring-2 ring-[#D67B52]/20 shadow-sm" : "border-[#3c3c3c]"
+                        }`}
+                      >
+                        <img src={url} alt={`Creation ${index}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Wallet connection banner if not connected */}
+            {!user.walletAddress && (
+              <div className="bg-[#89A8B2]/10 border-2 border-dashed border-[#89A8B2] p-3.5 rounded-2xl text-center space-y-2 mt-2">
+                <span className="text-[10px] font-mono font-bold text-[#89A8B2] block">WANT TO SECURE YOUR PROGRESS?</span>
+                <p className="text-[10px] text-[#6D5D6E] font-sans leading-normal">
+                  Connect deep-linked Sui dApp wallet to claim your booster and store milestones in the cloud blockchain ledger.
+                </p>
+                <div className="flex justify-center">
+                  <ConnectButton connectText="Connect wallet" />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Global Level Indicator bar */}
