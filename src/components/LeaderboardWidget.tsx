@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LeaderboardEntry } from "../types";
 import { Trophy, Award, Search, Users, RefreshCw, Star } from "lucide-react";
+import { AvatarWrapper } from "./AvatarWrapper";
 
 interface LeaderboardWidgetProps {
   userWallet: string | null;
@@ -151,11 +152,26 @@ export function LeaderboardWidget({
                 // Custom ranks styles
                 let rankVisual: React.ReactNode = rank;
                 if (rank === 1) {
-                  rankVisual = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#D67B52]/20 text-[#D67B52] font-bold border border-[#D67B52]/50">🏆</span>;
+                  rankVisual = (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D67B52]/10 text-[#D67B52] font-mono font-bold border border-[#D67B52]/30 uppercase text-[9px] tracking-wider select-none">
+                      <Trophy size={10} className="fill-current text-[#D67B52]" />
+                      <span>1st</span>
+                    </span>
+                  );
                 } else if (rank === 2) {
-                  rankVisual = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#89A8B2]/20 text-[#89A8B2] font-bold border border-[#89A8B2]/50">🥈</span>;
+                  rankVisual = (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#89A8B2]/10 text-[#89A8B2] font-mono font-bold border border-[#89A8B2]/30 uppercase text-[9px] tracking-wider select-none">
+                      <Trophy size={10} className="fill-current text-[#89A8B2]" />
+                      <span>2nd</span>
+                    </span>
+                  );
                 } else if (rank === 3) {
-                  rankVisual = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E8A0BF]/20 text-[#E8A0BF] font-bold border border-[#E8A0BF]/50">🥉</span>;
+                  rankVisual = (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8A0BF]/10 text-[#E8A0BF] font-mono font-bold border border-[#E8A0BF]/30 uppercase text-[9px] tracking-wider select-none">
+                      <Trophy size={10} className="fill-current text-[#E8A0BF]" />
+                      <span>3rd</span>
+                    </span>
+                  );
                 }
 
                 // Rank trend indicator
@@ -196,16 +212,7 @@ export function LeaderboardWidget({
                     
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-2">
-                        {entry.avatar && (entry.avatar.startsWith("data:") || entry.avatar.startsWith("http") || entry.avatar.startsWith("/") || entry.avatar.startsWith("blob:")) ? (
-                          <img
-                            src={entry.avatar}
-                            alt="Avatar"
-                            className="w-8 h-8 rounded-full border border-[#3c3c3c]/30 object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : (
-                          <span className="text-base">{entry.avatar || "🐻"}</span>
-                        )}
+                        <AvatarWrapper avatar={entry.avatar || "yeti"} size={32} />
                         <span className={`font-bold text-[#3c3c3c]`}>
                           {entry.username}
                           {isCurrentUser && <span className="text-[9px] bg-[#D67B52] text-white font-bold px-1.5 py-0.2 ml-1.5 rounded uppercase font-sans">You</span>}

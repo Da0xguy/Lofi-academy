@@ -737,7 +737,7 @@ public entry fun mint_badge(...) {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {/* Card 1 */}
         <motion.div 
@@ -791,6 +791,24 @@ public entry fun mint_badge(...) {
             </p>
           </div>
           <span className="text-[10px] font-mono text-stone-500 font-bold mt-4 uppercase inline-block">Exactly $0 utility souvenir</span>
+        </motion.div>
+
+        {/* Card 4 */}
+        <motion.div 
+          variants={itemVariants} 
+          whileHover={{ y: -5 }}
+          className="bg-white p-6 border-4 border-[#3c3c3c] rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between"
+        >
+          <div>
+            <div className="w-10 h-10 bg-purple-100 text-purple-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
+              📚
+            </div>
+            <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">ECOSYSTEM READS & AI DIGESTS</h4>
+            <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+              Explore our curated library of hot-of-the-press Sui updates! Undergo deep-dives into parallel-lane throughput, Mysticeti finality, and DeepBook v3. Generate instant, on-demand AI digests to distill core lessons into precise takeaways.
+            </p>
+          </div>
+          <span className="text-[10px] font-mono text-purple-600 font-bold mt-4 uppercase inline-block">Powered by Gemini AI</span>
         </motion.div>
       </motion.div>
 

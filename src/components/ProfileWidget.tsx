@@ -1,20 +1,50 @@
 import React, { useState } from "react";
 import { UserProfile, MintResult } from "../types";
-import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw, Calendar, Hash, Lock, ShieldCheck, Upload, Image } from "lucide-react";
+import { Wallet, Award, Sparkles, AlertCircle, Share2, Clipboard, ExternalLink, Settings, Eye, CheckCircle, RefreshCw, Calendar, Hash, Lock, ShieldCheck, Upload, Image, Waves, TrendingUp, Shield, BookOpen, Cpu, Trash2, Music, Volume2, VolumeX } from "lucide-react";
 import { motion } from "motion/react";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { AudioPlayerWidget } from "./AudioPlayerWidget";
+import { AvatarWrapper } from "./AvatarWrapper";
 
 interface ProfileWidgetProps {
   user: UserProfile;
   onChangeUser: (updates: Partial<UserProfile>) => void;
   completedTracks: string[];
   onMintSuccess: (trackId: string, mintData: MintResult) => void;
+  musicMuted?: boolean;
+  onToggleMusicMute?: () => void;
 }
 
-const avatars = ["🐻", "🐱", "🐶", "🦊", "🦁", "🐨", "🐸", "🐼", "🦦", "🐰"];
+const avatars = ["yeti", "owl", "cat", "dog", "panda", "penguin", "bunny", "koala", "fox", "frog"];
 
-export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSuccess }: ProfileWidgetProps) {
+function renderBadgeIcon(id: string, isMinted: boolean) {
+  const iconClass = isMinted ? "w-8 h-8 stroke-2 animate-pulse" : "w-8 h-8 stroke-2 opacity-50";
+  switch (id) {
+    case "sui-basics":
+      return <Waves className={`${iconClass} text-blue-500`} />;
+    case "sui-defi":
+      return <TrendingUp className={`${iconClass} text-amber-500`} />;
+    case "sui-protocols":
+      return <Shield className={`${iconClass} text-purple-500`} />;
+    case "sui-history":
+      return <BookOpen className={`${iconClass} text-emerald-500`} />;
+    case "sui-move-coding":
+      return <Cpu className={`${iconClass} text-yellow-500`} />;
+    case "worthless-nft":
+      return <Trash2 className={`${iconClass} text-stone-500`} />;
+    default:
+      return <Award className={`${iconClass} text-rose-500`} />;
+  }
+}
+
+export function ProfileWidget({ 
+  user, 
+  onChangeUser, 
+  completedTracks, 
+  onMintSuccess,
+  musicMuted = false,
+  onToggleMusicMute = () => {}
+}: ProfileWidgetProps) {
   const [walletType, setWalletType] = useState<string>("Sui Wallet");
   const [customUsername, setCustomUsername] = useState<string>(user.username);
   const [isMinting, setIsMinting] = useState<string | null>(null);
@@ -230,16 +260,17 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
 
               {/* Avatar select */}
               <div className="flex justify-center mb-2.5 mt-2">
-                {user.avatar && (user.avatar.startsWith("data:") || user.avatar.startsWith("http") || user.avatar.startsWith("/") || user.avatar.startsWith("blob:")) ? (
-                  <img
-                    src={user.avatar}
-                    alt="Avatar"
-                    className="w-16 h-16 rounded-full border-2 border-[#3c3c3c] object-cover shadow-[2px_2px_0px_0px_#3c3c3c]"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <span className="text-4xl filter drop-shadow">{user.avatar}</span>
-                )}
+                <div
+                  onClick={() => document.getElementById("avatar-upload-input")?.click()}
+                  className="group relative cursor-pointer select-none rounded-full w-16 h-16 transition-transform hover:scale-105 active:scale-95"
+                  title="Click to upload custom picture or select avatar"
+                >
+                  <AvatarWrapper avatar={user.avatar} size={64} className="border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]" />
+                  {/* Interactive EDIT overlay displayed on hover */}
+                  <div className="absolute inset-x-0 bottom-0 bg-[#3c3c3c]/60 rounded-b-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pb-0.5 pointer-events-none">
+                    <span className="text-[9px] text-white font-mono font-bold leading-none">EDIT</span>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1">
@@ -287,16 +318,17 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
             {/* Avatar Switcher */}
             <div className="space-y-2">
               <span className="text-[10px] font-mono text-[#6D5D6E] block">Choose Cute Buddy Mascot</span>
-              <div className="grid grid-cols-5 gap-1.5">
+              <div className="grid grid-cols-5 gap-2">
                 {avatars.map((av) => (
                   <button
                     key={av}
                     onClick={() => onChangeUser({ avatar: av })}
-                    className={`text-xl p-1.5 rounded-xl border-2 transition-all hover:scale-110 cursor-pointer ${
-                      user.avatar === av ? "bg-[#89A8B2]/20 border-[#3c3c3c]" : "bg-[#f8f5f2] border-transparent"
+                    className={`p-1 rounded-xl border-2 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center ${
+                      user.avatar === av ? "bg-[#89A8B2]/20 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]" : "bg-[#f8f5f2] border-stone-200 hover:border-stone-400"
                     }`}
+                    title={`Mascot: ${av}`}
                   >
-                    {av}
+                    <AvatarWrapper avatar={av} size={32} className="pointer-events-none" />
                   </button>
                 ))}
               </div>
@@ -373,6 +405,44 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Background Music Settings */}
+            <div id="music-settings-panel" className="space-y-2 bg-[#FAF8F5] p-3.5 border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c] mt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-bold font-mono">
+                  <Music size={14} className="text-[#D67B52]" />
+                  <span>Ambient Lofi Jams</span>
+                </div>
+                <span className="text-[9px] font-mono font-bold bg-[#89A8B2]/20 text-[#89A8B2] px-1.5 py-0.5 rounded border border-[#3c3c3c]/10">
+                  1-HR MIX
+                </span>
+              </div>
+              
+              <p className="text-[10px] text-[#6D5D6E] leading-normal font-sans">
+                A continuous, high-quality sweet 1-hour lofi track stream designed to help you concentrate on writing secure Sui Move bytecode.
+              </p>
+
+              <button
+                onClick={onToggleMusicMute}
+                className={`w-full py-2 px-3 text-xs font-mono font-bold rounded-xl border-2 border-[#3c3c3c] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[1px_1px_0px_0px_#3c3c3c] hover:translate-y-[-1px] active:translate-y-[1px] ${
+                  musicMuted
+                    ? "bg-[#E8E1D9] text-[#6D5D6E]"
+                    : "bg-[#89A8B2] text-white"
+                }`}
+              >
+                {musicMuted ? (
+                  <>
+                    <VolumeX size={14} />
+                    <span>Unmute Background Music</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 size={14} className="animate-pulse" />
+                    <span>Mute Background Music</span>
+                  </>
+                )}
+              </button>
             </div>
 
             {/* Wallet connection banner if not connected */}
@@ -680,7 +750,7 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
                   <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 border-[#3c3c3c] ${
                     isMinted ? "bg-white shadow-[2px_2px_0px_0px_#3c3c3c]" : "bg-[#E8E1D9]/40"
                   } mb-3`}>
-                    <span className="text-3xl filter drop-shadow">{badge.emoji}</span>
+                    {renderBadgeIcon(badge.id, isMinted)}
                   </div>
 
                   {/* Descriptions */}
@@ -695,7 +765,7 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
 
                   {/* Hover visual CTA */}
                   <div className="text-[10px] text-[#D67B52] font-mono mt-1 font-bold cursor-help flex items-center gap-1 select-none">
-                    {isMinted ? "Hover details ✨" : "Study to unlock"}
+                    {isMinted ? "Hover details" : "Study to unlock"}
                   </div>
                 </motion.div>
 
@@ -766,7 +836,7 @@ export function ProfileWidget({ user, onChangeUser, completedTracks, onMintSucce
       {/* Lofi Jams Music Audio Deck relocated under Profile */}
       <div className="bg-white border-4 border-[#3c3c3c] rounded-[24px] p-5 shadow-[4px_4px_0px_0px_#3c3c3c]">
         <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono mb-4 flex items-center gap-1.5">
-          <span>🎧 Lofi study jams audio controller</span>
+          <span>Lofi study jams audio controller</span>
         </h3>
         <AudioPlayerWidget />
       </div>
@@ -791,8 +861,8 @@ function BadgeMintRow({ id, title, isCompleted, mintedData, onMint, isMinting, w
   return (
     <div className={`flex items-center justify-between p-3 rounded-xl ${color}`}>
       <div className="flex items-center gap-2">
-        <motion.span 
-          className="text-lg inline-block text-center rounded-full"
+        <motion.div 
+          className="inline-flex items-center justify-center p-1.5 rounded-full bg-white border border-[#3c3c3c]/10"
           animate={{ 
             scale: [1, 1.12, 1],
             y: [0, -1, 0]
@@ -804,8 +874,8 @@ function BadgeMintRow({ id, title, isCompleted, mintedData, onMint, isMinting, w
             ease: "easeInOut"
           }}
         >
-          🏅
-        </motion.span>
+          <Award size={16} className={isCompleted ? "text-[#D67B52]" : "text-gray-400"} />
+        </motion.div>
         <div>
           <span className="text-xs font-bold block text-[#3c3c3c]">{title}</span>
           <span className="text-[10px] text-[#6D5D6E] font-mono font-medium">
@@ -837,8 +907,9 @@ function BadgeMintRow({ id, title, isCompleted, mintedData, onMint, isMinting, w
             {isMinting ? "Minting..." : "Mint Badge"}
           </button>
         ) : (
-          <span className="text-[9px] font-mono text-[#6D5D6E] uppercase tracking-widest block select-none font-bold">
-            Locked 🔑
+          <span className="text-[9px] font-mono text-[#6D5D6E] uppercase tracking-widest flex items-center gap-1 select-none font-bold">
+            <span>Locked</span>
+            <Lock size={10} />
           </span>
         )}
       </div>

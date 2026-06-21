@@ -14,7 +14,11 @@ import {
   Calendar, 
   Send,
   UserCheck,
-  Award
+  Award,
+  Compass,
+  Shield,
+  TrendingUp,
+  Image
 } from "lucide-react";
 
 interface Article {
@@ -35,6 +39,30 @@ interface Article {
   externalLink: string;
 }
 
+export function renderAuthorIcon(avatarChar: string, size = 18) {
+  const norm = (avatarChar || "").toLowerCase();
+  switch (norm) {
+    case "explorer":
+    case "⛄":
+      return <Compass size={size} className="text-[#89A8B2]" />;
+    case "guard":
+    case "🦊":
+      return <Shield size={size} className="text-[#D67B52]" />;
+    case "chart":
+    case "🐻":
+      return <TrendingUp size={size} className="text-amber-500" />;
+    case "art":
+    case "🦦":
+      return <Image size={size} className="text-purple-500" />;
+    case "news":
+    case "koala":
+    case "🐨":
+      return <Newspaper size={size} className="text-[#89A8B2]" />;
+    default:
+      return <UserCheck size={size} className="text-emerald-500" />;
+  }
+}
+
 const INITIAL_ARTICLES: Article[] = [
   {
     id: "mysticeti",
@@ -45,7 +73,7 @@ const INITIAL_ARTICLES: Article[] = [
     views: 1240,
     likes: 412,
     author: "Wynn Frostweave",
-    avatarChar: "⛄",
+    avatarChar: "explorer",
     summary: "The groundbreaking Mysticeti consensus engine reduces validator coordination requirements down to an unbelievable 390ms latency! By separating transactional checkpoints from physical voting loops, network finality stays ultra-rapid under highest load.",
     intro: "Sui's revolutionary upgrade, Mysticeti, represents a major leap forward in blockchain scalability—effectively shifting transactional latency from seconds to milliseconds.",
     bodyParagraphs: [
@@ -69,7 +97,7 @@ const INITIAL_ARTICLES: Article[] = [
     views: 984,
     likes: 310,
     author: "Kellan Winterborn",
-    avatarChar: "🦊",
+    avatarChar: "guard",
     summary: "Connecting Ethereum securely, the Native Sui Bridge positions asset locks directly under validator trust rather than risky third-party multi-sigs, offering an institutional-grade, zero-anxiety cross-chain experience.",
     intro: "Cross-chain bridges have historically been the weakest link in decentralized finance, prone to multi-million dollar exploits. In response, Sui built a native alternative safeguarded directly by its underlying consensus validators.",
     bodyParagraphs: [
@@ -93,7 +121,7 @@ const INITIAL_ARTICLES: Article[] = [
     views: 845,
     likes: 297,
     author: "Lyra Frostpeak",
-    avatarChar: "🐻",
+    avatarChar: "chart",
     summary: "DeepBook V3 introduces supreme optimization for Sui's native central limit order book. It allows automated makers and institutions to execute wholesale pricing orders with 90% cheaper gas overhead.",
     intro: "Central Limit Order Books (CLOBs) are notoriously expensive to run on standard blockchains. However, DeepBook V3 leverages Sui's parallel execution engine to power wholesale order flows on-chain.",
     bodyParagraphs: [
@@ -117,7 +145,7 @@ const INITIAL_ARTICLES: Article[] = [
     views: 1120,
     likes: 382,
     author: "Bram Snowdrift",
-    avatarChar: "🦦",
+    avatarChar: "art",
     summary: "Sui Kiosk wraps transfer policies directly into system smart contract bytecode. This enables creators to strictly enforce secondary market royalties and minting rules, preventing marketplace bypass.",
     intro: "While traditional NFT platforms suffer from marketplace royalty bypass, Sui Kiosk structures ownership limits natively into the actual object's move metadata.",
     bodyParagraphs: [
@@ -141,7 +169,7 @@ const INITIAL_ARTICLES: Article[] = [
     views: 750,
     likes: 245,
     author: "Yeti Correspondent",
-    avatarChar: "🐨",
+    avatarChar: "news",
     summary: "The Sui ecosystem experiences immense developer traction as traditional Web2 and Rust engineers transition to Move. The language's focus on secure, object-centric assets eliminates typical smart contract vulnerabilities.",
     intro: "A silent migration is taking place in blockchain development. Engineers are moving away from account-based Solidity contracts toward the safety and intuition of Sui Move.",
     bodyParagraphs: [
@@ -217,7 +245,7 @@ export function SuiArticlesWidget() {
       }
     } catch (err) {
       setTimeout(() => {
-        const fallbackCommentary = `• look at that beautiful parallel lane layout! 🏔️ the article "${activeArticle.title.toLowerCase()}" showcases why SUI is perfect for high-speed systems.\n• assets are locked directly inside state objects, bypassing risky multi-sig committees and third-party contract vulnerabilities.\n• cozy up by the thermal hearth while the consensus engine works its magic with sub-300ms finalized epochs! 🐻🕯️`;
+        const fallbackCommentary = `• look at that beautiful parallel lane layout! the article "${activeArticle.title.toLowerCase()}" showcases why SUI is perfect for high-speed systems.\n• assets are locked directly inside state objects, bypassing risky multi-sig committees and third-party contract vulnerabilities.\n• cozy up by the thermal hearth while the consensus engine works its magic with sub-300ms finalized epochs!`;
         setAiAnalysis(fallbackCommentary);
         setIsAiLoading(false);
       }, 700);
@@ -293,8 +321,8 @@ export function SuiArticlesWidget() {
           <div className="bg-white border-3 border-[#3c3c3c] rounded-[32px] p-6 shadow-[6px_6px_0px_0px_#3c3c3c] relative overflow-hidden">
             
             {/* Background decorative page paper seal */}
-            <div className="absolute right-4 top-4 text-stone-100 font-serif font-black select-none text-9xl leading-none pointer-events-none opacity-40">
-              {activeArticle.avatarChar}
+            <div className="absolute right-4 top-4 text-stone-100/5 select-none pointer-events-none">
+              {renderAuthorIcon(activeArticle.avatarChar, 140)}
             </div>
 
             {/* Article Top Bezel */}
@@ -315,8 +343,8 @@ export function SuiArticlesWidget() {
             {/* Author Profile Plate */}
             <div className="flex items-center justify-between gap-4 mb-6 relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#E8E1D9] border-2 border-[#3c3c3c] flex items-center justify-center text-xl shadow-[2px_2px_0px_0px_#3c3c3c]">
-                  {activeArticle.avatarChar}
+                <div className="w-10 h-10 rounded-xl bg-[#E8E1D9] border-2 border-[#3c3c3c] flex items-center justify-center shadow-[2px_2px_0px_0px_#3c3c3c]">
+                  {renderAuthorIcon(activeArticle.avatarChar, 20)}
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-stone-800 text-xs sm:text-sm leading-tight">
@@ -467,7 +495,7 @@ export function SuiArticlesWidget() {
             <div className="space-y-3.5 max-h-[640px] overflow-y-auto pr-1">
               {filteredArticles.length === 0 ? (
                 <div className="p-8 text-center text-stone-400 font-mono text-xs bg-stone-50 border border-dashed border-[#3c3c3c]/20 rounded-2xl select-none">
-                  No ecosystem articles match the filter. ❄️
+                  No ecosystem articles match the filter.
                 </div>
               ) : (
                 filteredArticles.map((art, idx) => {
@@ -495,8 +523,8 @@ export function SuiArticlesWidget() {
                           : `${chosenBg} border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]`
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-stone-100/80 border border-stone-300 flex items-center justify-center text-lg select-none">
-                        {art.avatarChar}
+                      <div className="w-8 h-8 rounded-lg bg-stone-100/80 border border-stone-300 flex items-center justify-center select-none">
+                        {renderAuthorIcon(art.avatarChar, 16)}
                       </div>
 
                       <div className="flex-1 min-w-0">

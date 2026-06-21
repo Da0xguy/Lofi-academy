@@ -349,7 +349,7 @@ export function AudioPlayerWidget() {
             title="Open Lofi Girl YouTube Stream"
             className="text-[9px] font-mono font-bold text-[#D67B52] bg-white border border-[#3c3c3c] rounded-lg px-2 py-1 shadow-[1px_1px_0px_0px_#3c3c3c] hover:bg-[#D67B52]/10 transition-all flex items-center gap-1 active:translate-y-px"
           >
-            <span>📺 Lofi Girl (24/7 Live)</span>
+            <span>Lofi Girl (24/7 Live)</span>
           </a>
 
           <a 
@@ -359,7 +359,7 @@ export function AudioPlayerWidget() {
             title="Open Lofi Beats Spotify Playlist"
             className="text-[9px] font-mono font-bold text-emerald-800 bg-[#E8F5E9] border border-emerald-700/50 rounded-lg px-2 py-1 shadow-[1px_1px_0px_0px_#1b5e20] hover:bg-[#C8E6C9] transition-all flex items-center gap-1 active:translate-y-px"
           >
-            <span>🟢 Spotify Lofi Beats</span>
+            <span>Spotify Lofi Beats</span>
           </a>
         </div>
       </div>

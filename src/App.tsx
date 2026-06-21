@@ -45,6 +45,62 @@ import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png
 import YETI_BADGE_ASSET from "./assets/images/yeti_badge_1779633396226.png";
 
 export default function App() {
+  // 1-hour background music mix player
+  const [musicMuted, setMusicMuted] = useState<boolean>(() => {
+    return localStorage.getItem("sui_yeti_music_muted") === "true";
+  });
+
+  const backgroundAudioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  // Initialize and run background music autonomously when entering page
+  useEffect(() => {
+    const audio = new Audio("https://archive.org/download/lofi-hip-hop-radio-lofi-beats-to-study-to/Lofi%20Hip%20Hop%20Radio%20lofi%20beats%20to%20study%20to.mp3");
+    audio.loop = true;
+    audio.volume = 0.22; // Ambient background volume
+    audio.muted = musicMuted;
+    backgroundAudioRef.current = audio;
+
+    // Try playing immediately
+    if (!musicMuted) {
+      audio.play().catch(() => {
+        console.log("Autoplay blocked by modern browser. Standby for user engagement.");
+      });
+    }
+
+    // Auto engagement handlers (triggers audio play on first touch/click in page)
+    const startAudioPlay = () => {
+      if (backgroundAudioRef.current && !musicMuted && backgroundAudioRef.current.paused) {
+        backgroundAudioRef.current.play().catch(() => {});
+      }
+      document.removeEventListener("click", startAudioPlay);
+      document.removeEventListener("keydown", startAudioPlay);
+    };
+
+    document.addEventListener("click", startAudioPlay);
+    document.addEventListener("keydown", startAudioPlay);
+
+    return () => {
+      audio.pause();
+      document.removeEventListener("click", startAudioPlay);
+      document.removeEventListener("keydown", startAudioPlay);
+    };
+  }, []);
+
+  // Hot sync mute trigger
+  useEffect(() => {
+    if (backgroundAudioRef.current) {
+      backgroundAudioRef.current.muted = musicMuted;
+      localStorage.setItem("sui_yeti_music_muted", musicMuted ? "true" : "false");
+      if (!musicMuted && backgroundAudioRef.current.paused) {
+        backgroundAudioRef.current.play().catch(() => {});
+      }
+    }
+  }, [musicMuted]);
+
+  const handleToggleMusicMute = () => {
+    setMusicMuted(prev => !prev);
+  };
+
   // State for landing page vs main app launch
   const [appLaunched, setAppLaunched] = useState<boolean>(() => {
     return localStorage.getItem("sui_yeti_launched") === "true";
@@ -1269,6 +1325,8 @@ export default function App() {
             onChangeUser={(updates) => setUser((p) => ({ ...p, ...updates }))}
             completedTracks={user.completedTracks}
             onMintSuccess={handleMintSuccess}
+            musicMuted={musicMuted}
+            onToggleMusicMute={handleToggleMusicMute}
           />
         )}
 

@@ -2138,7 +2138,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mee5",
             title: "The event::emit Instruction",
-            content: "To broadcast your custom event across validator networks, you instantiate the event structure and send it using 'event::emit()'. Client web applications can listen to these logs in real-time to trigger responsive UI notifications! 🏔️☕",
+            content: "To broadcast your custom event across validator networks, you instantiate the event structure and send it using 'event::emit()'. Client web applications can listen to these logs in real-time to trigger responsive UI notifications!",
             highlightCode: "event::emit(CoffeeBrewed {\n    brew_strength: 50,\n    maker: tx_context::sender(ctx)\n});",
             yetiMood: "chill",
             chalkboardHeader: "EMITTING REAL TIME LOGS"
@@ -2146,7 +2146,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mee6",
             title: "Tracking Compiler Panic Runs",
-            content: "What happens if a transaction aborts? The entire block of modifications rolls back. Any SUI tokens transferred or dynamic values mutated revert back to their original states instantly, leaving zero dirty traces in the registry footprint! 🛡️⚡",
+            content: "What happens if a transaction aborts? The entire block of modifications rolls back. Any SUI tokens transferred or dynamic values mutated revert back to their original states instantly, leaving zero dirty traces in the registry footprint!",
             highlightCode: "// Aborted transactions roll back completely\n// Unused gas budget is returned safely",
             yetiMood: "thinking",
             chalkboardHeader: "THE TRANSACTION UNDO SHIELD"
@@ -2154,7 +2154,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mee7",
             title: "Using custom logging functions",
-            content: "While debugging inside your local framework environments, we can set up modular debug structures that print simple string vectors. This coordinates developer views elegantly before publishing contracts into production nodes! 💻🐻",
+            content: "While debugging inside your local framework environments, we can set up modular debug structures that print simple string vectors. This coordinates developer views elegantly before publishing contracts into production nodes!",
             highlightCode: "// std::debug::print(&variable_to_inspect);",
             yetiMood: "excited",
             chalkboardHeader: "LOCAL VERBATIM"
@@ -2162,7 +2162,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mee8",
             title: "A Complete Secure Entry Blueprint",
-            content: "Let's review a robust design combining errors and events! We perform balance validations, execute state adjustments, emit the event log certificate, and complete the transfer cleanly. Yeti says: high-grade engineering right here! 🏔️🎖️",
+            content: "Let's review a robust design combining errors and events! We perform balance validations, execute state adjustments, emit the event log certificate, and complete the transfer cleanly. Yeti says: high-grade engineering right here!",
             highlightCode: "public entry fun brew_premium_coffee(\n    ctx: &mut TxContext\n) {\n    assert!(true, E_NOT_AUTHORIZED);\n    event::emit(CoffeeBrewed { brew_strength: 100, maker: tx_context::sender(ctx) });\n}",
             yetiMood: "proud",
             chalkboardHeader: "SAFE SECURE LOOPS"
@@ -2192,7 +2192,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad1",
             title: "The Reentrancy Shield Native to Move",
-            content: "Welcome, master sentinel! On older networks, reentrancy attacks (where standard attackers drain contracts by recursively calling external withdrawal loops before states update) caused billions in damages. sui Move is completely immune to this by default! 🐻🛡️",
+            content: "Welcome, master sentinel! On older networks, reentrancy attacks (where standard attackers drain contracts by recursively calling external withdrawal loops before states update) caused billions in damages. sui Move is completely immune to this by default!",
             highlightCode: "// Compiler structural definitions prevent external re-entry hooks",
             yetiMood: "proud",
             chalkboardHeader: "REENTRANCY RESISTANT"
@@ -2200,7 +2200,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad2",
             title: "Capabilities as Access Guardians",
-            content: "Instead of maintaining massive public access control lists on-chain, Move utilizes Capabilities! If a function can only be triggered by developers, require a unique 'DevCap' badge object to be sent as a parameter limit. No badge, no access! 🏷️🐻",
+            content: "Instead of maintaining massive public access control lists on-chain, Move utilizes Capabilities! If a function can only be triggered by developers, require a unique 'DevCap' badge object to be sent as a parameter limit. No badge, no access!",
             highlightCode: "public entry fun update_pricing(\n    _dev: &DevCap, // Required access key!\n    lobby: &mut GameLobby\n) { ... }",
             yetiMood: "chill",
             chalkboardHeader: "CAPABILITY GUARDIANS"
@@ -2208,7 +2208,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad3",
             title: "The Hot Potato Struct Pattern",
-            content: "Want to guarantee that a sequence of operations is completed in a single block without skipping steps? You write a 'Hot Potato' struct! This is a struct with absolutely NO abilities (no key, store, copy, drop). It must be destrustured before the block ends! 🥔⚡",
+            content: "Want to guarantee that a sequence of operations is completed in a single block without skipping steps? You write a 'Hot Potato' struct! This is a struct with absolutely NO abilities (no key, store, copy, drop). It must be destrustured before the block ends!",
             highlightCode: "struct Receipt {\n    amount_to_pay: u64\n} // No abilities! Must be handled in function execution!",
             yetiMood: "excited",
             chalkboardHeader: "HOT POTATO CHAINS"
@@ -2216,7 +2216,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad4",
             title: "Resolving the Hot Potato Potato",
-            content: "Because the Receipt has no ability parameters, a transaction cannot discard it. The user has to pass it back to a matching 'pay_balances' execution function in your module to destructure it. This secures flash-loan repayments completely! 🏰🏔",
+            content: "Because the Receipt has no ability parameters, a transaction cannot discard it. The user has to pass it back to a matching 'pay_balances' execution function in your module to destructure it. This secures flash-loan repayments completely!",
             highlightCode: "public fun pay_balances(\n    payment: Coin<SUI>,\n    receipt: Receipt // Deconstruct here!\n) { ... }",
             yetiMood: "thinking",
             chalkboardHeader: "POTATO DESTRUCTION ENTRANCE"
@@ -2224,7 +2224,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad5",
             title: "Enforcing Integer Safety Limits",
-            content: "Always check for mathematical overflows! When performing compounding interest calculations or asset distributions, convert smaller integers to u128 or u256 ranges before multiplication checks to verify zero parameter leakage under the cold ice! 📈❄",
+            content: "Always check for mathematical overflows! When performing compounding interest calculations or asset distributions, convert smaller integers to u128 or u256 ranges before multiplication checks to verify zero parameter leakage under the cold ice!",
             highlightCode: "let reward = ((staked as u128) * apr) / 10000;",
             yetiMood: "thinking",
             chalkboardHeader: "INTEGER MULTIPLICATIONS"
@@ -2232,7 +2232,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad6",
             title: "Storage Fund Leakage Defenses",
-            content: "When updating dynamic fields frequently, be aware of gas storage dynamics. Design models that recycle obsolete indexes cleanly to prevent capital locked up on validator disks, ensuring your code remains extremely light and clean! ♻️🐻",
+            content: "When updating dynamic fields frequently, be aware of gas storage dynamics. Design models that recycle obsolete indexes cleanly to prevent capital locked up on validator disks, ensuring your code remains extremely light and clean!",
             highlightCode: "dynamic_field::remove<bdf>(&mut parent.id, key);",
             yetiMood: "chill",
             chalkboardHeader: "RECYCLING MANAGEMENT"
@@ -2240,7 +2240,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad7",
             title: "Module Upgradability Limits",
-            content: "When publishing a Move package, Sui generates an upgrade cap badge. By defining safe, progressive migration functions inside your initializers, you secure version upgrades from malicious actors and maintain community trust forever! 🛡️✨",
+            content: "When publishing a Move package, Sui generates an upgrade cap badge. By defining safe, progressive migration functions inside your initializers, you secure version upgrades from malicious actors and maintain community trust forever!",
             highlightCode: "struct UpgradeCap has key { id: UID }",
             yetiMood: "proud",
             chalkboardHeader: "UPGRADE SAFEGUARDS"
@@ -2248,7 +2248,7 @@ export const initialTracks: LearningTrack[] = [
           {
             id: "mad8",
             title: "Graduation Blueprints with Yeti",
-            content: "You did it! You have unlocked all 6 elite tracks of this lofi Move Academy. Yeti is incredibly proud of your deep progress on parallel speed, objects, capability assertions, and beautiful designs. Go forth and craft cozy code on Sui! 🎖️🐻🎓",
+            content: "You did it! You have unlocked all 6 elite tracks of this lofi Move Academy. Yeti is incredibly proud of your deep progress on parallel speed, objects, capability assertions, and beautiful designs. Go forth and craft cozy code on Sui!",
             highlightCode: "// You have graduated!\n// Go construct the on-chain future, master creator!",
             yetiMood: "proud",
             chalkboardHeader: "GRADUATION DEGREE ACHIEVED"

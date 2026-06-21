@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "motion/react";
+import { Music, Coffee, Sparkles, Star, Cloud, Headphones, PenLine, Compass } from "lucide-react";
 
 export default function Background() {
   // Generate coordinates for random grid blinking / pulsing boxes
@@ -7,14 +8,14 @@ export default function Background() {
 
   // Whimsical drifting lo-fi particles/notes for an extra dreamy and animated background atmosphere
   const particles = [
-    { label: "🎵", size: "text-base sm:text-lg", x: "10%", y: "20%", delay: 0, duration: 25 },
-    { label: "☕", size: "text-lg sm:text-xl", x: "85%", y: "15%", delay: 3, duration: 28 },
-    { label: "✨", size: "text-xs sm:text-sm", x: "70%", y: "45%", delay: 5, duration: 22 },
-    { label: "⭐", size: "text-[10px] sm:text-xs", x: "15%", y: "75%", delay: 2, duration: 18 },
-    { label: "☁️", size: "text-xl sm:text-2xl", x: "40%", y: "12%", delay: 7, duration: 32 },
-    { label: "🎧", size: "text-xs sm:text-sm", x: "92%", y: "65%", delay: 1, duration: 24 },
-    { label: "✏️", size: "text-[10px] sm:text-xs", x: "50%", y: "85%", delay: 4, duration: 20 },
-    { label: "🐚", size: "text-[10px] sm:text-xs", x: "6%", y: "45%", delay: 8, duration: 26 },
+    { icon: Music, color: "text-blue-400", size: 16, x: "10%", y: "20%", delay: 0, duration: 25 },
+    { icon: Coffee, color: "text-amber-500", size: 18, x: "85%", y: "15%", delay: 3, duration: 28 },
+    { icon: Sparkles, color: "text-yellow-400", size: 14, x: "70%", y: "45%", delay: 5, duration: 22 },
+    { icon: Star, color: "text-amber-400", size: 12, x: "15%", y: "75%", delay: 2, duration: 18 },
+    { icon: Cloud, color: "text-blue-100", size: 22, x: "40%", y: "12%", delay: 7, duration: 32 },
+    { icon: Headphones, color: "text-purple-400", size: 14, x: "92%", y: "65%", delay: 1, duration: 24 },
+    { icon: PenLine, color: "text-[#D67B52]", size: 12, x: "50%", y: "85%", delay: 4, duration: 20 },
+    { icon: Compass, color: "text-emerald-400", size: 14, x: "6%", y: "45%", delay: 8, duration: 26 },
   ];
 
   return (
@@ -97,27 +98,30 @@ export default function Background() {
       />
 
       {/* 2. Floating whimsy elements floating up and down with random rotations */}
-      {particles.map((p, idx) => (
-        <motion.div
-          key={idx}
-          className={`absolute ${p.size} opacity-40 dark:opacity-30`}
-          style={{ left: p.x, top: p.y }}
-          animate={{
-            y: [0, -25, 15, 0],
-            x: [0, 15, -10, 0],
-            rotate: [0, 20, -20, 0],
-            scale: [1, 1.12, 0.93, 1]
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          {p.label}
-        </motion.div>
-      ))}
+      {particles.map((p, idx) => {
+        const IconComponent = p.icon;
+        return (
+          <motion.div
+            key={idx}
+            className={`absolute opacity-40 dark:opacity-30`}
+            style={{ left: p.x, top: p.y }}
+            animate={{
+              y: [0, -25, 15, 0],
+              x: [0, 15, -10, 0],
+              rotate: [0, 20, -20, 0],
+              scale: [1, 1.12, 0.93, 1]
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <IconComponent size={p.size} className={p.color} />
+          </motion.div>
+        );
+      })}
 
       <svg 
         className="absolute inset-0 w-full h-full opacity-40 dark:opacity-20 transition-opacity duration-500" 
