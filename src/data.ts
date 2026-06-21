@@ -1675,6 +1675,66 @@ export const initialTracks: LearningTrack[] = [
             explanation: "Mysticeti leverages specialized Directed Acyclic Graph (DAG) protocols to reduce execution round trips, enabling sub-300ms transaction confirmations."
           }
         ]
+      },
+      {
+        id: "history-ecosystem-impact",
+        title: "Ecosystem Power & Developer Empowerment",
+        description: "Explore how the Sui Foundation fuels real-world utility, global hub activities, and developer innovation.",
+        xpValue: 50,
+        videoUrl: "https://www.youtube.com/watch?v=b-7I1uUvY7k",
+        videoTitle: "Sui Ecosystem Review & Developer Opportunities",
+        steps: [
+          {
+            id: "eco1",
+            title: "Real-World Adoption and RWA",
+            content: "Sui's impact is global! Major global institutions, luxury brands, and mobile operators utilize Sui to issue high-velocity Real World Assets (RWAs), secure digital identity markers, and process instant global micro-transactions. This bridges purely theoretical blockchain research directly into the hands of billions of real on-chain users. Yeti loves seeing technology make life warmer!",
+            highlightCode: "// Sui processes stablecoins, loyalty points, and digital IDs\n// globally and securely at sub-second speeds.",
+            yetiMood: "chill",
+            chalkboardHeader: "REAL-WORLD UTILITY"
+          },
+          {
+            id: "eco2",
+            title: "Sui Builder Houses & Hackathons",
+            content: "The heartbeat of Sui lies in its dynamic, physical community! Through international Sui Builder Houses, specialized developer bootcamps, and legendary decentralized hackerspaces, builders from Tokyo to Paris collaborate in real-time. These high-energy activities cultivate technical breakthroughs, secure funding, and foster lifelong engineering alliances.",
+            highlightCode: "// Global developer hubs host live coding challenges,\n// security peer-reviews, and networking streams.",
+            yetiMood: "excited",
+            chalkboardHeader: "GLOBAL HUB ACTIVITIES"
+          },
+          {
+            id: "eco3",
+            title: "Empowering Developers: Grants & Tools",
+            content: "Sui puts developer needs first! The Sui Foundation actively distributes millions of dollars in developer-centric grants, academic sponsorships, and startup incubator aid. Alongside direct economic support, builders are empowered with state-of-the-art tooling, instant debugging IDE suites, zkLogin OAuth capabilities, and lightning-fast SDK kits.",
+            highlightCode: "// Sui Foundation provides robust technical audits,\n// financial backing, and distribution channels for creators.",
+            yetiMood: "proud",
+            chalkboardHeader: "DEVELOPER FIRST FORCE"
+          }
+        ],
+        quiz: [
+          {
+            id: "eq1",
+            question: "How does the Sui Foundation actively empower Web3 developers?",
+            options: [
+              "By distributing developer-centric grants, academic aid, and state-of-the-art open source tooling",
+              "By requiring developers to work inside physical ice caves",
+              "By banning other programming languages",
+              "By charging a monthly fee to run the compiler"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Sui's developer-first strategy includes generous financial grants, incubation programs, and sophisticated developer tools to make building easy."
+          },
+          {
+            id: "eq2",
+            question: "Wha is the primary purpose of the global Sui Builder Houses?",
+            options: [
+              "To sell offline game boards",
+              "To act as a physical server farm",
+              "To bring global developers together to collaborate, build high-utility apps, and receive expert mentorship",
+              "To train people how to ski"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Sui Builder Houses connect builders, founders, and security auditors worldwide to iterate on products and form engineering collaborations."
+          }
+        ]
       }
     ]
   },

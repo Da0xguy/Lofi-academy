@@ -66,6 +66,7 @@ const getModuleVideo = (module: TrackModule) => {
     "protocols-multisig": { url: "https://www.youtube.com/watch?v=8Vco7C_Cpxo", title: "Implementing High-Security Multi-Signature Wallets on Sui" },
     "history-mysten": { url: "https://www.youtube.com/watch?v=D-Z9L1jL_tM", title: "Mysten Labs: The Pioneers & Engineers Behind Sui" },
     "history-founders": { url: "https://www.youtube.com/watch?v=D-Z9L1jL_tM", title: "Sui Founders Interview: Redefining Web3 Consensus Foundations" },
+    "history-ecosystem-impact": { url: "https://www.youtube.com/watch?v=b-7I1uUvY7k", title: "Sui Ecosystem Review, Global Hacker houses, & Developer Inflow" },
     "move-basics": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Your First Move Contract: Structs, Capabilities, and Entry Modules" },
     "move-functions": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Writing Purposive Move Functions, Parameters, & Return Signatures" },
     "move-objects-creation": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Object Creation and Lifecycle Management in Sui Move" },
