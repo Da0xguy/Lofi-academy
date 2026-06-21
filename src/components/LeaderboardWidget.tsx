@@ -196,7 +196,16 @@ export function LeaderboardWidget({
                     
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-base">{entry.avatar || "🐻"}</span>
+                        {entry.avatar && (entry.avatar.startsWith("data:") || entry.avatar.startsWith("http") || entry.avatar.startsWith("/") || entry.avatar.startsWith("blob:")) ? (
+                          <img
+                            src={entry.avatar}
+                            alt="Avatar"
+                            className="w-8 h-8 rounded-full border border-[#3c3c3c]/30 object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <span className="text-base">{entry.avatar || "🐻"}</span>
+                        )}
                         <span className={`font-bold text-[#3c3c3c]`}>
                           {entry.username}
                           {isCurrentUser && <span className="text-[9px] bg-[#D67B52] text-white font-bold px-1.5 py-0.2 ml-1.5 rounded uppercase font-sans">You</span>}

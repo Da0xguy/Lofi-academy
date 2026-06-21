@@ -372,6 +372,92 @@ app.post("/api/gemini/tutor", async (req, res) => {
   }
 });
 
+// 3.5. AI Avatar Generator Endpoint
+app.post("/api/gemini/generate-avatar", async (req, res) => {
+  const { prompt } = req.body;
+  const client = initGemini();
+  
+  const defaultPrompt = prompt || "a cute cozy lo-fi animal companion (like a yeti, penguin, bear, red panda, or wolf) wearing a winter scarf / beanie. minimalist flat-design cartoon styled.";
+  
+  const systemInstruction = `
+  You are an expert graphic designer and SVG generator.
+  Your task is to generate and return ONLY a beautifully structured, highly creative, modern flat-design vector SVG representing a cute avatar of a cozy animal companion requested by the user.
+  
+  Design guidelines:
+  - Return ONLY raw XML SVG string code (starting with <svg> and ending with </svg>).
+  - Do NOT wrap the output in markdown code blocks (\`\`\`xml or \`\`\`svg or \`\`\`). Do NOT include any introductory or explanatory text or backticks. The response must be pure SVG parser-friendly XML text.
+  - Make it modern, clean, centered, and aesthetically proportional. It should look like a professional, high-fidelity avatar icon.
+  - The SVG should have a solid rounded or circle background color (e.g. pastel colors like #89A8B2, #E8A0BF, #B9D7EA, #E8E1D9, #D67B52) with an aspect ratio of 1:1.
+  - Max width element viewBox: "0 0 100 100".
+  - Include beautiful details: winter wearables (scarves, hats, ear muffs, beanies, or headphones), cute blushy cheeks, closed eyes or sparkling anime eyes, tiny smiles.
+  - Use high-contrast flat colors and elegant SVG paths, circles, rectangles, shapes compatible with modern browsers.
+  `;
+  
+  try {
+    if (client) {
+      const response = await client.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: `Create a cozy avatar for: ${defaultPrompt}`,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.9,
+        },
+      });
+      
+      let svgText = response.text || "";
+      // Clean markdown blocks if Gemini accidentally wraps them
+      svgText = svgText.trim();
+      if (svgText.startsWith("```")) {
+        svgText = svgText.replace(/^```[a-zA-Z]*\n/, "").replace(/\n```$/, "").trim();
+      }
+      
+      if (!svgText.includes("<svg")) {
+        throw new Error("Failed to generate correct SVG content structure.");
+      }
+      
+      // Return as base64 data-url
+      const base64Svg = Buffer.from(svgText).toString("base64");
+      const dataUri = `data:image/svg+xml;base64,${base64Svg}`;
+      
+      res.json({ success: true, dataUri, rawSvg: svgText });
+    } else {
+      // Offline fallback: generate a beautiful, dynamic SVG representation programmatically!
+      const fallbackAnimals = ["Yeti", "Penguin", "Panda", "Fox", "Bear"];
+      const animal = fallbackAnimals[Math.floor(Math.random() * fallbackAnimals.length)];
+      const colors = ["#89A8B2", "#E8A0BF", "#B9D7EA", "#E8E1D9", "#D67B52"];
+      const bg = colors[Math.floor(Math.random() * colors.length)];
+      
+      const offlineSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+        <circle cx="50" cy="50" r="48" fill="${bg}" stroke="#3c3c3c" stroke-width="3"/>
+        <circle cx="50" cy="55" r="30" fill="#ffffff" stroke="#3c3c3c" stroke-width="3"/>
+        <circle cx="50" cy="55" r="22" fill="#fafafa" />
+        <path d="M 23 45 Q 50 15 77 45 Z" fill="#D67B52" stroke="#3c3c3c" stroke-width="3"/>
+        <rect x="20" y="40" width="60" height="10" rx="5" fill="#f8f5f2" stroke="#3c3c3c" stroke-width="3"/>
+        <circle cx="50" cy="22" r="8" fill="#f8f5f2" stroke="#3c3c3c" stroke-width="2.5"/>
+        <circle cx="40" cy="56" r="3.5" fill="#3c3c3c"/>
+        <circle cx="60" cy="56" r="3.5" fill="#3c3c3c"/>
+        <circle cx="41.5" cy="54.5" r="1" fill="#fff"/>
+        <circle cx="61.5" cy="54.5" r="1" fill="#fff"/>
+        <circle cx="34" cy="62" r="4.5" fill="#E8A0BF" opacity="0.8"/>
+        <circle cx="66" cy="62" r="4.5" fill="#E8A0BF" opacity="0.8"/>
+        <path d="M 47 62 Q 50 65 53 62" fill="none" stroke="#3c3c3c" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="32" y="73" width="36" height="8" rx="4" fill="#89A8B2" stroke="#3c3c3c" stroke-width="2.5"/>
+        <path d="M 58 78 L 58 90 L 66 90 L 66 78 Z" fill="#89A8B2" stroke="#3c3c3c" stroke-width="2.5"/>
+        <text x="50" y="94" font-family="'JetBrains Mono', monospace" font-size="6" font-weight="900" fill="#3c3c3c" text-anchor="middle">[COZY CODER]</text>
+      </svg>
+      `.trim();
+      
+      const base64Svg = Buffer.from(offlineSvg).toString("base64");
+      const dataUri = `data:image/svg+xml;base64,${base64Svg}`;
+      res.json({ success: true, dataUri, rawSvg: offlineSvg, note: "Offline synthetic fallback" });
+    }
+  } catch (error: any) {
+    console.error("Gemini Avatar generation error:", error);
+    res.status(500).json({ success: false, error: "AI pipeline failed to render SVG." });
+  }
+});
+
 // 4. Simulate Badge Minting via Move Contract (Returns Explorer Links & Logs)
 app.post("/api/sui/mint-badge", (req, res) => {
   const { wallet, badgeId, trackName } = req.body;
