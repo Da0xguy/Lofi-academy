@@ -28,17 +28,35 @@ export function LeaderboardWidget({
 
   const fetchLeaderboard = async () => {
     setIsLoading(true);
-    try {
-      const response = await fetch("/api/sui/leaderboard");
-      const data = await response.json();
-      if (data.success) {
-        setLeaderboard(data.leaderboard);
+    let retries = 3;
+    let delay = 1000;
+    let lastError: any = null;
+
+    while (retries > 0) {
+      try {
+        const response = await fetch("/api/sui/leaderboard");
+        if (!response.ok) {
+          throw new Error(`API status ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.success) {
+          setLeaderboard(data.leaderboard);
+          setIsLoading(false);
+          return; // Success!
+        } else {
+          throw new Error(data.error || "Unknown response error");
+        }
+      } catch (err) {
+        lastError = err;
+        retries--;
+        if (retries > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          delay *= 2;
+        }
       }
-    } catch (err) {
-      console.error("Failed to fetch leaderboard from API:", err);
-    } finally {
-      setIsLoading(false);
     }
+    console.error("Failed to fetch leaderboard from API after retries:", lastError);
+    setIsLoading(false);
   };
 
   // Submit current user details to leaderboard
@@ -54,24 +72,40 @@ export function LeaderboardWidget({
       activeWallet = guestId;
     }
 
-    try {
-      await fetch("/api/sui/leaderboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          wallet: activeWallet,
-          username: username,
-          xp: userXP,
-          level: userLevel,
-          badges: userBadges,
-          avatar: avatar
-        })
-      });
-      // Fetch fresh rankings
-      fetchLeaderboard();
-    } catch (err) {
-      console.error("Failed to sync current user scores to leaderboard:", err);
+    let retries = 3;
+    let delay = 1000;
+    let lastError: any = null;
+
+    while (retries > 0) {
+      try {
+        const response = await fetch("/api/sui/leaderboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            wallet: activeWallet,
+            username: username,
+            xp: userXP,
+            level: userLevel,
+            badges: userBadges,
+            avatar: avatar
+          })
+        });
+        if (!response.ok) {
+          throw new Error(`API status ${response.status}`);
+        }
+        // Fetch fresh rankings on success
+        fetchLeaderboard();
+        return; // Success!
+      } catch (err) {
+        lastError = err;
+        retries--;
+        if (retries > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          delay *= 2;
+        }
+      }
     }
+    console.error("Failed to sync current user scores to leaderboard after retries:", lastError);
   };
 
   // Sync to backend whenever relevant values or refresh triggers change!

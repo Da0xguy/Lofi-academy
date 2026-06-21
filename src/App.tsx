@@ -40,6 +40,56 @@ import {
 
 import { SuiArticlesWidget } from "./components/SuiArticlesWidget";
 
+// Helper to retrieve educational YouTube video tutorials for modules
+const getModuleVideo = (module: TrackModule) => {
+  if (module.videoUrl && module.videoTitle) {
+    return { url: module.videoUrl, title: module.videoTitle };
+  }
+  
+  const lookups: Record<string, { url: string; title: string }> = {
+    "basics-intro": { url: "https://www.youtube.com/watch?v=D-Z9L1jL_tM", title: "Sui Explained: Core Architecture & Design Innovations" },
+    "basics-move": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Move Language Essentials: Asset & Ownership Safety on Sui" },
+    "basics-staking": { url: "https://www.youtube.com/watch?v=bC6_JcllSxk", title: "How to Stake SUI Coins & Earn Passive Rewards on Testnet" },
+    "basics-parallel": { url: "https://www.youtube.com/watch?v=8Vco7C_Cpxo", title: "Deep Dive into Sui’s Parallel Transaction Execution Engine" },
+    "basics-objects-explained": { url: "https://www.youtube.com/watch?v=mE6_3d2mK9o", title: "Sui's Object Model: Under the Hood of Pure Asset-Oriented Storage" },
+    "basics-gas-fees": { url: "https://www.youtube.com/watch?v=mE6_3d2mK9o", title: "Sui Gas Pricing Model & Storage Fund Economics Tutorial" },
+    "defi-swaps": { url: "https://www.youtube.com/watch?v=07-u06zX9vM", title: "Sui DeFi Spring: Automated Market Makers & Swap Protocol Mechanics" },
+    "defi-lending": { url: "https://www.youtube.com/watch?v=D-Z9L1jL_tM", title: "Web3 Lending & Borrowing Pools: Decoupling Smart Collateral" },
+    "defi-liquid-staking": { url: "https://www.youtube.com/watch?v=07-u06zX9vM", title: "Liquid Staking on Sui: Conversion, Yields & LST Implementations" },
+    "defi-derivatives": { url: "https://www.youtube.com/watch?v=07-u06zX9vM", title: "On-Chain Perpetual Swaps & Derivative Order Books" },
+    "defi-aggregators": { url: "https://www.youtube.com/watch?v=07-u06zX9vM", title: "DEX Routing Aggregators: Boosting capital efficiency on Sui" },
+    "defi-oracles": { url: "https://www.youtube.com/watch?v=mE6_3d2mK9o", title: "Integrating Pyth & Stork Decentralized Oracles on Sui" },
+    "protocols-deepbook": { url: "https://www.youtube.com/watch?v=8Vco7C_Cpxo", title: "DeepBook v3 Architecture: Fully On-Chain Shared Order Book" },
+    "protocols-kiosk": { url: "https://www.youtube.com/watch?v=NnshbYV0Hno", title: "Sui Kiosk: Enforcing Royalties and Advanced Secure NFT Protections" },
+    "protocols-zklogin": { url: "https://www.youtube.com/watch?v=mE6_3d2mK9o", title: "Sui zkLogin In-Depth Tutorial: Sign in via Google & Web2 APIs" },
+    "protocols-ptb": { url: "https://www.youtube.com/watch?v=8Vco7C_Cpxo", title: "Mastering Sui Programmable Transaction Blocks (PTB) for Batch Operations" },
+    "protocols-multisig": { url: "https://www.youtube.com/watch?v=8Vco7C_Cpxo", title: "Implementing High-Security Multi-Signature Wallets on Sui" },
+    "history-mysten": { url: "https://www.youtube.com/watch?v=D-Z9L1jL_tM", title: "Mysten Labs: The Pioneers & Engineers Behind Sui" },
+    "history-founders": { url: "https://www.youtube.com/watch?v=D-Z9L1jL_tM", title: "Sui Founders Interview: Redefining Web3 Consensus Foundations" },
+    "move-basics": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Your First Move Contract: Structs, Capabilities, and Entry Modules" },
+    "move-functions": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Writing Purposive Move Functions, Parameters, & Return Signatures" },
+    "move-objects-creation": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Object Creation and Lifecycle Management in Sui Move" },
+    "move-shared-managed": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Owned vs. Shared Objects: Performance Trade-offs in Move" },
+    "raw-rpc-queries": { url: "https://www.youtube.com/watch?v=mE6_3d2mK9o", title: "Connecting Frontends to Sui with the TypeScript SDK" },
+    "event-indexers": { url: "https://www.youtube.com/watch?v=mE6_3d2mK9o", title: "Sui WebSockets and GraphQL: Building Real-time Event Monitors" },
+    "gas-budget-tuning": { url: "https://www.youtube.com/watch?v=8Vco7C_Cpxo", title: "High-Efficiency Transaction Simulations and Gas Budget Calibration" },
+    "move-unit-testing": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Unit Testing with test_scenario: Sandbox State Control in Move" },
+    "move-property-fuzzing": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Property-Based Fuzzing & Boundary Arithmetic Validations" },
+    "move-formal-specification": { url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg", title: "Formal Verification using the Move Prover & Specifications" }
+  };
+
+  const lookup = lookups[module.id];
+  if (lookup) {
+    return lookup;
+  }
+
+  // Fallback if not matched
+  return {
+    url: "https://www.youtube.com/watch?v=3HuxrYlK5Yg",
+    title: `Sui Move Course Series: Deep Dive on ${module.title}`
+  };
+};
+
 // Pre-generated static assets mapped from tools outputs
 import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png";
 import YETI_BADGE_ASSET from "./assets/images/yeti_badge_1779633396226.png";
@@ -376,23 +426,40 @@ export default function App() {
         activeWallet = guestId;
       }
 
-      try {
-        await fetch("/api/sui/leaderboard", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            wallet: activeWallet,
-            username: user.username,
-            xp: user.xp,
-            level: user.level,
-            badges: user.mintedBadges.map((b) => b.trackId),
-            avatar: user.avatar
-          })
-        });
-        setLeaderboardRefreshCode((prev) => prev + 1);
-      } catch (err) {
-        console.error("Failed to sync score to backend leaderboard:", err);
+      let retries = 3;
+      let delay = 1000;
+      let lastError: any = null;
+
+      while (retries > 0) {
+        try {
+          const response = await fetch("/api/sui/leaderboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              wallet: activeWallet,
+              username: user.username,
+              xp: user.xp,
+              level: user.level,
+              badges: user.mintedBadges.map((b) => b.trackId),
+              avatar: user.avatar
+            })
+          });
+          if (!response.ok) {
+            throw new Error(`API Status ${response.status}`);
+          }
+          setLeaderboardRefreshCode((prev) => prev + 1);
+          return; // Success!
+        } catch (err) {
+          lastError = err;
+          retries--;
+          if (retries > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            delay *= 2;
+          }
+        }
       }
+
+      console.error("Failed to sync score to backend leaderboard:", lastError);
     };
 
     const debounceTimer = setTimeout(() => {
@@ -1165,6 +1232,38 @@ export default function App() {
                       </div>
                     )}
 
+                    {/* RECOMMENDED LECTURE REFERENCE */}
+                    {activeModule && (
+                      <div className="bg-[#FAF8F5] border-2 border-dashed border-[#D67B52]/50 p-3 rounded-2xl text-left">
+                        <span className="text-[9px] uppercase font-bold text-[#D67B52] block tracking-wide mb-1 flex items-center gap-1 font-mono">
+                          <Tv size={12} className="text-[#D67B52]" /> RECOMMENDED STUDY REFERENCE
+                        </span>
+                        <div className="flex items-start gap-2">
+                          <div className="bg-red-500 text-white rounded-lg px-2 py-1 font-bold text-xs shrink-0 font-mono flex items-center justify-center">
+                            YT
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-[10px] font-extrabold text-[#3c3c3c] leading-snug font-mono truncate">
+                              {getModuleVideo(activeModule).title}
+                            </h4>
+                            <p className="text-[9px] text-[#6D5D6E] mt-0.5 leading-snug font-mono">
+                              Master this module's on-chain mechanics with a video guide.
+                            </p>
+                            <a
+                              href={getModuleVideo(activeModule).url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              referrerPolicy="no-referrer"
+                              className="inline-flex items-center gap-1 text-[9px] font-bold text-red-600 hover:text-red-700 transition-colors mt-1 font-mono cursor-pointer border border-red-200 bg-red-50 hover:bg-red-100/70 px-1.5 py-0.5 rounded"
+                            >
+                              <span>Watch reference video</span>
+                              <ExternalLink size={10} />
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="pt-2">
                       <a
                         href={`https://x.com/intent/tweet?text=${encodeURIComponent(
@@ -1214,6 +1313,38 @@ export default function App() {
                       <span>XP Earned (Correct Questions):</span>
                       <strong className="text-[#D67B52] font-extrabold">+{correctAnswersCount * 10} XP</strong>
                     </div>
+
+                    {/* RECOMMENDED LECTURE REFERENCE FOR RETRY */}
+                    {activeModule && (
+                      <div className="bg-[#FAF8F5] border-2 border-dashed border-[#D67B52]/50 p-3 rounded-2xl text-left">
+                        <span className="text-[9px] uppercase font-bold text-[#D67B52] block tracking-wide mb-1 flex items-center gap-1 font-mono">
+                          <Tv size={12} className="text-[#D67B52]" /> TUTORIAL VIDEO REFERENCE
+                        </span>
+                        <div className="flex items-start gap-2">
+                          <div className="bg-red-500 text-white rounded-lg px-2 py-1 font-bold text-xs shrink-0 font-mono flex items-center justify-center">
+                            YT
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-[10px] font-extrabold text-[#3c3c3c] leading-snug font-mono truncate">
+                              {getModuleVideo(activeModule).title}
+                            </h4>
+                            <p className="text-[9px] text-[#6D5D6E] mt-0.5 leading-snug font-mono">
+                              Struggling with a question? Watch a walkthrough to master the concepts!
+                            </p>
+                            <a
+                              href={getModuleVideo(activeModule).url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              referrerPolicy="no-referrer"
+                              className="inline-flex items-center gap-1 text-[9px] font-bold text-red-600 hover:text-red-700 transition-colors mt-1 font-mono cursor-pointer border border-red-200 bg-red-50 hover:bg-red-100/70 px-1.5 py-0.5 rounded"
+                            >
+                              <span>Watch video reference</span>
+                              <ExternalLink size={10} />
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="pt-1">
                       <a

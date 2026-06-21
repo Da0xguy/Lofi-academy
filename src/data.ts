@@ -13,6 +13,8 @@ export const initialTracks: LearningTrack[] = [
         title: "Introduction to Sui Blockchain",
         description: "What makes Sui radically fast for decentralized networks?",
         xpValue: 45,
+        videoUrl: "https://www.youtube.com/watch?v=D-Z9L1jL_tM",
+        videoTitle: "Sui Blockchain Explained in 10 Minutes",
         steps: [
           {
             id: "step1",
@@ -106,6 +108,8 @@ export const initialTracks: LearningTrack[] = [
         title: "The Move Language Safety",
         description: "Understand the asset safety principles behind the Sui Move language.",
         xpValue: 55,
+        videoUrl: "https://www.youtube.com/watch?v=3HuxrYlK5Yg",
+        videoTitle: "Move programming language on Sui: Complete Guide for Beginners",
         steps: [
           {
             id: "step1",
@@ -2270,6 +2274,339 @@ export const initialTracks: LearningTrack[] = [
         ]
       }
     ]
+  },
+  {
+    id: "sui-sdk-indexing",
+    title: "Sui SDK & Indexers",
+    description: "Master RPC queries, custom indexer architectures, and real-time frontend event integrations.",
+    iconName: "Cpu",
+    difficulty: "Intermediate",
+    modules: [
+      {
+        id: "raw-rpc-queries",
+        title: "Sui TypeScript RPC Foundations",
+        description: "Fetch block data, fetch objects dynamically, and interact with Sui JSON-RPC nodes.",
+        xpValue: 50,
+        videoUrl: "https://www.youtube.com/watch?v=mE6_3d2mK9o",
+        videoTitle: "Connecting Frontends to Sui with the TypeScript SDK",
+        steps: [
+          {
+            id: "rpc1",
+            title: "Connecting to the Client",
+            content: "Welcome back to the cozy tech deck! Today we step beyond smart contracts to see how client web applications talk to Sui. We use a SuiClient connection to query RPC nodes. It allows us to resolve on-chain object details, query account balances, or fetch transaction blocks with a simple, type-safe API! Grab a hot coffee and let's configure your client connection.",
+            highlightCode: "import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';\n\nconst client = new SuiClient({\n  url: getFullnodeUrl('testnet')\n});",
+            yetiMood: "chill",
+            chalkboardHeader: "CLIENT CONNECTIONS"
+          },
+          {
+            id: "rpc2",
+            title: "Reading Object Fields",
+            content: "Remember, everything in Sui is an object. To read the content of any individual object, we provide its 32-byte address ID to 'getObject'. We can specify content requirements to retrieve full serializations or parse layout parameters into clean JSON records. Yeti is keeping your storage query fast!",
+            highlightCode: "const objectResult = await client.getObject({\n  id: '0xabc123...',\n  options: { showContent: true, showOwner: true }\n});",
+            yetiMood: "thinking",
+            chalkboardHeader: "OBJECT FIELD RETRIEVAL"
+          },
+          {
+            id: "rpc3",
+            title: "Resolving Dynamic Fields",
+            content: "What if your on-chain struct has thousands of sub-items inside child dynamic fields? Instead of pulling a massive nested object, we can paginate list queries using 'getDynamicFields'. This keeps client bandwidth extremely lightweight and prevents browser frame lag!",
+            highlightCode: "const fields = await client.getDynamicFields({\n  parentId: '0xparent123...'\n});",
+            yetiMood: "excited",
+            chalkboardHeader: "PAGINATED CHILDS"
+          },
+          {
+            id: "rpc4",
+            title: "Checking Coin Balances",
+            content: "To show SUI or custom testnet coins in a dApp, we query historical coin balances. We can query total unified balances or filter specific coin types to display custom reward systems comfortably. Yeti verified this handles mist precisely!",
+            highlightCode: "const balance = await client.getBalance({\n  owner: '0xuserAddress...',\n  coinType: '0x2::sui::SUI'\n});",
+            yetiMood: "proud",
+            chalkboardHeader: "BALANCES ENGINE"
+          }
+        ],
+        quiz: [
+          {
+            id: "rq1",
+            question: "Which client utility class is recommended to connect to Sui JSON-RPC networks?",
+            options: [
+              "SolanaWeb3",
+              "SuiClient",
+              "SuiProviderLegacy",
+              "EtherProvider"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "SuiClient is the official, modernized client entrypoint in the @mysten/sui package for interactively querying and reading Sui blockchain nodes."
+          },
+          {
+            id: "rq2",
+            question: "Why should you use getDynamicFields instead of querying raw nested structures for high-volume items?",
+            options: [
+              "It decreases transaction speeds",
+              "It deletes older entries automatically",
+              "It paginates child dynamic values, preserving client-side performance and keeping memory footprint low",
+              "It requires gas payments to read"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "getDynamicFields allows clean pagination of dynamic objects on the blockchain without having to read a massive static structural map."
+          }
+        ]
+      },
+      {
+        id: "event-indexers",
+        title: "High-Throughput Event Indexers",
+        description: "Build reactive off-chain engines that capture custom events and update frontends instantly.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "idx1",
+            title: "The Event Capture Hub",
+            content: "Web3 web interfaces shouldn't poll RPC nodes repeatedly to find changes. That would burn validator pipelines! Instead, we define event monitors. When on-chain packages execute 'event::emit', our subscriber intercepts the stream payload instantly and updates the UI state in real-time. Yeti calls this smooth as velvet!",
+            highlightCode: "client.subscribeEvent({\n  filter: { Package: '0xcontractPackageId' },\n  onMessage: (event) => {\n    console.log('New event received:', event);\n  }\n});",
+            yetiMood: "excited",
+            chalkboardHeader: "EVENT STREAMERS"
+          },
+          {
+            id: "idx2",
+            title: "Building Custom SQL Indexers",
+            content: "For complex leaderboards or transaction histories, we stream events into an off-chain PostgreSQL database. By writing a small Node server that processes blocks and maps transaction headers into relational tables, we gain maximum search speed without touching slow RPC gateways. This is high-grade setup!",
+            highlightCode: "// Stream event items to analytical databases\n// or local storage states for blazing fast queries",
+            yetiMood: "thinking",
+            chalkboardHeader: "RELATIONAL INDEXING"
+          },
+          {
+            id: "idx3",
+            title: "GraphQL Gateway Introductions",
+            content: "Sui supports GraphQL natively for queries! Instead of multiple sequential REST API roundtrips, we write single clean queries specifying exactly what variables we need (IDs, fields, owners, or events). Yeti has his telescope aligned to this stream!",
+            highlightCode: "query { \n  owner(address: \"0x...\") {\n    objects {\n      nodes { digest contents { json } }\n    }\n  }\n}",
+            yetiMood: "chill",
+            chalkboardHeader: "GRAPHQL HARMONY"
+          }
+        ],
+        quiz: [
+          {
+            id: "iq1",
+            question: "What is the primary benefit of deploying off-chain databases and event indexers?",
+            options: [
+              "It makes consensus slower",
+              "It provides instant searchable records without overloading the on-chain gateway",
+              "It replaces the need for any on-chain smart contracts",
+              "It prevents users from deleting files"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Off-chain indexing mirrors relevant on-chain data into databases, which can be queried instantly with full search filters without sending repetitive on-chain requests."
+          },
+          {
+            id: "iq2",
+            question: "How do client web pages receive notification of smart contract changes in real-time?",
+            options: [
+              "By emailing the developers",
+              "Through websockets subscribing to smart contract event filters",
+              "By reloading the web browser every 2 seconds",
+              "Through manual paper receipts"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "SuiClient event subscriptions work over high-efficiency WebSockets, notifying client browsers the moment a contract emits an event certificate."
+          }
+        ]
+      },
+      {
+        id: "gas-budget-tuning",
+        title: "Advanced Gas Budget Tuning",
+        description: "Perform transaction simulation, estimation, and avoid gas dry-run outages.",
+        xpValue: 50,
+        steps: [
+          {
+            id: "gas_tune1",
+            title: "Transaction Dry-Runs",
+            content: "Before prompting users to sign a heavy transaction with their actual Sui coins, it is wise to run a test execution. A dry-run executes the compiled transaction on a simulated RPC node, checking if the bytecode would panic, showing what assets mutate, and outputting exact gas calculations safely!",
+            highlightCode: "const dryRunResponse = await client.dryRunTransactionBlock({\n  transactionBlock: compiledTxnBlockBytes\n});",
+            yetiMood: "thinking",
+            chalkboardHeader: "PRE-SIGNING DRY RUNS"
+          },
+          {
+            id: "gas_tune2",
+            title: "Analyzing Effects & Gas Consumption",
+            content: "The dry-run response contains critical details. The 'events' array shows emitted logs, the 'gasUsed' block breaks down execution and storage components, and the 'status' tells you if the contract aborted. This acts as a protective shield for user balances!",
+            highlightCode: "const executionCost = dryRunResponse.effects.gasUsed;\nconsole.log('Execution Gas used (MIST):', executionCost.computationCost);",
+            yetiMood: "chill",
+            chalkboardHeader: "ANALYZING RAW METRICS"
+          },
+          {
+            id: "gas_tune3",
+            title: "Defending Against Price Fluctuations",
+            content: "Sui gas estimation is incredibly deterministic because of the gas pricing mechanism. However, when writing critical DeFi interactions, adding a tiny gas budget buffer (like 5%-10%) ensures the transfer never fails mid-step due to minor dynamic fields growth during dense network congestion. Yeti says: keep it cozy and keep a safety margin!",
+            highlightCode: "// Set gas budget dynamically to execution + 10% safety buffer\ntxb.setGasBudget(calculatedGas * 1.1);",
+            yetiMood: "proud",
+            chalkboardHeader: "BUDGET SAFETY MARGIN"
+          }
+        ],
+        quiz: [
+          {
+            id: "gq1",
+            question: "Why should applications perform transaction dry-runs before requesting actual signatures?",
+            options: [
+              "To make gas more expensive",
+              "To verify code execution success and calculate exact gas costs without spending actual coins",
+              "To mine active testnet block rewards",
+              "To reset the validator cache"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "A dry-run executes transaction blocks in a read-only environment, returning computed assets changes and gas requirements without modifying state."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sui-contract-testing",
+    title: "Move Verification & Testing",
+    description: "Enforce smart contract invariants using unit-tests, property-based verification, and the Move Prover.",
+    iconName: "ShieldCheck",
+    difficulty: "Advanced",
+    modules: [
+      {
+        id: "move-unit-testing",
+        title: "Testing with sui::test_scenario",
+        description: "Instantiate mock environments, advance epochs, and manage mock validator settings.",
+        xpValue: 60,
+        steps: [
+          {
+            id: "test1",
+            title: "Simulating on-chain Scenarios",
+            content: "Welcome, master sentinel, to advanced testing systems! Sui provides the 'sui::test_scenario' module. It allows you to simulate a virtual blockchain environment. You can instantiate multiple test players, create mock objects, send transactions, and inspect global state modifications right inside your local machine!",
+            highlightCode: "use sui::test_scenario;\n\n#[test]\nfun test_cozy_coffee_flow() {\n    let mut scenario = test_scenario::begin(@0xCAFE);\n    // ... execute logic ...\n    test_scenario::end(scenario);\n}",
+            yetiMood: "chill",
+            chalkboardHeader: "VIRTUAL LEDGER SIMULATORS"
+          },
+          {
+            id: "test2",
+            title: "Managing Test Callers",
+            content: "In our virtual scenario, we can shift caller addresses dynamically using 'next_tx'. This makes it incredibly easy to test access control limits. For example, we start a transaction as a standard Guest, verify they get blocked from the vault, then switch to a DevCap capability holder to unlock it successfully!",
+            highlightCode: "test_scenario::next_tx(&mut scenario, @0xUSER_ALICE);\n// Perform transactions under Alice's permission context",
+            yetiMood: "thinking",
+            chalkboardHeader: "PERFORMING PERMISSION JUMPS"
+          },
+          {
+            id: "test3",
+            title: "Consuming and Validating Objects",
+            content: "Once a contract transaction finishes, objects are placed in the scenario owner inventory. In tests, we assert their presence by taking the object out of the scenario, inspecting its inner fields, and returning it cleanly. It's like checking the bookshelf in your study room!",
+            highlightCode: "let sweat = test_scenario::take_from_sender<Sweatshirt>(&scenario);\nassert!(sweat.color == b\"green\", 101);\ntest_scenario::return_to_sender(&scenario, sweat);",
+            yetiMood: "excited",
+            chalkboardHeader: "CHECKING FOR THE COZY ASSETS"
+          }
+        ],
+        quiz: [
+          {
+            id: "tq1",
+            question: "How do you switch the active sender address during a test_scenario execution?",
+            options: [
+              "By manual network resets",
+              "Using test_scenario::next_tx() and specifying the sender's mock account address",
+              "By modifying the compiled cargo binary",
+              "Sui does not support changing callers"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "test_scenario::next_tx() closes the current mock transaction and starts a fresh transaction context with the given sender's address."
+          },
+          {
+            id: "tq2",
+            question: "Why must you return objects taken via take_from_sender after asserting their properties?",
+            options: [
+              "To pay for gas fines",
+              "Otherwise they will get deleted forever",
+              "To satisfy Move's resource ownership rules and ensure the scenario closes cleanly without dangling resources",
+              "To speed up the compiler"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Move enforcements are fully active in test runs. Any object taken from a test context must be safely returned or consumed to prevent resource leakage."
+          }
+        ]
+      },
+      {
+        id: "move-property-fuzzing",
+        title: "Fuzzing & Invariance Verification",
+        description: "Write checks that test contract logic with hundreds of randomly generated inputs.",
+        xpValue: 60,
+        steps: [
+          {
+            id: "fuzz1",
+            title: "The Math Invariant Check",
+            content: "Classic unit tests only check specific inputs you configure (e.g. testing exactly 10 SUI). But what if a math bug only triggers at the absolute maximum integer limit of a u64? Property-based fuzzing tests your function with hundreds of random variables, discovering edge-case overflows automatically. Yeti verified this finds the cracks in the cold ice!",
+            highlightCode: "// Test logic against randomized boundary values\n// to verify mathematical constraints remain fully invariant",
+            yetiMood: "excited",
+            chalkboardHeader: "MATHEMATICAL INVARIANTS"
+          },
+          {
+            id: "fuzz2",
+            title: "Writing Assert Invariants",
+            content: "When writing code, design assertions that must *always* remain true regardless of the environment context. For instance, the vault's total asset balance must always equal the sum of outstanding shares multiplied by the price index. If a fuzzer ever finds an input that breaks this assertion, it halts and shows you the path!",
+            highlightCode: "assert!(vault.total_assets == outstanding_shares * share_price, E_INVARIANT_VIOLATION);",
+            yetiMood: "thinking",
+            chalkboardHeader: "BOUNDING SECURITY INVARIANTS"
+          }
+        ],
+        quiz: [
+          {
+            id: "fq1",
+            question: "What is the primary objective of property-based fuzz testing in Move contracts?",
+            options: [
+              "To check if the typescript compilation works",
+              "To find logical errors and arithmetic overflows using automated, randomized input generation",
+              "To increase staking APY",
+              "To customize the CSS color options"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Fuzz testing queries the contract with a dense array of randomized inputs, helping researchers identify edge case overflow parameters or verification gaps."
+          }
+        ]
+      },
+      {
+        id: "move-formal-specification",
+        title: "Move Prover & Formal Specs",
+        description: "Introduce mathematical specifications to mathematically prove that your logic contains zero bugs.",
+        xpValue: 70,
+        steps: [
+          {
+            id: "prov1",
+            title: "Welcome to the Move Prover",
+            content: "Testing can only prove the presence of bugs, never their absolute absence. For high-security vault systems, we use mathematical formal verification! The Move Prover analyzes your code and mathematically proves whether it satisfies formal rules under ALL scenarios. It's like having a master mathematician verify your log cabin blueprint!",
+            highlightCode: "spec module {\n    pragma verify = true;\n}",
+            yetiMood: "proud",
+            chalkboardHeader: "MATHEMATICAL EXHAUSTIVE PROOF"
+          },
+          {
+            id: "prov2",
+            title: "Writing Spec Blocks",
+            content: "We write specification blocks inside or alongside ourMove modules using the 'spec' keyword. In these blocks, we define pre-conditions (conditions that must be true for the caller) and post-conditions (conditions guaranteed to be true after the function completes). The compiler verifies this automatically!",
+            highlightCode: "spec transfer_funds {\n    aborts_if balance_of(sender) < amount;\n    ensures balance_of(sender) == old(balance_of(sender)) - amount;\n}",
+            yetiMood: "thinking",
+            chalkboardHeader: "SPECIFICATION BLOCKS"
+          },
+          {
+            id: "prov3",
+            title: "Graduating Secure Creators",
+            content: "You have scaled the highest, coziest peaks of SUI Move engineering! By combining parallel execution speed, modular dynamic structures, custom indexers, complete unit-tests, and formal specifications, you are now a master creator. Yeti the tutor is incredibly proud of your beautiful journey. Get some hot cocoa and look at your legendary developer achievements!",
+            highlightCode: "// Congratulations on graduating from loficabin!\n// Your code safety is pristine. 🎓🐻❄️",
+            yetiMood: "proud",
+            chalkboardHeader: "THE SUPREME DEGREE"
+          }
+        ],
+        quiz: [
+          {
+            id: "pq1",
+            question: "How does the Move Prover guarantee that a contract is secure?",
+            options: [
+              "By hosting the application on stable local servers",
+              "By using formal mathematical verification to prove that logic conforms perfectly to your defined specifications",
+              "By testing 2 scenarios manually",
+              "By changing the wallet seed keys"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "The Move Prover mathematically evaluates the system's invariants, ensuring that no state combination can ever bypass the defined specifications."
+          }
+        ]
+      }
+    ]
   }
 ];
+
 

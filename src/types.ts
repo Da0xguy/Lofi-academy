@@ -22,6 +22,8 @@ export interface TrackModule {
   xpValue: number;
   steps: ModuleStep[];
   quiz: QuizQuestion[];
+  videoUrl?: string;
+  videoTitle?: string;
 }
 
 export interface LearningTrack {
