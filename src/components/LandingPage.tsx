@@ -747,7 +747,7 @@ public entry fun mint_badge(...) {
         >
           <div>
             <div className="w-10 h-10 bg-orange-100 text-[#D67B52] border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              ☕
+              <Coffee size={18} />
             </div>
             <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">COZY GREEN CHALKBOARDS</h4>
             <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
@@ -765,7 +765,7 @@ public entry fun mint_badge(...) {
         >
           <div>
             <div className="w-10 h-10 bg-emerald-100 text-emerald-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              📊
+              <TrendingUp size={18} />
             </div>
             <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">INTERACTIVE DEFI PORTFOLIO</h4>
             <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
@@ -783,7 +783,7 @@ public entry fun mint_badge(...) {
         >
           <div>
             <div className="w-10 h-10 bg-blue-100 text-[#89A8B2] border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              🥫
+              <Award size={18} />
             </div>
             <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">CLAIM THE VALUELESS NFT GIFT</h4>
             <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
@@ -801,7 +801,7 @@ public entry fun mint_badge(...) {
         >
           <div>
             <div className="w-10 h-10 bg-purple-100 text-purple-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              📚
+              <BookOpen size={18} />
             </div>
             <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">ECOSYSTEM READS & AI DIGESTS</h4>
             <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
