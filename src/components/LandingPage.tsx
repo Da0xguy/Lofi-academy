@@ -365,192 +365,279 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
   };
 
   return (
-    <div id="landing-page-root" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] font-sans selection:bg-[#D67B52] selection:text-white pb-20 leading-relaxed overflow-x-hidden relative">
+    <div id="landing-page-root" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] font-sans selection:bg-[#D67B52] selection:text-white pb-24 leading-relaxed overflow-x-hidden relative">
       <Background />
       
-      {/* Top Utility Nav for Landing Page */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center z-10 relative">
-        <span className="text-sm font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-          <Compass className="text-[#D67B52]" size={18} /> Lofi Academy
-        </span>
-        {toggleDarkMode && (
-          <button
-            onClick={toggleDarkMode}
-            className="px-3 py-1.5 bg-white border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs font-bold text-[#3c3c3c] hover:scale-102 transition-transform cursor-pointer flex items-center gap-1.5 active:translate-y-[1px]"
-            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          >
-            <span>
-              {isDarkMode ? (
-                <Moon size={14} className="text-indigo-400" />
-              ) : (
-                <Sun size={14} className="text-amber-500 animate-spin" style={{ animationDuration: "12s" }} />
-              )}
-            </span>
-            <span className="hidden sm:inline">{isDarkMode ? "Dark" : "Light"}</span>
-          </button>
-        )}
-      </div>
-      
-      {/* Dynamic Background Floating Gaming Elements Overlay */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {FLOATING_ITEMS.map((item, idx) => (
-          <motion.div
-            key={idx}
-            className="absolute text-2xl filter drop-shadow select-none opacity-[0.22] md:opacity-[0.28]"
-            style={{ left: item.left, top: item.top }}
-            animate={{
-              y: [0, -28, 28, 0],
-              x: [0, 16, -16, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: item.duration,
-              delay: item.delay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            {item.id === "game" && <Gamepad size={32} className="text-indigo-500/35" />}
-            {item.id === "star" && <Sparkles size={28} className="text-yellow-500/40" />}
-            {item.id === "coin" && <Coins size={28} className="text-[#D67B52]/40" />}
-            {item.id === "terminal" && <Terminal size={28} className="text-emerald-500/35" />}
-            {item.id === "zap" && <Zap size={28} className="text-amber-500/45 fill-amber-300/10" />}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* 1. HERO BANNER HEADER SECTOR */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="max-w-7xl mx-auto px-6 pt-12 pb-6 flex flex-col items-center text-center relative"
-      >
-        {/* Abstract absolute background graphic rings for Neo-brutalist styling */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[340px] h-[340px] md:w-[600px] md:h-[600px] border-4 border-dashed border-[#3c3c3c]/5 rounded-full pointer-events-none -z-10 animate-spin" style={{ animationDuration: '60s' }}></div>
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 w-[240px] h-[240px] md:w-[400px] md:h-[400px] border-2 border-dashed border-[#3c3c3c]/10 rounded-full pointer-events-none -z-10 animate-spin" style={{ animationDuration: '30s', animationDirection: 'reverse' }}></div>
-
-        {/* Mascot badge flag */}
-        <motion.div 
-          whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#89A8B2]/20 border-2 border-[#3c3c3c] text-[#89A8B2] font-mono text-xs font-bold rounded-full mb-6 cursor-pointer shadow-[2px_2px_0px_0px_#3c3c3c]"
-        >
-          <Sparkles size={14} className="animate-spin text-[#D67B52]" />
-          <span>Interactive SUI Move Playground v1.1</span>
-        </motion.div>
-
-        {/* Main Display Typography pair */}
-        <motion.h1 
-          initial={{ scale: 0.95 }}
-          animate={{ scale: 1 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif tracking-tight text-[#3c3c3c] max-w-4xl"
-        >
-          Cozy Study, Fast Code: <span className="text-[#D67B52] relative inline-block">Sui Academy <span className="absolute left-0 bottom-1 w-full h-3 bg-amber-200 -z-10 -rotate-1 rounded-sm"></span></span>
-        </motion.h1>
-
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-base md:text-xl text-[#6D5D6E] font-medium mt-6 max-w-2xl leading-relaxed"
-        >
-          Lofi Quest is a cute Claymorphic space where blockchain concepts feel friendly. Brew warm virtual coffee, chill with procedurally synced chord loops, and master cryptography, parallel consensus, and secure Move contracts under the snowy gaze of Yeti!
-        </motion.p>
-
-        {/* Cozy Yeti Cabin Showcase Illustration */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="w-full max-w-2xl mt-8 relative group border-4 border-[#3c3c3c] rounded-3xl bg-white shadow-[8px_8px_0px_0px_#3c3c3c] overflow-hidden"
-        >
-          <img
-            src={YETI_STUDY_ASSET}
-            alt="Yeti Lofi Log Cabin study space"
-            referrerPolicy="no-referrer"
-            className="w-full h-auto aspect-video object-cover group-hover:scale-[1.02] transition-all duration-500 filter brightness-95"
-          />
-          <div className="absolute top-3 left-3 bg-white/95 border-2 border-[#3c3c3c] px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] uppercase tracking-wider">
-            🐻 Yeti's Cozy Study Log
+      {/* 1. DUOLINGO STYLE TOP NAVBAR */}
+      <nav className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_rgba(60,60,60,0.1)]">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2.5 font-serif font-black text-xl text-[#3c3c3c] tracking-tight">
+            <Compass className="text-[#D67B52] animate-spin" style={{ animationDuration: "30s" }} size={24} />
+            <span className="matches-title">Lofi Academy</span>
           </div>
-          <div className="absolute bottom-3 right-3 bg-stone-900/85 backdrop-blur-sm border-2 border-[#3c3c3c] px-3 py-1 rounded-xl text-[9px] font-mono font-extrabold text-amber-300 shadow-[1.5px_1.5px_0px_0px_#3c3c3c] flex items-center gap-1 select-none">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
-            <span>RADIO ACTIVE: 104.7 LOFI CHILL BEATS</span>
-          </div>
-        </motion.div>
-
-        {/* GIGANTIC LAUNCH CALL-TO-ACTION WITH ANIMATION */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, type: "spring" }}
-          className="mt-10 flex flex-col items-center justify-center gap-4 w-full max-w-lg"
-        >
-          {isWalletConnected ? (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-              <motion.button
+          
+          <div className="flex items-center gap-3">
+            {toggleDarkMode && (
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 bg-white border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c] hover:scale-105 active:translate-y-[1px] transition-all cursor-pointer"
+                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                {isDarkMode ? (
+                  <Moon size={16} className="text-indigo-400" />
+                ) : (
+                  <Sun size={16} className="text-amber-500" />
+                )}
+              </button>
+            )}
+            
+            {isWalletConnected && (
+              <button
                 onClick={onLaunch}
-                whileHover={{ scale: 1.06, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full sm:w-auto px-10 py-5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-serif font-extrabold text-lg md:text-xl rounded-2xl border-4 border-[#3c3c3c] shadow-[6px_6px_0px_0px_#3c3c3c] hover:shadow-[8px_8px_0px_0px_#3c3c3c] cursor-pointer transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                className="hidden sm:inline-flex px-4 py-2 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white font-mono font-bold text-xs rounded-xl border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] active:translate-y-[2px] transition-all cursor-pointer"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <span>Enter Academy</span>
-                  <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
-                </span>
-                <div className="absolute top-0 -inset-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-full group-hover:duration-1000 group-hover:translate-x-0 group-hover:transition-all" />
-              </motion.button>
-              <a 
-                href="#visual-learn-more"
-                className="w-full sm:w-auto px-8 py-5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-mono font-bold text-sm rounded-2xl border-4 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] cursor-pointer text-center"
-              >
-                How it works
-              </a>
-            </div>
-          ) : (
-            <div className="w-full bg-[#E8E1D9]/40 border-4 border-[#3c3c3c] p-6 rounded-3xl shadow-[5px_5px_0px_0px_#3c3c3c] flex flex-col items-center text-center gap-4">
-              <div className="flex items-center gap-2 text-[#D67B52] font-bold bg-[#D67B52]/10 px-3 py-1.5 rounded-xl border-2 border-[#3c3c3c] text-xs uppercase font-mono shadow-[1px_1px_0px_0px_#3c3c3c]">
-                <Lock size={12} className="animate-bounce" />
-                <span>Sui Wallet Required</span>
-              </div>
-              <p className="text-xs text-[#6D5D6E] font-sans font-semibold max-w-sm leading-relaxed">
-                To access classrooms, complete tasks, analyze Cetus AMM pool statistics, or study secure Move compilations, you need to connect your Sui Wallet first.
-              </p>
-              <div className="p-1 scale-105 rounded-xl bg-white border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]">
-                <ConnectButton connectText="Connect Wallet to Unlock Academy" />
-              </div>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Floating elements animation representation */}
-        <div className="flex gap-4 mt-6 text-xs text-[#6D5D6E] font-mono font-bold select-none">
-          <span className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-xl border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]"><Music size={12} className="text-[#D67B52]" /> Static-Beats Synced</span>
-          <span className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-xl border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]"><Zap size={12} className="text-yellow-500 fill-yellow-500" /> &lt; 0.5s Latency</span>
-          <span className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-xl border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]"><Heart size={12} className="text-rose-500 fill-rose-500" /> Free Souvenir Badge</span>
+                ENTER ROOM
+              </button>
+            )}
+          </div>
         </div>
-      </motion.div>
+      </nav>
 
-      {/* 2. THE THREE TAB PILLARS OF UNDERSTANDING */}
-      <div id="visual-learn-more" className="max-w-6xl mx-auto px-6 py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3.5xl font-bold font-serif text-[#3c3c3c]">
-            Structured To Decode Web3 Magic
+      {/* 2. GIGANTIC DUOLINGO HERO ROW */}
+      <div className="max-w-6xl mx-auto px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+        
+        {/* Left Side: Animated Yeti Mascot Illustration + Speech Bubble */}
+        <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
+          
+          {/* Playful Duolingo-style Speech Bubble above the mascot */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
+            className="mb-6 relative bg-white border-4 border-[#3c3c3c] px-6 py-4 rounded-2xl shadow-[4px_4px_0px_0px_#3c3c3c] max-w-sm text-center"
+          >
+            <p className="text-xs sm:text-sm font-bold text-[#3c3c3c] leading-relaxed">
+              "Psst... Grab a warm coffee! Learning Sui Move is cozy, interactive, and completely stress-free! 🏔️☕"
+            </p>
+            {/* Bubble arrow */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-r-4 border-b-4 border-[#3c3c3c] rotate-45 -mt-2"></div>
+          </motion.div>
+
+          {/* Large, Beautiful Mascot Showcase Frame */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-sm aspect-square relative border-4 border-[#3c3c3c] rounded-[36px] bg-white shadow-[8px_8px_0px_0px_#3c3c3c] overflow-hidden group"
+          >
+            <img
+              src={YETI_STUDY_ASSET}
+              alt="Yeti studying blockchain code in cozy cabin"
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 filter brightness-95"
+            />
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-[#3c3c3c] text-white px-4 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase whitespace-nowrap">
+              ❄️ Yeti's Study Log Cabin
+            </div>
+          </motion.div>
+
+          {/* Quick Stats Under Mascot */}
+          <div className="mt-6 flex flex-wrap gap-2.5 justify-center">
+            <span className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] text-[10px] font-mono font-bold text-[#6D5D6E]">
+              <Music size={11} className="text-[#D67B52]" /> Static-Beats Synced
+            </span>
+            <span className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] text-[10px] font-mono font-bold text-[#6D5D6E]">
+              <Zap size={11} className="text-amber-500 fill-amber-300/20" /> &lt;0.3s Finality
+            </span>
+          </div>
+        </div>
+
+        {/* Right Side: High-Impact Typography & Chunky CTA buttons */}
+        <div className="lg:col-span-7 flex flex-col text-center lg:text-left">
+          
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tight text-[#3c3c3c] leading-[1.1] mb-6">
+            The free, fun, and <span className="text-[#D67B52] relative inline-block">cozy way <span className="absolute left-0 bottom-1 w-full h-2.5 bg-amber-200 -z-10 -rotate-1 rounded"></span></span> to learn Sui!
+          </h1>
+          
+          <p className="text-base md:text-lg text-[#6D5D6E] font-medium leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+            Learn parallel consensus, compile robust smart contracts, and master Web3 concepts in an immersive lofi study space. Play mini-games, review code, and earn worthless souvenir badges!
+          </p>
+
+          {/* Sturdy Rounded Call to Action Buttons */}
+          <div className="flex flex-col gap-4 max-w-md mx-auto lg:mx-0 w-full">
+            {isWalletConnected ? (
+              <>
+                {/* 3D chunky primary button */}
+                <button
+                  onClick={onLaunch}
+                  className="w-full py-4.5 bg-[#D67B52] hover:bg-[#c26a42] text-white font-sans font-extrabold text-lg rounded-2xl border-2 border-b-6 border-[#3c3c3c] shadow-md hover:translate-y-[2px] hover:border-b-4 active:translate-y-[4px] active:border-b-2 transition-all cursor-pointer text-center uppercase tracking-wider"
+                >
+                  GET STARTED
+                </button>
+                
+                <a
+                  href="#how-it-works-anchor"
+                  className="w-full py-4 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-sans font-extrabold text-sm rounded-2xl border-2 border-b-6 border-[#3c3c3c] hover:translate-y-[2px] hover:border-b-4 active:translate-y-[4px] active:border-b-2 transition-all text-center uppercase tracking-wide cursor-pointer"
+                >
+                  I want to read how it works
+                </a>
+              </>
+            ) : (
+              <div className="bg-[#FAF8F5] border-4 border-[#3c3c3c] p-6 rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] space-y-4 text-center">
+                <div className="inline-flex items-center gap-1.5 bg-orange-50 border-2 border-[#3c3c3c] px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#D67B52] uppercase">
+                  <Lock size={12} className="animate-bounce" /> Sui Wallet Locked
+                </div>
+                
+                <p className="text-xs text-[#6D5D6E] font-semibold leading-relaxed max-w-sm mx-auto">
+                  To complete interactive courses, test smart compilers, simulate real-time DEX liquidity, and mint your souvenir badge, let's link your Sui account.
+                </p>
+
+                <div className="scale-105 py-1 flex justify-center">
+                  <div className="p-1 bg-white border-2 border-[#3c3c3c] rounded-xl shadow-[3px_3px_0px_0px_#3c3c3c]">
+                    <ConnectButton connectText="Connect Wallet to Start" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* 3. FOUR CORE Pillars (Simplification of Duolingo benefits) */}
+      <div id="how-it-works-anchor" className="max-w-6xl mx-auto px-6 py-12 border-t-4 border-[#3c3c3c]/10 mt-12">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-black font-sans text-[#3c3c3c] tracking-tight">
+            Why people love learning with Yeti
           </h2>
-          <p className="text-xs text-[#6D5D6E] font-mono uppercase tracking-widest font-extrabold mt-1">
-            Click columns below to explore three vital modern blockchain paradigms
+          <p className="text-sm text-[#6D5D6E] font-medium mt-2">
+            No boring lectures. No tedious setup. Just pure interactive lofi magic.
           </p>
         </div>
 
-        {/* Column selectors */}
-        <div id="visual-pillars-grid" className="max-w-md mx-auto mb-8">
-          <div className="grid grid-cols-3 gap-2 bg-white border-2 border-[#3c3c3c] p-1.5 rounded-2xl font-mono font-bold text-xs shadow-[3px_3px_0px_0px_#3c3c3c] relative overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Card 1 */}
+          <div className="bg-white p-6 border-4 border-[#3c3c3c] rounded-2xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between interactive-card">
+            <div>
+              <div className="w-10 h-10 bg-orange-100 text-[#D67B52] border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center mb-4 shadow-[1.5px_1.5px_0px_0px_#3c3c3c]">
+                <Coffee size={18} />
+              </div>
+              <h4 className="text-base font-bold font-sans text-[#3c3c3c] uppercase">COZY CHALKBOARDS</h4>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                Study clean compiled Move code snippets displayed on green classroom chalkboards. Play sound loops and verify compiler parameters in a warm workspace.
+              </p>
+            </div>
+            <span className="text-[9px] font-mono text-[#D67B52] font-black uppercase mt-4">100% stress free</span>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white p-6 border-4 border-[#3c3c3c] rounded-2xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between interactive-card">
+            <div>
+              <div className="w-10 h-10 bg-emerald-100 text-emerald-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center mb-4 shadow-[1.5px_1.5px_0px_0px_#3c3c3c]">
+                <TrendingUp size={18} />
+              </div>
+              <h4 className="text-base font-bold font-sans text-[#3c3c3c] uppercase">DEFI SANDBOX</h4>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                Interact with simulated Cetus and Navi Lending interfaces. Learn swap math, slippage, and parallel pipelines safely without risking actual gas coins.
+              </p>
+            </div>
+            <span className="text-[9px] font-mono text-[#89A8B2] font-black uppercase mt-4">Simulators included</span>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white p-6 border-4 border-[#3c3c3c] rounded-2xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between interactive-card">
+            <div>
+              <div className="w-10 h-10 bg-blue-100 text-[#89A8B2] border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center mb-4 shadow-[1.5px_1.5px_0px_0px_#3c3c3c]">
+                <Award size={18} />
+              </div>
+              <h4 className="text-base font-bold font-sans text-[#3c3c3c] uppercase">SOUVENIR NFTS</h4>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                Connect a mock ledger wallet inside the cabin and mint real cryptographic certificate receipts. Claim a completely worthless but extremely cute digital medal!
+              </p>
+            </div>
+            <span className="text-[9px] font-mono text-stone-500 font-black uppercase mt-4">$0 utility token</span>
+          </div>
+
+          {/* Card 4 */}
+          <div className="bg-white p-6 border-4 border-[#3c3c3c] rounded-2xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between interactive-card">
+            <div>
+              <div className="w-10 h-10 bg-purple-100 text-purple-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center mb-4 shadow-[1.5px_1.5px_0px_0px_#3c3c3c]">
+                <BookOpen size={18} />
+              </div>
+              <h4 className="text-base font-bold font-sans text-[#3c3c3c] uppercase">ECOSYSTEM UPDATES</h4>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                Access curated newsletters on Mysticeti speeds, zkLogin tools, and DeepBook. Generate custom AI digests with integrated Gemini language models.
+              </p>
+            </div>
+            <span className="text-[9px] font-mono text-purple-600 font-black uppercase mt-4">Gemini powered AI</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. SUI IN THE WORLD & DEVELOPER EMPOWERMENT (The requested module) */}
+      <div className="bg-[#FAF8F5] border-t-4 border-b-4 border-[#3c3c3c] py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-[10px] font-mono font-bold text-[#D67B52] bg-[#D67B52]/10 border-2 border-[#3c3c3c] px-3 py-1 rounded-full uppercase tracking-wider">
+              SUI GLOBAL ENGAGEMENT
+            </span>
+            <h2 className="text-3xl font-black font-sans text-[#3c3c3c] mt-3">
+              How Sui is Empowering Developers Worldwide
+            </h2>
+            <p className="text-sm text-[#6D5D6E] font-medium mt-2 leading-relaxed">
+              Explore how the Sui Foundation fuels real-world utility, global hub activities, and developer innovation.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 border-2 border-b-4 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] relative">
+              <div className="text-3xl mb-3">🌍</div>
+              <h3 className="text-lg font-bold font-sans text-[#3c3c3c] uppercase">Real-World Utility</h3>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                Major institutions, luxury brands, and mobile operators use Sui to issue high-velocity Real World Assets (RWAs), secure digital identity markers, and process instant global micro-transactions. This bridges purely theoretical blockchain research directly into the hands of real users!
+              </p>
+            </div>
+
+            <div className="bg-white p-6 border-2 border-b-4 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] relative">
+              <div className="text-3xl mb-3">🏡</div>
+              <h3 className="text-lg font-bold font-sans text-[#3c3c3c] uppercase">Builder Houses</h3>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                The heartbeat of Sui lies in its dynamic, physical community! Through international Sui Builder Houses, developer bootcamps, and legendary decentralized hackerspaces, builders from Tokyo to Paris collaborate in real-time to trigger technical breakthroughs and form alliances.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 border-2 border-b-4 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] relative">
+              <div className="text-3xl mb-3">🛠️</div>
+              <h3 className="text-lg font-bold font-sans text-[#3c3c3c] uppercase">Developer Grants</h3>
+              <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
+                Sui puts developer needs first! The Sui Foundation distributes millions of dollars in developer grants, academic sponsorships, and startup incubator aid. Alongside direct economic support, builders are empowered with state-of-the-art tooling, instant debugging IDE suites, and SDKs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. INTERACTIVE KNOWLEDGE REVELATOR TAB SLIDER */}
+      <div className="max-w-4xl mx-auto px-6 py-16">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3.5xl font-black font-sans text-[#3c3c3c] tracking-tight">
+            Structured to decode web3 magic
+          </h2>
+          <p className="text-xs text-[#6D5D6E] font-mono uppercase tracking-widest font-extrabold mt-1">
+            Click tabs to see three vital modern blockchain paradigms
+          </p>
+        </div>
+
+        {/* Tab selection */}
+        <div className="max-w-md mx-auto mb-6">
+          <div className="grid grid-cols-3 gap-1.5 bg-white border-2 border-[#3c3c3c] p-1.5 rounded-2xl font-mono font-bold text-xs shadow-[3px_3px_0px_0px_#3c3c3c]">
             {(["sui", "web3", "move"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => {
                   setActiveTab(t);
-                  setIsAutoplay(false); // Pause on manual user action so they can comfortably read
+                  setIsAutoplay(false); // Pause on manual action
                 }}
                 className={`py-2 px-1 rounded-xl transition-all capitalize cursor-pointer relative overflow-hidden ${
                   activeTab === t 
@@ -571,81 +658,57 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
             ))}
           </div>
 
-          {/* Autoplay controllers */}
-          <div className="flex items-center justify-between px-1 mt-3 font-mono text-[10px] text-[#6D5D6E] font-bold">
+          <div className="flex items-center justify-between px-1 mt-2.5 font-mono text-[9px] text-[#6D5D6E] font-bold">
             <button 
-              onClick={() => {
-                setIsAutoplay(prev => !prev);
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1 bg-white border-2 border-[#3c3c3c] hover:bg-stone-50 active:translate-y-0.5 rounded-lg shadow-[1.5px_1.5px_0px_0px_#3c3c3c] cursor-pointer transition-all uppercase"
+              onClick={() => setIsAutoplay(prev => !prev)}
+              className="flex items-center gap-1 px-2 py-0.5 bg-white border-2 border-[#3c3c3c] rounded shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer"
             >
-              <span className="flex items-center gap-1">
-                {isAutoplay ? <Pause size={10} className="text-[#3c3c3c]" /> : <Play size={10} className="text-[#3c3c3c]" />}
-                <span>{isAutoplay ? "Pause Autoplay" : "Play Autoplay"}</span>
-              </span>
+              {isAutoplay ? <Pause size={9} /> : <Play size={9} />}
+              <span>{isAutoplay ? "Pause Cycle" : "Auto Cycle"}</span>
             </button>
-            <div className="flex items-center gap-1.5">
-              {isAutoplay ? (
-                <>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span>Autoplay (cycling in {Math.max(1, Math.ceil((5000 - (autoplayProgress / 100) * 5000) / 1000))}s)</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                  <span className="text-stone-500 font-semibold flex items-center gap-1">
-                    <span>User Controlled. Click</span>
-                    <Play size={8} className="inline text-stone-600 border border-stone-300 rounded p-0.5" />
-                    <span>to auto-cycle</span>
-                  </span>
-                </>
-              )}
-            </div>
+            {isAutoplay && <span>Next tab in {Math.max(1, Math.ceil((5000 - (autoplayProgress / 100) * 5000) / 1000))}s</span>}
           </div>
         </div>
 
+        {/* Tab display */}
         <motion.div 
           key={activeTab}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
           className="bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_0px_#3c3c3c]"
         >
           {activeTab === "sui" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#89A8B2] bg-[#89A8B2]/10 border-2 border-[#3c3c3c] px-2.5 py-1 rounded-full uppercase">
+                <span className="text-[9px] font-mono font-bold text-[#89A8B2] bg-[#89A8B2]/10 border-2 border-[#3c3c3c] px-2 py-0.5 rounded-full uppercase">
                   Parallel Scale Leader
                 </span>
-                <h3 className="text-2xl font-bold font-serif text-[#3c3c3c] mt-3">Why are SUI transactions so fast?</h3>
+                <h3 className="text-xl font-bold font-sans text-[#3c3c3c] mt-2">Why are SUI transactions so fast?</h3>
                 <p className="text-xs text-[#6D5D6E] mt-2 font-mono leading-relaxed">
-                  traditional blockchains act like single highways. all transactions queues up behind one slow truck! sui processes simple transactions synchronously, bypassing global consensus locks for individual state records.
+                  Traditional blockchains act like single highways where everything queues up behind one slow truck. Sui processes simple transactions in parallel, bypassing global consensus locks for individual state records.
                 </p>
-                <div className="space-y-3 mt-4 text-xs font-semibold text-[#3c3c3c]">
-                  <div className="flex items-start gap-2.5">
-                    <span className="bg-emerald-100 text-emerald-700 p-1 rounded-md border border-[#3c3c3c] shrink-0 font-bold">✓</span>
-                    <p><strong>Sub-second finality</strong> — transfers take ~300ms, faster than clicking a Web2 payment API.</p>
+                <div className="space-y-2 mt-4 text-xs font-semibold text-[#3c3c3c]">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-emerald-100 text-emerald-700 p-0.5 px-1.5 rounded border border-[#3c3c3c] shrink-0 font-bold">✓</span>
+                    <p><strong>Sub-300ms finality</strong> — Faster than clicking a Web2 payment API gateway.</p>
                   </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="bg-emerald-100 text-emerald-700 p-1 rounded-md border border-[#3c3c3c] shrink-0 font-bold">✓</span>
-                    <p><strong>Dynamic gas adjustment</strong> — Sui adjusts epoch incentives every 24 hours to prevent sudden rate spikes.</p>
+                  <div className="flex items-start gap-2">
+                    <span className="bg-emerald-100 text-emerald-700 p-0.5 px-1.5 rounded border border-[#3c3c3c] shrink-0 font-bold">✓</span>
+                    <p><strong>Dynamic gas adjustment</strong> — Epoch values adjust incentives every 24 hours.</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#F3EFEA] border-2 border-[#3c3c3c] p-5 rounded-2xl shadow-inner font-mono text-[11px] space-y-2 opacity-95">
-                <div className="text-stone-400 uppercase font-extrabold pb-1.5 border-b border-[#3c3c3c]/10 flex justify-between">
+              <div className="bg-[#F3EFEA] border-2 border-[#3c3c3c] p-4 rounded-2xl shadow-inner font-mono text-[10px] space-y-2">
+                <div className="text-stone-400 uppercase font-extrabold pb-1 border-b border-[#3c3c3c]/10 flex justify-between">
                   <span>SUI VS TRADITIONAL SPEED</span>
                   <span className="text-emerald-600 animate-pulse">● MEASURED</span>
                 </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between"><span>Bitcoin Block Rate:</span> <strong className="text-stone-500">10 mins</strong></div>
-                  <div className="flex justify-between"><span>Solana Average latency:</span> <strong className="text-amber-700">2.5 seconds</strong></div>
+                <div className="space-y-1 text-stone-600 font-bold">
+                  <div className="flex justify-between"><span>Bitcoin Block:</span> <span>10 mins</span></div>
+                  <div className="flex justify-between"><span>Solana latency:</span> <span>~2.5 seconds</span></div>
                   <div className="flex justify-between text-emerald-700 font-extrabold bg-white p-1 rounded border-2 border-[#3c3c3c]">
-                    <span>Sui Transaction time:</span> <span>0.28 seconds (!)</span>
+                    <span>Sui transaction:</span> <span>0.28 seconds (!)</span>
                   </div>
-                </div>
-                <div className="text-[9px] text-[#6D5D6E] leading-relaxed pt-2 opacity-80 border-t border-[#3c3c3c]/10">
-                  Sui bypasses massive consensus queues for individual objects by certifying transaction signals instantly on validators.
                 </div>
               </div>
             </div>
@@ -654,32 +717,27 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
           {activeTab === "web3" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#D67B52] bg-[#D67B52]/10 border-2 border-[#3c3c3c] px-2.5 py-1 rounded-full uppercase">
+                <span className="text-[9px] font-mono font-bold text-[#D67B52] bg-[#D67B52]/10 border-2 border-[#3c3c3c] px-2 py-0.5 rounded-full uppercase">
                   True Decentralization
                 </span>
-                <h3 className="text-2xl font-bold font-serif text-[#3c3c3c] mt-3">What is Web3 and how does cryptography protect you?</h3>
+                <h3 className="text-xl font-bold font-sans text-[#3c3c3c] mt-2">What is Web3 & Cryptography?</h3>
                 <p className="text-xs text-[#6D5D6E] mt-2 font-mono leading-relaxed">
-                  Web2 servers are owned by huge monolithic companies that track, sell, or delete your credentials at will. Web3 utilizes math and cryptographic keypairs to secure ownership inside immutable, decentralized peer networks.
+                  Web2 servers are owned by huge monolithic companies that track, sell, or delete credentials at will. Web3 utilizes math and cryptographic keypairs to secure ownership inside immutable, decentralized peer networks.
                 </p>
-                <div className="space-y-3 mt-4 text-xs font-semibold text-[#3c3c3c]">
-                  <div className="flex items-start gap-2.5">
-                    <span className="bg-[#89A8B2]/20 text-[#89A8B2] p-1 rounded-md border border-[#3c3c3c] shrink-0 font-bold">🗝️</span>
-                    <p><strong>Private Key Ownership</strong> — Transactions require digital signatures generated locally. No central database can hijack your identity.</p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="bg-[#89A8B2]/20 text-[#89A8B2] p-1 rounded-md border border-[#3c3c3c] shrink-0 font-bold">📡</span>
-                    <p><strong>Validator Consensus Nodes</strong> — Thousands of nodes query peer consensus, verifying that your balance cannot be double-spent.</p>
+                <div className="space-y-2 mt-4 text-xs font-semibold text-[#3c3c3c]">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-[#89A8B2]/20 text-[#89A8B2] p-0.5 px-1.5 rounded border border-[#3c3c3c] shrink-0 font-bold">🗝️</span>
+                    <p><strong>Private Key Ownership</strong> — Digital signatures are generated locally. No central database can hijack your identity.</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#F3EFEA] border-2 border-[#3c3c3c] p-5 rounded-2xl shadow-inner font-mono text-[11px] relative">
-                <div className="absolute top-2 right-2 text-amber-500">🗝️</div>
-                <div className="text-stone-400 uppercase font-extrabold pb-2 mb-3 border-b border-[#3c3c3c]/10">CRYPTOGRAPHIC SIGNATURE WORKFLOW:</div>
-                <div className="space-y-2 text-[10px] leading-relaxed text-[#3c3c3c]">
-                  <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-[#D67B52]"></span><span>Frontend structures clear text payload.</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-[#D67B52]"></span><span>Your <strong>Private Key</strong> signs hash locally inside browser wrapper.</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-[#D67B52]"></span><span>Signed payload is broadcast through <strong>RPC gateways</strong>.</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span><span className="text-emerald-700 font-bold">Validators verify public address and commit ledger updates.</span></div>
+              <div className="bg-[#F3EFEA] border-2 border-[#3c3c3c] p-4.5 rounded-2xl shadow-inner font-mono text-[10px] space-y-1.5">
+                <div className="text-stone-400 uppercase font-extrabold pb-1.5 border-b border-[#3c3c3c]/10">CRYPTOGRAPHIC WORKFLOW:</div>
+                <div className="space-y-1 text-stone-600 font-bold">
+                  <p>1. Client signs payload locally with private key</p>
+                  <p>2. Hash broadcasted through RPC gateways</p>
+                  <p>3. Validators verify public address matches signature</p>
+                  <p className="text-emerald-700 bg-white p-1 rounded border border-emerald-400 font-extrabold text-[9px]">4. Consensus confirmed: State updated immutable!</p>
                 </div>
               </div>
             </div>
@@ -688,144 +746,52 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
           {activeTab === "move" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
-                <span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50 border-2 border-[#3c3c3c] px-2.5 py-1 rounded-full uppercase">
+                <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 border-2 border-[#3c3c3c] px-2 py-0.5 rounded-full uppercase">
                   Object-Centric Move Paradigm
                 </span>
-                <h3 className="text-2xl font-bold font-serif text-[#3c3c3c] mt-3">Why is Sui Move inherently secure?</h3>
+                <h3 className="text-xl font-bold font-sans text-[#3c3c3c] mt-2">Why is Sui Move inherently secure?</h3>
                 <p className="text-xs text-[#6D5D6E] mt-2 font-mono leading-relaxed">
-                  In Ethereum, smart contracts hold values as simple balance lists inside global storage grids. In Sui Move, physical assets behave like actual atomic <strong>Objects</strong> that are stored directly inside your address coordinates!
+                  In Ethereum, smart contracts hold values as simple balance lists inside global storage. In Sui Move, assets behave like actual atomic <strong>Objects</strong> stored directly inside your own address coordinates!
                 </p>
-                <div className="space-y-3 mt-4 text-xs font-semibold text-[#3c3c3c]">
-                  <div className="flex items-start gap-2.5">
-                    <span className="bg-amber-100 text-[#D67B52] p-1 rounded-md border border-[#3c3c3c] shrink-0 font-bold">📦</span>
-                    <p><strong>Absolute Object Control</strong> — Objects are signed by unique IDs, and creators must explicit import rules to borrow, transfer, or overwrite them.</p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="bg-amber-100 text-[#D67B52] p-1 rounded-md border border-[#3c3c3c] shrink-0 font-bold">🛡️</span>
-                    <p><strong>Zero re-entrancy threats</strong> — Moves compiler prevents arbitrary dynamic contract references, blocking Ethereum-style lock attacks.</p>
+                <div className="space-y-2 mt-4 text-xs font-semibold text-[#3c3c3c]">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-amber-100 text-[#D67B52] p-0.5 px-1.5 rounded border border-[#3c3c3c] shrink-0 font-bold">📦</span>
+                    <p><strong>Absolute Object Control</strong> — Creators must explicitly import rules to borrow, transfer, or overwrite them.</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-stone-900 text-stone-200 border-2 border-[#3c3c3c] p-4 rounded-2xl shadow-lg font-mono text-[10px] leading-relaxed">
-                <div className="text-gray-400 border-b border-[#3c3c3c] pb-1.5 mb-2 uppercase flex justify-between">
+              <div className="bg-stone-900 text-stone-200 border-2 border-[#3c3c3c] p-3 rounded-2xl shadow-lg font-mono text-[9px] leading-tight">
+                <div className="text-gray-400 border-b border-[#3c3c3c] pb-1 mb-1 uppercase flex justify-between">
                   <span>sui_move_module::custom_badge</span>
                   <span className="text-indigo-400">Move compiled</span>
                 </div>
-                <pre className="text-emerald-400 font-bold font-mono">
+                <pre className="text-emerald-400 font-bold">
 {`struct CozyBadge has key, store {
     id: UID,
     title: String,
     xp_granted: u64,
-}
-
-public entry fun mint_badge(...) {
-    // strict compiled logic
 }`}
                 </pre>
-                <div className="text-gray-500 mt-2 font-mono text-[9px]">
-                  Objects have key capabilities defining whether they can be keys (discoverable) or stored (transferable).
-                </div>
               </div>
             </div>
           )}
         </motion.div>
       </div>
 
-      {/* 3. COZY HERO BENTO SECTION - WITH EXCELLENT ANIMATIONS */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        {/* Card 1 */}
-        <motion.div 
-          variants={itemVariants} 
-          whileHover={{ y: -5 }}
-          className="bg-white p-6 border-4 border-[#3c3c3c] rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between"
-        >
-          <div>
-            <div className="w-10 h-10 bg-orange-100 text-[#D67B52] border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              <Coffee size={18} />
-            </div>
-            <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">COZY GREEN CHALKBOARDS</h4>
-            <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
-              Ditch long exhausting developer documentation! Cozy Yeti maps critical concepts onto elegant green chalkboards. Read snippet blocks, check compiled samples, and test your clarity with non-punishing modular evaluations.
-            </p>
-          </div>
-          <span className="text-[10px] font-mono text-[#D67B52] font-bold mt-4 uppercase inline-block">100% stress free</span>
-        </motion.div>
-
-        {/* Card 2 */}
-        <motion.div 
-          variants={itemVariants} 
-          whileHover={{ y: -5 }}
-          className="bg-white p-6 border-4 border-[#3c3c3c] rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between"
-        >
-          <div>
-            <div className="w-10 h-10 bg-emerald-100 text-emerald-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              <TrendingUp size={18} />
-            </div>
-            <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">INTERACTIVE DEFI PORTFOLIO</h4>
-            <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
-              Simulate actual Decentralized Exchange Swaps on Cetus Router logic, calculate pool slippage rates, or construct deep borrow debt structures at Navi Lending Sandbox. Learn protocol mathematics securely with mock gas settling tools.
-            </p>
-          </div>
-          <span className="text-[10px] font-mono text-[#89A8B2] font-bold mt-4 uppercase inline-block">Real block simulators Included</span>
-        </motion.div>
-
-        {/* Card 3 */}
-        <motion.div 
-          variants={itemVariants} 
-          whileHover={{ y: -5 }}
-          className="bg-white p-6 border-4 border-[#3c3c3c] rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between"
-        >
-          <div>
-            <div className="w-10 h-10 bg-blue-100 text-[#89A8B2] border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              <Award size={18} />
-            </div>
-            <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">CLAIM THE VALUELESS NFT GIFT</h4>
-            <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
-              Once inside, connect a mock wallet and mint your certificate into your Sui Kiosk address profiles. You can also trigger the Certified completely, absolutely Worthless NFT to see true ledger object registration logs!
-            </p>
-          </div>
-          <span className="text-[10px] font-mono text-stone-500 font-bold mt-4 uppercase inline-block">Exactly $0 utility souvenir</span>
-        </motion.div>
-
-        {/* Card 4 */}
-        <motion.div 
-          variants={itemVariants} 
-          whileHover={{ y: -5 }}
-          className="bg-white p-6 border-4 border-[#3c3c3c] rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] flex flex-col justify-between"
-        >
-          <div>
-            <div className="w-10 h-10 bg-purple-100 text-purple-700 border-2 border-[#3c3c3c] rounded-xl flex items-center justify-center font-bold mb-4 shadow-[1px_1px_0px_0px_#3c3c3c]">
-              <BookOpen size={18} />
-            </div>
-            <h4 className="text-lg font-bold font-serif text-[#3c3c3c]">ECOSYSTEM READS & AI DIGESTS</h4>
-            <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
-              Explore our curated library of hot-of-the-press Sui updates! Undergo deep-dives into parallel-lane throughput, Mysticeti finality, and DeepBook v3. Generate instant, on-demand AI digests to distill core lessons into precise takeaways.
-            </p>
-          </div>
-          <span className="text-[10px] font-mono text-purple-600 font-bold mt-4 uppercase inline-block">Powered by Gemini AI</span>
-        </motion.div>
-      </motion.div>
-
-      {/* 5B. PLAYABLE MINI-ARCADE: YETI'S PARALLEL CONSENSUS MULTI-LANE ARCADE */}
-      <div id="retro-arcade-panel" className="max-w-4xl mx-auto px-6 py-6 text-center z-10 relative">
-        <div className="bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 shadow-[5px_5px_0px_0px_#3c3c3c] max-w-xl mx-auto">
-          <Gamepad size={36} className="mx-auto text-indigo-600 mb-2 animate-pulse" />
+      {/* 6. PLAYABLE MINI-ARCADE: CONSENSUS SPEEDWAY */}
+      <div id="retro-arcade-panel" className="max-w-xl mx-auto px-6 py-6 text-center z-10 relative">
+        <div className="bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 shadow-[5px_5px_0px_0px_#3c3c3c]">
+          <Gamepad size={36} className="mx-auto text-[#D67B52] mb-2 animate-bounce" />
           
-          <h4 className="text-lg font-bold font-serif text-[#3c3c3c] uppercase tracking-wide">Yeti's Parallel Consensus Arcade</h4>
-          <p className="text-xs text-[#6D5D6E] font-semibold mt-1 mb-4 max-w-md mx-auto">
-            Sui processes simple transactions in parallel (Fast Path) and shared transactions sequentially. Switch lanes to escape congestion surges!
+          <h4 className="text-lg font-bold font-sans text-[#3c3c3c] uppercase">Yeti's Parallel Consensus Speedway</h4>
+          <p className="text-xs text-[#6D5D6E] font-semibold mt-1 mb-4">
+            Avoid transaction congestion blockades & collect MIST gas refund coins!
           </p>
 
-          <div className="flex justify-between items-center bg-[#FAF8F5] px-3.5 py-1.5 border-2 border-[#3c3c3c] rounded-2xl mb-3.5 text-xs font-mono select-none">
+          <div className="flex justify-between items-center bg-[#FAF8F5] px-3.5 py-1.5 border-2 border-[#3c3c3c] rounded-xl mb-3 text-xs font-mono select-none">
             <span className="font-bold flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>NETWORK STATUS: ACTIVE</span>
+              <span>VALIDATORS: SYNCED</span>
             </span>
             <span className="text-[#D67B52] font-black uppercase">
               EPOCH {Math.floor(gameScore / 5) + 1}
@@ -839,7 +805,6 @@ public entry fun mint_badge(...) {
                 handleJump();
                 return;
               }
-              // Switch lanes based on click height inside container
               const rect = e.currentTarget.getBoundingClientRect();
               const relativeY = e.clientY - rect.top;
               if (relativeY < rect.height / 2) {
@@ -848,45 +813,42 @@ public entry fun mint_badge(...) {
                 handleSwapLane(1);
               }
             }}
-            className="relative h-48 w-full bg-stone-900 border-4 border-[#3c3c3c] rounded-2xl overflow-hidden shadow-inner font-mono cursor-pointer select-none group"
+            className="relative h-44 w-full bg-stone-900 border-4 border-[#3c3c3c] rounded-2xl overflow-hidden shadow-inner font-mono cursor-pointer select-none"
             title="Click Top half for Fast-Path, Bottom half for Consensus!"
           >
-            {/* Ambient scanlines overlay */}
-            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.22)_50%)] bg-[size:100%_4px] opacity-25 z-20"></div>
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.22)_50%)] bg-[size:100%_4px] opacity-20 z-20"></div>
 
             {/* Score HUD Display */}
-            <div className="absolute top-2 left-3 right-3 flex justify-between text-[11px] font-bold z-20">
-              <span className="text-amber-400">LEDGER SCORE: {gameScore}</span>
+            <div className="absolute top-2 left-3 right-3 flex justify-between text-[10px] font-bold z-20">
+              <span className="text-amber-400">SCORE: {gameScore}</span>
               <span className="text-emerald-400 font-mono">
-                {hasShield ? "🛡️ GAS SHIELD CHARGED" : "⚡ PARALLEL PIPELINE"}
+                {hasShield ? "🛡️ SHIELD ENABLED" : "⚡ PARALLEL ROUTING"}
               </span>
               <span className="text-stone-400">HIGH: {highScore}</span>
             </div>
 
-            {/* Track 0 Segment Line (Fast Path) */}
-            <div className="absolute bottom-24 left-0 right-0 h-0.5 border-t border-dashed border-cyan-800/60 z-0"></div>
-            <div className="absolute bottom-26 left-3 text-cyan-500/40 text-[8px] font-black uppercase tracking-wider">
-              LANE 0: FAST-PATH (OWNED OBJECTS BYPASS)
+            {/* Tracks */}
+            <div className="absolute bottom-22 left-0 right-0 h-0.5 border-t border-dashed border-cyan-800/60 z-0"></div>
+            <div className="absolute bottom-24 left-3 text-cyan-500/40 text-[7px] font-black uppercase tracking-wider">
+              LANE 0: FAST-PATH (OWNED OBJECT BYPASS)
             </div>
 
-            {/* Track 1 Segment Line (Shared Consensus) */}
             <div className="absolute bottom-8 left-0 right-0 h-0.5 border-t border-dashed border-amber-800/60 z-0"></div>
-            <div className="absolute bottom-10 left-3 text-amber-500/40 text-[8px] font-black uppercase tracking-wider">
-              LANE 1: SHARED METADATA CONSENSUS
+            <div className="absolute bottom-10 left-3 text-amber-500/40 text-[7px] font-black uppercase tracking-wider">
+              LANE 1: SHARED OBJECT CONSENSUS QUEUE
             </div>
 
-            {/* Ground separator bar */}
             <div className="absolute bottom-0 left-0 right-0 h-2 bg-stone-950 z-10"></div>
 
-            {/* Yeti Avatar 🐻 with dynamic vertical lane alignment */}
+            {/* Yeti Avatar */}
             <motion.div 
-              className={`absolute left-10 text-3xl z-10 flex items-center transition-all duration-250`}
+              className="absolute left-10 text-2xl z-10 flex items-center transition-all duration-200"
               style={{ 
-                bottom: activeLane === 0 ? "46px" : "12px",
+                bottom: activeLane === 0 ? "42px" : "10px",
                 filter: hasShield ? "drop-shadow(0 0 8px rgba(34, 211, 238, 0.8))" : "none"
               }}
               animate={isJumping ? { 
-                y: -36, 
+                y: -30, 
                 rotate: [0, -10, 10, 0],
                 scale: [1, 1.15, 1] 
               } : { 
@@ -900,158 +862,116 @@ public entry fun mint_badge(...) {
               {hasShield && (
                 <span className="absolute -inset-1 rounded-full border-2 border-cyan-400 animate-ping opacity-60"></span>
               )}
-              <span className="absolute -top-3 -right-2 text-[10px] animate-bounce">☕</span>
-              
-              {/* Floating bubble text above yeti */}
-              <div className="absolute left-8 -top-8 bg-white text-stone-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-stone-400 shadow-sm font-sans flex items-center gap-0.5 whitespace-nowrap z-20">
-                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
-                <span>
-                  {gameScore === 0 ? "Dodge congestion! 🏔️" : gameScore < 5 ? "Epoch 1: Narwhal ⚡" : gameScore < 10 ? "Epoch 2: Bullshark 🦈" : "Epoch 3: Mysticeti 🔥"}
-                </span>
-              </div>
             </motion.div>
 
-            {/* Collectible GAS MIST Refund Coin 🪙 */}
+            {/* Collectible Coin */}
             {gameStarted && !gameOver && (
               <motion.div 
-                className="absolute text-lg z-10"
+                className="absolute text-base z-10"
                 style={{ 
-                  bottom: coinLane === 0 ? "48px" : "14px", 
+                  bottom: coinLane === 0 ? "44px" : "12px", 
                   left: `${coinX}%` 
                 }}
-                animate={{ y: [0, -3, 0] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ y: [0, -2, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity }}
               >
-                <span className="filter drop-shadow-md">🪙</span>
+                <span>🪙</span>
               </motion.div>
             )}
 
-            {/* Obstacle Hazard representing transaction congestions 🧱 */}
+            {/* Obstacle Hazard */}
             {gameStarted && !gameOver && (
               <div 
-                className="absolute text-xl z-10 flex flex-col items-center"
+                className="absolute text-lg z-10 flex flex-col items-center"
                 style={{ 
-                  bottom: blockLane === 0 ? "48px" : "14px", 
+                  bottom: blockLane === 0 ? "44px" : "12px", 
                   left: `${blockX}%` 
                 }}
               >
                 <span>{obstacleType}</span>
-                <span className={`text-[6px] font-extrabold px-1 border rounded font-mono uppercase tracking-wider block ${
-                  blockLane === 0 ? "text-cyan-400 border-cyan-500/50 bg-stone-950" : "text-amber-400 border-amber-500/50 bg-stone-950"
-                }`}>
-                  {blockLane === 0 ? "Owned Hack" : "Queue Jam"}
-                </span>
               </div>
             )}
 
-            {/* Standby screen layer */}
+            {/* Standby */}
             {!gameStarted && (
               <div className="absolute inset-0 bg-stone-900/95 flex flex-col items-center justify-center p-4 z-20">
-                <span className="text-[#D67B52] text-xs font-black tracking-widest animate-pulse mb-1">
-                  [ MULTI-LANE CONSENSUS ENGAGED ]
+                <span className="text-[#D67B52] text-[10px] font-black tracking-widest animate-pulse mb-1">
+                  [ ARCADIA CONSENSUS ]
                 </span>
-                <p className="text-stone-400 text-[10px] max-w-xs leading-normal font-sans">
-                  Use Up/Down Arrow keys or click tracks to alter lanes between Fast-Path and Consensus tracks. Avoid blockades & collect MIST gas 🪙!
+                <p className="text-stone-400 text-[9px] max-w-xs leading-tight font-sans">
+                  Press arrow keys or click tracks to alter lanes. Space to jump obstacle blockades!
                 </p>
-                <button className="mt-3.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-bold shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer uppercase">
+                <button className="mt-3 px-3 py-1 bg-indigo-600 border-2 border-stone-700 rounded-lg text-white text-[9px] font-bold cursor-pointer uppercase">
                   INSERT PROTOCOL COIN 🪙
                 </button>
               </div>
             )}
 
-            {/* Crash gameover state layer */}
+            {/* Gameover */}
             {gameOver && (
               <div className="absolute inset-0 bg-red-950/90 flex flex-col items-center justify-center p-4 z-30">
-                <span className="text-red-400 text-xs font-black uppercase tracking-widest mb-1 animate-bounce">
-                  💥 TRANSACTION COLLISION CRASH 💥
+                <span className="text-red-400 text-[10px] font-black uppercase tracking-widest mb-1">
+                  💥 TRANSACTION COLLIDED 💥
                 </span>
-                <p className="text-stone-300 text-[10px] max-w-xs font-serif leading-none mt-1">
-                  Ledger aborted. Score: <strong className="text-amber-400">{gameScore}</strong> | Highest Verified Score: <strong className="text-white">{highScore}</strong>
+                <p className="text-stone-300 text-[9px] mt-1">
+                  Consensus Aborted. Score: <strong className="text-amber-400">{gameScore}</strong> | High: <strong className="text-white">{highScore}</strong>
                 </p>
-                <button className="mt-3.5 px-4 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 border-2 border-[#3c3c3c] rounded-xl text-white text-[10px] font-extrabold shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer">
-                  REPLAY LEDGER SYMPOSIUM 🔄
+                <button className="mt-3 px-3 py-1 bg-[#D67B52] border-2 border-stone-700 rounded-lg text-white text-[9px] font-extrabold cursor-pointer">
+                  REPLAY LEDGER SEQUENCE 🔄
                 </button>
               </div>
             )}
           </div>
 
-          {/* Parallel controls feedback bar */}
-          <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 bg-[#FAF8F5] p-3 border-2 border-[#3c3c3c] rounded-2xl text-left">
+          {/* Controls feedback bar */}
+          <div className="mt-3 flex items-center justify-between gap-2 bg-[#FAF8F5] p-3 border-2 border-[#3c3c3c] rounded-2xl text-left">
             <div>
-              <span className="text-[#3c3c3c] text-[10px] font-bold block">ACTIVE LANE SELECTOR:</span>
-              <div className="flex gap-2 mt-1">
+              <span className="text-[#3c3c3c] text-[9px] font-bold block">ACTIVE LANE SELECTOR:</span>
+              <div className="flex gap-1.5 mt-1">
                 <button
                   onClick={() => handleSwapLane(0)}
                   disabled={!gameStarted || gameOver}
-                  className={`px-2.5 py-1 text-[9px] font-mono font-black border-2 border-[#3c3c3c] rounded-lg shadow-[1px_1px_0px_0px_#3c3c3c] transition-all cursor-pointer ${
-                    activeLane === 0 
-                      ? "bg-cyan-100 text-cyan-800" 
-                      : "bg-white text-stone-500 opacity-60"
+                  className={`px-2 py-0.5 text-[8px] font-mono font-black border border-[#3c3c3c] rounded cursor-pointer ${
+                    activeLane === 0 ? "bg-cyan-100 text-cyan-800" : "bg-white text-stone-500 opacity-60"
                   }`}
                 >
-                  🟢 LANE 0: FAST PATH
+                  🟢 LANE 0
                 </button>
                 <button
                   onClick={() => handleSwapLane(1)}
                   disabled={!gameStarted || gameOver}
-                  className={`px-2.5 py-1 text-[9px] font-mono font-black border-2 border-[#3c3c3c] rounded-lg shadow-[1px_1px_0px_0px_#3c3c3c] transition-all cursor-pointer ${
-                    activeLane === 1 
-                      ? "bg-amber-100 text-[#D67B52]" 
-                      : "bg-white text-stone-500 opacity-60"
+                  className={`px-2 py-0.5 text-[8px] font-mono font-black border border-[#3c3c3c] rounded cursor-pointer ${
+                    activeLane === 1 ? "bg-amber-100 text-[#D67B52]" : "bg-white text-stone-500 opacity-60"
                   }`}
                 >
-                  🟡 LANE 1: CONSENSUS
+                  🟡 LANE 1
                 </button>
               </div>
             </div>
 
             <button
               onClick={handleJump}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white border-2 border-[#3c3c3c] font-mono text-[10px] font-extrabold rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#3c3c3c] max-height-[32px] self-end"
+              className="px-3 py-1.5 bg-indigo-600 text-white border-2 border-[#3c3c3c] font-mono text-[9px] font-bold rounded-lg shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer"
             >
-              🚀 JUMP YETI [Space]
+              🚀 JUMP [Space]
             </button>
           </div>
-
-          {/* REAL TIME TRANSACTION MONITOR LOG WINDOW */}
-          <div className="bg-stone-900 border-2 border-[#3c3c3c] rounded-2xl p-3.5 mt-3 text-left font-mono text-[9px] text-stone-300 shadow-[2px_2px_0px_0px_#3c3c3c]">
-            <div className="flex items-center justify-between border-b border-stone-800 pb-1.5 mb-2 select-none text-[8px] text-stone-400 font-extrabold uppercase">
-              <span className="flex items-center gap-1">
-                <Cpu size={10} className="text-cyan-400 animate-spin" />
-                <span>Validator Node Ledger Stream</span>
-              </span>
-              <span className="text-[#D67B52]">Latency: 280ms (Mysticeti)</span>
-            </div>
-            <div className="space-y-1 max-h-[85px] overflow-y-auto font-mono scrollbar-none scroll-smooth">
-              {gameLogs.map((log, idx) => (
-                <div key={idx} className="truncate select-text">
-                  <span className="text-stone-500">[{new Date().toLocaleTimeString().split(" ")[0]}]:</span>{" "}
-                  <span className={log.includes("[FATAL]") || log.includes("[CRASH]") ? "text-red-400" : log.includes("[GAS]") || log.includes("[EPOCH]") ? "text-cyan-300 font-bold" : "text-stone-300"}>
-                    {log}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
         </div>
       </div>
 
-      {/* 6. COZY STICKY FOOTER REDIRECT BOX */}
+      {/* 7. BOTTOM CALL TO ACTION CONTAINER */}
       <div className="mt-16 text-center max-w-md mx-auto px-6">
-        <h3 className="text-xl font-bold font-serif text-[#3c3c3c]">Ready to start SUI Move Academy?</h3>
-        <p className="text-xs text-[#6D5D6E] font-medium mt-1 mb-4">
-          Complete tasks to level up, earn XP points, verify swap slippage structures and secure your profile.
+        <h3 className="text-2xl font-black font-sans text-[#3c3c3c]">Ready to start learning?</h3>
+        <p className="text-xs text-[#6D5D6E] font-semibold mt-1 mb-6">
+          Level up, earn genuine XP points, claim certificates, and study secure Move module structures today.
         </p>
 
-        <motion.button
+        <button
           onClick={onLaunch}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full py-4 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white font-serif font-extrabold text-base rounded-xl border-2 border-[#3c3c3c] shadow-[3px_3px_0px_0px_#3c3c3c] cursor-pointer cursor-semibold flex items-center justify-center gap-2"
+          className="w-full py-4 bg-[#89A8B2] hover:bg-[#72929c] text-white font-sans font-extrabold text-base rounded-2xl border-2 border-b-6 border-[#3c3c3c] hover:translate-y-[2px] hover:border-b-4 active:translate-y-[4px] active:border-b-2 transition-all cursor-pointer uppercase tracking-wider text-center"
         >
-          <span>Launch Lofi Quest Room Now</span>
-        </motion.button>
+          ENTER THE ACADEMY ❄️
+        </button>
       </div>
 
     </div>

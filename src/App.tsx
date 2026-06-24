@@ -1603,7 +1603,7 @@ export default function App() {
       <footer className="border-t-4 border-[#3c3c3c] bg-[#F3EFEA] p-4 text-center text-[10px] text-[#6D5D6E] font-mono">
         <p className="flex items-center justify-center gap-1 select-none font-bold">
           <span>🏔️</span>
-          <span>© 2026 Lofi Quest SUI Academy. Built for CLAY Hackathon. All rights preserved.</span>
+          <span>© 2026 Lofi Academy. Built for CLAY Hackathon. All rights preserved.</span>
         </p>
       </footer>
 

@@ -25,6 +25,7 @@ let ai: GoogleGenAI | null = null;
 const initGemini = () => {
   if (!ai) {
     const apiKey = process.env.GEMINI_API_KEY;
+    console.log("[SERVER_STARTUP] GEMINI_API_KEY presence status:", apiKey ? `present (length: ${apiKey.length})` : "ABSENT/MISSING");
     if (apiKey) {
       ai = new GoogleGenAI({
         apiKey: apiKey,
@@ -365,9 +366,10 @@ app.post("/api/gemini/tutor", async (req, res) => {
     }
   } catch (error: any) {
     console.error("Gemini API error:", error);
+    const errorDetails = error?.message || String(error);
     res.json({ 
       success: true, 
-      text: "yeti is slightly snoozing under the soft blanket of code... but don't worry! here is your lofi hint: the sui gas structure is object-based, and double-spent tokens are completely impossible. keep on rockin'! 🐻🍵" 
+      text: `yeti is slightly snoozing under the soft blanket of code... but don't worry! here is your lofi hint: the sui gas structure is object-based, and double-spent tokens are completely impossible. keep on rockin'! 🐻🍵\n\n[Debug info - API error: ${errorDetails}]` 
     });
   }
 });
@@ -454,7 +456,7 @@ app.post("/api/gemini/generate-avatar", async (req, res) => {
     }
   } catch (error: any) {
     console.error("Gemini Avatar generation error:", error);
-    res.status(500).json({ success: false, error: "AI pipeline failed to render SVG." });
+    res.status(500).json({ success: false, error: `AI pipeline failed to render SVG: ${error?.message || error}` });
   }
 });
 

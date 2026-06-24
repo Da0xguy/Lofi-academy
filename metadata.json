@@ -1,5 +1,5 @@
 {
-  "name": "Lofi Quest",
+  "name": "Lofi Academy",
   "description": "A lofi-styled learning adventure to learn Sui development, earn XP, complete interactive quizzes, and mint Move achievement badges.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
