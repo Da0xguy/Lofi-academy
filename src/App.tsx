@@ -744,11 +744,14 @@ export default function App() {
           </div>
           <button 
             onClick={handleReturnToLanding}
-            className="text-stone-500 font-mono text-xs hover:text-[#D67B52] underline cursor-pointer mt-4"
+            className="text-stone-500 font-mono text-xs hover:text-[#D67B52] cursor-pointer mt-4"
             title="Return to Guided Introduction"
           >
-            <span className="hidden sm:inline">&larr; Return to Guided Introduction</span>
-            <span className="sm:hidden text-sm flex items-center gap-1" aria-label="Exit">🚪 Exit Intro</span>
+            <span className="hidden md:inline underline">&larr; Return to Guided Introduction</span>
+            <span className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-xl font-bold shadow-[2px_2px_0px_0px_#3c3c3c] active:translate-y-[1px] hover:bg-[#F3EFEA]">
+              <X size={13} />
+              <span>Exit Intro</span>
+            </span>
           </button>
         </motion.div>
       </div>
@@ -1103,12 +1106,14 @@ export default function App() {
 
                   <button
                     onClick={() => setFlowState("syllabus")}
-                    className="text-[11px] text-[#D67B52] hover:underline font-bold shrink-0 flex items-center gap-1 cursor-pointer transition-colors hover:text-[#D67B52]/80"
+                    className="text-[#D67B52] hover:text-[#D67B52]/80 font-bold shrink-0 flex items-center justify-center cursor-pointer transition-colors p-1"
                     title="Exit to Course Syllabus"
                   >
-                    {/* On desktop show full text, on mobile show the exit symbol 🚪 only */}
-                    <span className="hidden sm:inline">&larr; Exit to Course Syllabus</span>
-                    <span className="sm:hidden text-base" aria-label="Exit">🚪</span>
+                    {/* On desktop show full text, on mobile show a retro styled X close button */}
+                    <span className="hidden md:inline text-xs font-mono">&larr; Exit to Course Syllabus</span>
+                    <span className="md:hidden flex items-center justify-center bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-lg p-1.5 shadow-[1.5px_1.5px_0px_0px_#3c3c3c] active:translate-y-[1px]" aria-label="Exit">
+                      <X size={14} />
+                    </span>
                   </button>
                 </div>
 
