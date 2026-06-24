@@ -8,7 +8,7 @@ import { ProfileWidget } from "./components/ProfileWidget";
 import { TutorFloatingWidget } from "./components/TutorFloatingWidget";
 import { AudioPlayerWidget } from "./components/AudioPlayerWidget";
 import { LandingPage } from "./components/LandingPage";
-import Background from "./components/Background";
+import CustomCursor from "./components/CustomCursor";
 import { motion, AnimatePresence } from "motion/react";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { getFirebaseUserProfile, saveFirebaseUserProfile } from "./lib/firestoreUtils";
@@ -490,6 +490,14 @@ export default function App() {
       setActiveModuleId(firstMod.id);
     }
     setFlowState("syllabus");
+    
+    // Smooth scroll to the syllabus modules section
+    setTimeout(() => {
+      document.getElementById("curriculum-syllabus-container")?.scrollIntoView({ 
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 60);
   };
 
   // Enter active classroom step by step slide
@@ -621,6 +629,7 @@ export default function App() {
   if (appLoading) {
     return (
       <div className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col items-center justify-center p-6 selection:bg-[#D67B52] selection:text-white">
+        <CustomCursor />
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -717,7 +726,7 @@ export default function App() {
   if (appLaunched && !currentAccount) {
     return (
       <div className="min-h-screen bg-[#F9F6F0] flex flex-col items-center justify-center p-6 selection:bg-[#D67B52] selection:text-white relative">
-        <Background />
+        <CustomCursor />
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -736,8 +745,10 @@ export default function App() {
           <button 
             onClick={handleReturnToLanding}
             className="text-stone-500 font-mono text-xs hover:text-[#D67B52] underline cursor-pointer mt-4"
+            title="Return to Guided Introduction"
           >
-            &larr; Return to Guided Introduction
+            <span className="hidden sm:inline">&larr; Return to Guided Introduction</span>
+            <span className="sm:hidden text-sm flex items-center gap-1" aria-label="Exit">🚪 Exit Intro</span>
           </button>
         </motion.div>
       </div>
@@ -752,7 +763,7 @@ export default function App() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white relative"
     >
-      <Background />
+      <CustomCursor />
       
       {/* 1. TOP HEADER & HUD STATUS */}
       <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
@@ -897,26 +908,27 @@ export default function App() {
       </header>
 
       {/* 2. SUB-NAV NAVIGATION TABS PANEL */}
-      <nav id="app-tabs-navigation" className={`bg-white border-b-2 border-[#3c3c3c] py-2.5 px-6 ${mobileMenuOpen ? "block" : "hidden md:block"}`}>
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-start gap-2 overflow-x-auto text-[13px] font-mono">
+      <nav id="app-tabs-navigation" className={`bg-white border-b-2 border-[#3c3c3c] py-2.5 px-4 sm:px-6 ${mobileMenuOpen ? "block" : "hidden md:block"}`}>
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-start gap-1.5 sm:gap-2 overflow-x-auto text-[12px] sm:text-[13px] font-mono no-scrollbar">
           <button
             onClick={() => {
               handleReturnToLanding();
               setMobileMenuOpen(false);
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-[#D67B52] border-dashed border-[#D67B52]/60 hover:border-[#D67B52] hover:bg-[#D67B52]/5"
+            className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-[#D67B52] border-dashed border-[#D67B52]/60 hover:border-[#D67B52] hover:bg-[#D67B52]/5 text-xs"
             title="Read blockchain mechanics & about pages again"
           >
-            <Sparkles size={14} className="animate-pulse" />
-            <span>Introduction Guide 📖</span>
+            <Sparkles size={13} className="animate-pulse shrink-0" />
+            <span className="hidden sm:inline">Introduction Guide 📖</span>
+            <span className="sm:hidden">Intro 📖</span>
           </button>
 
           {[
-            { id: "dashboard", label: "Quest Room", shortLabel: "Quest Room", symbol: "🧭", icon: Compass },
-            { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", symbol: "📊", icon: TrendingUp },
-            { id: "articles", label: "Cozy Gazette", shortLabel: "Cozy Gazette", symbol: "📰", icon: BookOpen },
-            { id: "leaderboard", label: "Leaderboard", shortLabel: "Leaderboard", symbol: "🏆", icon: Trophy },
-            { id: "profile", label: "Profile", shortLabel: "Kiosk", symbol: "👤", icon: User }
+            { id: "dashboard", label: "Quest Room", shortLabel: "Quest Room", mobileLabel: "Quest", symbol: "🧭", icon: Compass },
+            { id: "simulator", label: "DeFi Swap/Lend Box", shortLabel: "DeFi Box", mobileLabel: "DeFi", symbol: "📊", icon: TrendingUp },
+            { id: "articles", label: "Cozy Gazette", shortLabel: "Cozy Gazette", mobileLabel: "Gazette", symbol: "📰", icon: BookOpen },
+            { id: "leaderboard", label: "Leaderboard", shortLabel: "Leaderboard", mobileLabel: "Ranks", symbol: "🏆", icon: Trophy },
+            { id: "profile", label: "Profile", shortLabel: "Kiosk", mobileLabel: "Profile", symbol: "👤", icon: User }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -930,16 +942,16 @@ export default function App() {
                   });
                   setMobileMenuOpen(false);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-xs sm:text-sm ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap border-2 font-bold text-xs ${
                   isActive 
                      ? "bg-[#F3EFEA] text-[#D67B52] border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]" 
                      : "text-[#6D5D6E] border-transparent hover:border-[#3c3c3c]/40 hover:bg-[#f8f5f2] hover:text-[#3c3c3c]"
                 }`}
               >
-                <Icon size={14} className="shrink-0" />
+                <Icon size={13} className="shrink-0" />
                 <span className="hidden md:inline">{tab.label}</span>
                 <span className="hidden sm:inline md:hidden">{tab.shortLabel}</span>
-                <span className="sm:hidden">{tab.symbol}</span>
+                <span className="sm:hidden">{tab.mobileLabel}</span>
               </button>
             );
           })}
@@ -1015,7 +1027,7 @@ export default function App() {
 
             {/* Learning module steps classroom workspace */}
             {flowState === "syllabus" && (
-              <div className="bg-white border-2 border-[#3c3c3c] rounded-3xl p-6 shadow-[4px_4px_0px_0px_#3c3c3c]">
+              <div id="curriculum-syllabus-container" className="scroll-mt-24 bg-white border-2 border-[#3c3c3c] rounded-3xl p-6 shadow-[4px_4px_0px_0px_#3c3c3c]">
                 <div className="flex items-center justify-between border-b-2 border-dashed border-[#3c3c3c]/20 pb-3 mb-5">
                   <div>
                     <span className="text-xs font-mono text-[#D67B52] tracking-wider font-extrabold">Active Curriculum Syllabus:</span>
@@ -1073,19 +1085,30 @@ export default function App() {
             {flowState === "classroom" && (
               <div className="space-y-6">
                 {/* Visual title guide header */}
-                <div className="flex items-center justify-between bg-[#F3EFEA] p-4 rounded-2xl border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs text-[#3c3c3c]">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#D67B52] animate-spin">☕</span>
-                    <span className="text-[#6D5D6E] font-bold">Track: <strong className="text-[#3c3c3c] font-extrabold">{activeTrack.title}</strong></span>
-                    <span className="text-[#3c3c3c]/40 font-bold">/</span>
-                    <span className="text-[#6D5D6E] font-bold">Class: <strong className="text-[#3c3c3c] font-extrabold">{activeModule.title}</strong></span>
+                <div className="flex items-center justify-between bg-[#F3EFEA] p-3 sm:p-4 rounded-2xl border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs text-[#3c3c3c] min-w-0 gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 truncate">
+                    <span className="text-[#D67B52] animate-spin shrink-0">☕</span>
+                    {/* Desktop layout: Full Track and Class */}
+                    <div className="hidden md:flex items-center gap-2 truncate">
+                      <span className="text-[#6D5D6E] font-bold">Track: <strong className="text-[#3c3c3c] font-extrabold">{activeTrack.title}</strong></span>
+                      <span className="text-[#3c3c3c]/40 font-bold">/</span>
+                      <span className="text-[#6D5D6E] font-bold">Class: <strong className="text-[#3c3c3c] font-extrabold">{activeModule.title}</strong></span>
+                    </div>
+                    {/* Mobile layout: Shortened to just Class */}
+                    <div className="md:hidden truncate font-bold text-stone-700 flex items-center gap-1 min-w-0">
+                      <span className="text-[#6D5D6E] font-medium text-[11px] shrink-0">Class:</span>
+                      <span className="truncate text-xs text-[#3c3c3c]">{activeModule.title}</span>
+                    </div>
                   </div>
 
                   <button
                     onClick={() => setFlowState("syllabus")}
-                    className="text-[11px] text-[#D67B52] hover:underline font-bold"
+                    className="text-[11px] text-[#D67B52] hover:underline font-bold shrink-0 flex items-center gap-1 cursor-pointer transition-colors hover:text-[#D67B52]/80"
+                    title="Exit to Course Syllabus"
                   >
-                    &larr; Exit to Course Syllabus
+                    {/* On desktop show full text, on mobile show the exit symbol 🚪 only */}
+                    <span className="hidden sm:inline">&larr; Exit to Course Syllabus</span>
+                    <span className="sm:hidden text-base" aria-label="Exit">🚪</span>
                   </button>
                 </div>
 

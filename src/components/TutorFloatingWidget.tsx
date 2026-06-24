@@ -190,7 +190,7 @@ export function TutorFloatingWidget({ currentTrack, currentLesson }: TutorFloati
                   <span>Yeti the Tutor</span>
                   <Sparkles size={11} className="text-[#D67B52] animate-pulse" />
                 </h3>
-                <p className="text-[9px] sm:text-[10px] text-[#6D5D6E] font-mono">Gemini lofi assistant, 100% cozy</p>
+                <p className="text-[9px] sm:text-[10px] text-[#6D5D6E] font-mono">Interactive lofi assistant, 100% cozy</p>
               </div>
             </div>
 

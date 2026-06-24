@@ -431,14 +431,14 @@ export function SuiArticlesWidget() {
                 <Sparkles size={13} className="animate-spin text-purple-600" />
               </div>
               <h4 className="text-xs font-mono font-bold text-[#3c3c3c] uppercase tracking-wider">
-                Yeti Library AI Assistant: Gemini Article Commentary
+                Yeti Library AI Assistant: Smart Article Commentary
               </h4>
             </div>
 
             {!aiAnalysis && !isAiLoading ? (
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#3c3c3c]/10">
                 <p className="text-[11px] font-sans text-stone-600 font-medium leading-relaxed">
-                  Yeti reviews actual transaction structures inside this article using the Gemini API. Ask Yeti for smart real-time commentary!
+                  Yeti reviews actual transaction structures inside this article. Ask Yeti for smart real-time commentary!
                 </p>
                 <button
                   onClick={handleAskYetiAi}

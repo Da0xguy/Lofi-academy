@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import Background from "./Background";
+import CustomCursor from "./CustomCursor";
 import { 
   Sparkles, 
   TrendingUp, 
@@ -366,6 +367,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
 
   return (
     <div id="landing-page-root" className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] font-sans selection:bg-[#D67B52] selection:text-white pb-24 leading-relaxed overflow-x-hidden relative">
+      <CustomCursor />
       <Background />
       
       {/* 1. DUOLINGO STYLE TOP NAVBAR */}
@@ -567,10 +569,10 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
               </div>
               <h4 className="text-base font-bold font-sans text-[#3c3c3c] uppercase">ECOSYSTEM UPDATES</h4>
               <p className="text-xs text-[#6D5D6E] font-semibold mt-2 leading-relaxed">
-                Access curated newsletters on Mysticeti speeds, zkLogin tools, and DeepBook. Generate custom AI digests with integrated Gemini language models.
+                Access curated newsletters on Mysticeti speeds, zkLogin tools, and DeepBook. Generate custom smart digests to keep you fully updated.
               </p>
             </div>
-            <span className="text-[9px] font-mono text-purple-600 font-black uppercase mt-4">Gemini powered AI</span>
+            <span className="text-[9px] font-mono text-purple-600 font-black uppercase mt-4">Cozy Smart digests</span>
           </div>
         </div>
       </div>

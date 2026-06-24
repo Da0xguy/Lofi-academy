@@ -341,7 +341,7 @@ export function ProfileWidget({
                 <span>AI Yeti Avatar Studio</span>
               </div>
               <p className="text-[10px] text-[#6D5D6E] leading-relaxed">
-                Describe any animal companion theme or pick a standard preset to generate custom vector graphics instantly via Gemini!
+                Describe any animal companion theme or pick a standard preset to generate custom vector graphics instantly!
               </p>
 
               <div className="flex gap-1.5">
