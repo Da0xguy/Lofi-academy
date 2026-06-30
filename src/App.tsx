@@ -12,6 +12,7 @@ import CustomCursor from "./components/CustomCursor";
 import { motion, AnimatePresence } from "motion/react";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { getFirebaseUserProfile, saveFirebaseUserProfile } from "./lib/firestoreUtils";
+import confetti from "canvas-confetti";
 
 import { 
   Compass, 
@@ -583,6 +584,35 @@ export default function App() {
           completedModules: updatedCompletedModules,
           completedTracks: updatedCompletedTracks
         }));
+
+        // Trigger lightweight interactive confetti celebrations!
+        try {
+          confetti({
+            particleCount: 140,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+          
+          setTimeout(() => {
+            confetti({
+              particleCount: 80,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0, y: 0.8 }
+            });
+          }, 250);
+          
+          setTimeout(() => {
+            confetti({
+              particleCount: 80,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1, y: 0.8 }
+            });
+          }, 400);
+        } catch (e) {
+          console.error("Confetti trigger failed:", e);
+        }
       }
 
       setFlowState("quiz-result");

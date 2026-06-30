@@ -24,7 +24,7 @@ import {
 interface Article {
   id: string;
   title: string;
-  category: "Consensus" | "DeFi" | "Bridges" | "Creators" | "Community";
+  category: "Consensus" | "DeFi" | "Bridges" | "Creators" | "Community" | "Foundation";
   date: string;
   readTime: string;
   views: number;
@@ -183,6 +183,30 @@ const INITIAL_ARTICLES: Article[] = [
       "Parallel transaction lanes: High-volume parallel processing keeps gas fees flat."
     ],
     externalLink: "https://sui.io/blog/why-developers-choose-sui-move/"
+  },
+  {
+    id: "lofi-sui-foundation",
+    title: "The Sui & Lofi Foundations: Empowering Developers and Global Communities",
+    category: "Foundation",
+    date: "2026-06-25",
+    readTime: "4 min read",
+    views: 1540,
+    likes: 512,
+    author: "Lofi Ecosystem",
+    avatarChar: "guard",
+    summary: "Discover how the Sui and Lofi Foundations are driving progress: deploying millions in developer grants, engineering eco-conscious low-energy infrastructure, and democratizing accessible digital education.",
+    intro: "A sustainable high-speed blockchain network relies on a proactive foundational support system. The Sui and Lofi Foundations work globally to fund developer initiatives, protect the environment, and establish robust, accessible educational academies.",
+    bodyParagraphs: [
+      "The foundations actively deploy developer-first grants, supporting independent hackathons, builder incubation programs, and academic research hubs. Over $50 million in global grants has been distributed to lower-barrier tooling efforts, making it incredibly straightforward for students and small startups to build on-chain products without upfront financial constraints.",
+      "In terms of ecological responsibility, Sui Move's proof-of-stake design ensures a low-carbon future. The energy consumption of the entire globally distributed Sui validator committee is less than that of a few dozen household refrigerators, making Mysticeti one of the greenest tech systems on Earth. Additionally, the foundations directly sponsor real-world sustainability oracle feeds and carbon credits offset models integrated natively inside smart contracts.",
+      "Lastly, the foundations champion accessible technical education. By financing local developer community hubs and open-access portals like this interactive Lofi Academy, they ensure that aspiring engineers—regardless of their economic background or geography—can learn secure smart contract coding for free and gain high-value software engineering skills."
+    ],
+    takeaways: [
+      "Global developer support: Over $50M distributed in grants, hackathons, and open source tooling rewards.",
+      "Green technology design: Proof-of-stake system requires negligible energy while providing sub-second finality.",
+      "Democratized learning paths: Funding free educational resources and developer academies worldwide."
+    ],
+    externalLink: "https://sui.io/grants-hub/"
   }
 ];
 
@@ -263,7 +287,7 @@ export function SuiArticlesWidget() {
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ["All", "Consensus", "DeFi", "Bridges", "Creators", "Community"];
+  const categories = ["All", "Consensus", "DeFi", "Bridges", "Creators", "Community", "Foundation"];
 
   return (
     <div className="space-y-6">
