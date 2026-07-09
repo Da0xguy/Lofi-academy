@@ -66,6 +66,7 @@ export function LeaderboardWidget({
       }
     }
     console.error("Failed to fetch leaderboard from API after retries:", lastError);
+    setLeaderboard(defaultLeaderboard);
     setIsLoading(false);
   };
 

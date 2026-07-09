@@ -195,14 +195,19 @@ app.post("/api/sui/leaderboard", async (req, res) => {
     
     snapshot.forEach((snap) => {
       const data = snap.data();
+      if (!data) return;
+      
       const badgeIds = Array.isArray(data.mintedBadges)
-        ? data.mintedBadges.map((b: any) => b.trackId)
+        ? data.mintedBadges.map((b: any) => b?.trackId).filter(Boolean)
         : (Array.isArray(data.completedTracks) ? data.completedTracks : []);
 
+      const walletStr = data.walletAddress || snap.id || "";
+      if (!walletStr) return;
+
       dbUsers.push({
-        username: data.username || "CozyExplorer",
-        avatar: data.avatar || "🦊",
-        wallet: data.walletAddress || snap.id,
+        username: String(data.username || "CozyExplorer"),
+        avatar: String(data.avatar || "🦊"),
+        wallet: String(walletStr),
         xp: Number(data.xp ?? 0),
         level: Number(data.level ?? 1),
         badges: badgeIds,
@@ -211,7 +216,11 @@ app.post("/api/sui/leaderboard", async (req, res) => {
       });
     });
 
-    const activeWallets = new Set(dbUsers.map(u => u.wallet.toLowerCase()));
+    const activeWallets = new Set(
+      dbUsers
+        .map(u => typeof u.wallet === "string" ? u.wallet.toLowerCase() : "")
+        .filter(Boolean)
+    );
     const finalLeaderboard = [...dbUsers];
     for (const b of defaultLeaderboard) {
       if (!activeWallets.has(b.wallet.toLowerCase())) {
