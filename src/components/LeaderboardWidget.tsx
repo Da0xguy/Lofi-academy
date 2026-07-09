@@ -181,7 +181,7 @@ export function LeaderboardWidget({
             <tbody>
               {filteredLeaderboard.map((entry, index) => {
                 const rank = index + 1;
-                const isCurrentUser = userWallet && entry.wallet.toLowerCase() === userWallet.toLowerCase();
+                const isCurrentUser = userWallet && entry.wallet && typeof entry.wallet === "string" && entry.wallet.toLowerCase() === userWallet.toLowerCase();
 
                 // Custom ranks styles
                 let rankVisual: React.ReactNode = rank;
@@ -268,19 +268,21 @@ export function LeaderboardWidget({
                     <td className="py-4 px-3 text-right text-[#3c3c3c]">
                       {entry.badges && entry.badges.length > 0 ? (
                         <div className="flex items-center justify-end gap-1 select-none">
-                          {entry.badges.map((b) => {
+                          {entry.badges.map((b, bIdx) => {
+                            if (!b) return null;
+                            const badgeStr = typeof b === "string" ? b : (typeof b === "object" && (b as any).trackId ? String((b as any).trackId) : JSON.stringify(b));
                             let color = "bg-[#B9D7EA] text-[#3c3c3c]";
-                            if (b === "defi" || b === "sui-defi") color = "bg-[#E8E1D9] text-[#3c3c3c]";
-                            if (b === "protocols" || b === "sui-protocols") color = "bg-[#E8A0BF] text-white";
-                            if (b === "history" || b === "sui-history") color = "bg-[#89A8B2] text-white";
+                            if (badgeStr === "defi" || badgeStr === "sui-defi") color = "bg-[#E8E1D9] text-[#3c3c3c]";
+                            if (badgeStr === "protocols" || badgeStr === "sui-protocols") color = "bg-[#E8A0BF] text-white";
+                            if (badgeStr === "history" || badgeStr === "sui-history") color = "bg-[#89A8B2] text-white";
                             
                             return (
                               <span
-                                key={b}
+                                key={`${badgeStr}-${bIdx}`}
                                 className={`text-[9px] px-2.5 py-1 rounded-lg uppercase font-bold text-center border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] ${color}`}
-                                title={`${b} Completed Badge`}
+                                title={`${badgeStr} Completed Badge`}
                               >
-                                {b.replace("sui-", "")}
+                                {badgeStr.replace("sui-", "")}
                               </span>
                             );
                           })}
