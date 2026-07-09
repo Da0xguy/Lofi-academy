@@ -158,7 +158,7 @@ To run Lofi Quest on local development setups:
     ```
 3.  Set up your local configuration variables file (`.env`):
     ```env
-    GEMINI_API_KEY=your-api-key-here
+    GEMINI_API_KEY
     ```
 4.  Launch the development server:
     ```bash
