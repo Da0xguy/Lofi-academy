@@ -419,7 +419,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
             className="mb-6 relative bg-white border-4 border-[#3c3c3c] px-6 py-4 rounded-2xl shadow-[4px_4px_0px_0px_#3c3c3c] max-w-sm text-center"
           >
             <p className="text-xs sm:text-sm font-bold text-[#3c3c3c] leading-relaxed">
-              "Psst... Grab a warm coffee! Learning Sui Move is cozy, interactive, and completely stress-free! 🏔️☕"
+              "Psst... Grab a warm coffee! Learning Sui Move is cozy, interactive, and completely stress-free!"
             </p>
             {/* Bubble arrow */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-r-4 border-b-4 border-[#3c3c3c] rotate-45 -mt-2"></div>
@@ -462,7 +462,7 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
           </h1>
           
           <p className="text-base md:text-lg text-[#6D5D6E] font-medium leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
-            Learn parallel consensus, compile robust smart contracts, and master Web3 concepts in an immersive lofi study space. Play mini-games, review code, and earn worthless souvenir badges!
+            Learn parallel consensus, compile robust smart contracts, and master Web3 concepts in an immersive lofi study space. Play mini-games, review code, and earn souvenir badges!
           </p>
 
           {/* Sturdy Rounded Call to Action Buttons */}
