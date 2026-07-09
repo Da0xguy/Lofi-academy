@@ -4,7 +4,7 @@ Welcome to **Lofi Quest**, a beautifully crafted, highly immersive web applicati
 
 ---
 
-## 📖 Key Project Features
+##  Key Project Features
 
 ### 1. Robust Gamified Syllabus (6 Tracks of 6 Modules each)
 The application defines **6 interactive learning tracks** inside `src/data.ts`. To ensure high educational value, each track features **at least 6 rich modules**, and each module contains **at least 5 detailed chalkboard slides** (steps) ending with a validation quiz.
@@ -72,7 +72,7 @@ User profiles, XP earnings, completed modules, and minted NFT badge receipts are
 
 ---
 
-## 🏗️ System Architecture & Data Flows
+##  System Architecture & Data Flows
 
 ### 1. The React Client (Frontend)
 Built with **React 19**, **Vite**, **TypeScript**, and **Tailwind CSS**. 
@@ -100,18 +100,18 @@ Our custom building scripts compile both backend and frontend layers cleanly ins
 
 ---
 
-## 🌌 Environment Variables Setup
+##  Environment Variables Setup
 
 To unlock the Yeti AI Tutor chat companion, establish a `.env` file in the project's root:
 
 ```env
 # Documented in .env.example
-GEMINI_API_KEY=your_actual_google_gemini_api_key_here
+GEMINI_API_KEY
 ```
 
 *Note: If no key is supplied, Lofi Quest automatically detects the omission and transitions to a local heuristic fallback response system so studying remains fully functional.*
 
 ---
 
-## 🐻 Happy Learning on Sui!
+##  Happy Learning on Sui!
 *Sip some tea, turn on the lofi beats, and enjoy crafting cozy move code under the snow with Yeti!*
