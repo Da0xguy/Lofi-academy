@@ -13,6 +13,16 @@ interface LeaderboardWidgetProps {
   refreshTrigger: number;
 }
 
+const defaultLeaderboard: LeaderboardEntry[] = [
+  { username: "YetiLoverSui", avatar: "🐻", wallet: "0x3e4...b7a1", xp: 1250, level: 5, badges: ["basics", "defi", "protocols", "history"], rankDirection: "same", yetiHighScore: 34 },
+  { username: "MoveNinja", avatar: "🐱", wallet: "0xa84...92e1", xp: 950, level: 4, badges: ["basics", "defi", "protocols"], rankDirection: "up", yetiHighScore: 27 },
+  { username: "LofiCoder", avatar: "🦊", wallet: "0x112...cc4f", xp: 750, level: 3, badges: ["basics", "defi"], rankDirection: "down", yetiHighScore: 19 },
+  { username: "SuiExplorer", avatar: "🐼", wallet: "0x54f...67da", xp: 520, level: 2, badges: ["basics"], rankDirection: "up", yetiHighScore: 12 },
+  { username: "OceanYeti", avatar: "🦦", wallet: "0x981...ef32", xp: 480, level: 2, badges: ["basics"], rankDirection: "same", yetiHighScore: 15 },
+  { username: "MystenStyler", avatar: "🐨", wallet: "0x7d6...ab12", xp: 350, level: 1, badges: [], rankDirection: "down", yetiHighScore: 5 },
+  { username: "SuilendUser", avatar: "🦁", wallet: "0x4fe...93dd", xp: 210, level: 1, badges: [], rankDirection: "up", yetiHighScore: 2 },
+];
+
 export function LeaderboardWidget({
   userWallet,
   userXP,
@@ -22,7 +32,7 @@ export function LeaderboardWidget({
   avatar,
   refreshTrigger
 }: LeaderboardWidgetProps) {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(defaultLeaderboard);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -118,10 +128,15 @@ export function LeaderboardWidget({
   }, [userWallet, userXP, userLevel, JSON.stringify(userBadges), username, avatar]);
 
   // Filter rankings according to query
-  const filteredLeaderboard = leaderboard.filter((entry) => 
-    entry.username.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    entry.wallet.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredLeaderboard = (leaderboard || []).filter((entry) => {
+    if (!entry) return false;
+    const nameStr = typeof entry.username === "string" ? entry.username : "";
+    const walletStr = typeof entry.wallet === "string" ? entry.wallet : "";
+    return (
+      nameStr.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      walletStr.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   return (
     <div id="leaderboard-deck" className="bg-white border-2 border-[#3c3c3c] rounded-3xl p-6 shadow-[4px_4px_0px_0px_#3c3c3c] text-[#3c3c3c]">
@@ -232,7 +247,7 @@ export function LeaderboardWidget({
 
                 return (
                   <tr
-                    key={entry.wallet}
+                    key={entry.wallet || `entry-${index}`}
                     className={`border-b border-[#3c3c3c]/15 hover:bg-[#F3EFEA]/60 transition-colors ${
                       isCurrentUser ? "bg-[#89A8B2]/10 font-bold border-l-4 border-l-[#89A8B2]" : ""
                     }`}
@@ -266,7 +281,7 @@ export function LeaderboardWidget({
                     <td className="py-4 px-3 text-center font-bold text-[#3c3c3c]">{entry.level}</td>
 
                     <td className="py-4 px-3 text-right text-[#3c3c3c]">
-                      {entry.badges && entry.badges.length > 0 ? (
+                      {Array.isArray(entry.badges) && entry.badges.length > 0 ? (
                         <div className="flex items-center justify-end gap-1 select-none">
                           {entry.badges.map((b, bIdx) => {
                             if (!b) return null;
