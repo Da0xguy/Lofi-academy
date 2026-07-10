@@ -34,8 +34,11 @@ Executing these mock calls generates detailed simulated Move transaction logs, c
 ### 4. Yeti AI Tutor (Gemini 3.5 Flash)
 The helpful, character-locked mascot companion. Powered server-side by `gemini-3.5-flash`, the tutor dynamically reads the user’s selected track, current lesson, and chat history to provide supportive, cozy, all-lowercase guidance. If the endpoint is unconfigured or offline, it gracefully falls back to secure local heuristic hints.
 
-### 5. Persistent Multi-User Leaderboard (Firebase Sync)
-User profiles, XP earnings, completed modules, and minted NFT badge receipts are continuously saved to a Cloud Firestore database. Active scores are rendered inside a styled scoreboard.
+### 5. Safe & Cozy Account Authentication (Firebase Sync)
+The application features a secure, full-stack email-and-password-based account system backed by Cloud Firestore. Instead of complex Web3 seed-phrase setups, users can instantly register, log in, and securely sync their consensus XP, levels, learning streak, custom avatars, and completed module achievements in the cloud across any device or browser.
+
+### 6. Interactive SUI Kiosk NFT Showcase (Coming Soon)
+A dedicated, retro-styled showcase area models Sui's unique **Kiosk** system. Completed track achievements are displayed as custom certificate badges. While the application currently displays these under a **Coming Soon** simulated placeholder (for easy playground exploration), the layout is fully styled and pre-configured to bind to real on-chain SUI transactions, preparing users to mint their educational achievements as authentic on-chain NFTs.
 
 ---
 
@@ -60,7 +63,7 @@ User profiles, XP earnings, completed modules, and minted NFT badge receipts are
     ├── lib
     │   └── utils.ts             # Tailwind class name mergers
     └── components
-        ├── LandingPage.tsx      # Entry registration screen (avatar and username custom selection)
+        ├── LandingPage.tsx      # Entry registration screen (with custom secure Auth Modal for Sign In / Sign Up)
         ├── Background.tsx       # Animated cozy cabin overlay rendering snowfall & fireplaces
         ├── YachtChalkboard.tsx  # Dynamic lesson slide manager, quiz screens, and navigation
         ├── ProfileWidget.tsx    # User stats cabinet tracking progress badges and level progressions

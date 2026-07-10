@@ -74,91 +74,6 @@ export function ProfileWidget({
   const [copiedTx, setCopiedTx] = useState<string | null>(null);
   const [inspectorTab, setInspectorTab] = useState<"move" | "ts" | "diagram" | "faq">("move");
 
-  // zkLogin simulated states inside profile
-  const [showZkLogin, setShowZkLogin] = useState<boolean>(false);
-  const [zkEmail, setZkEmail] = useState<string>("");
-  const [zkLoading, setZkLoading] = useState<boolean>(false);
-  const [zkError, setZkError] = useState<string>("");
-
-  const handleProfileZkLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!zkEmail || !zkEmail.includes("@")) {
-      setZkError("Please enter a valid Google email address.");
-      return;
-    }
-
-    setZkLoading(true);
-    setZkError("");
-
-    try {
-      const cleanId = zkEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
-      const zkAddress = "0xzk_google_" + cleanId;
-      
-      const cloudProfile = await getFirebaseUserProfile(zkAddress);
-      
-      if (cloudProfile) {
-        // Merge current local achievements with loaded cloud profile
-        const mergedXP = Math.max(Number(cloudProfile.xp ?? 0), user.xp);
-        const mergedLevel = Math.max(Number(cloudProfile.level ?? 1), user.level);
-        
-        const mergedModules = Array.from(new Set([
-          ...(Array.isArray(cloudProfile.completedModules) ? cloudProfile.completedModules : []),
-          ...user.completedModules
-        ]));
-        const mergedTracks = Array.from(new Set([
-          ...(Array.isArray(cloudProfile.completedTracks) ? cloudProfile.completedTracks : []),
-          ...user.completedTracks
-        ]));
-        
-        const mergedBadges = [
-          ...(Array.isArray(cloudProfile.mintedBadges) ? cloudProfile.mintedBadges : [])
-        ];
-        user.mintedBadges.forEach((localBadge) => {
-          if (!mergedBadges.some((cb) => cb.trackId === localBadge.trackId)) {
-            mergedBadges.push(localBadge);
-          }
-        });
-
-        const mergedProfile = {
-          username: cloudProfile.username || user.username || "CozyExplorer",
-          avatar: cloudProfile.avatar || user.avatar || "🦊",
-          walletAddress: zkAddress,
-          xp: mergedXP,
-          level: mergedLevel,
-          completedModules: mergedModules,
-          completedTracks: mergedTracks,
-          claimedWelcomeXP: Boolean(cloudProfile.claimedWelcomeXP || user.claimedWelcomeXP),
-          mintedBadges: mergedBadges,
-          streak: Math.max(Number(cloudProfile.streak ?? 1), user.streak),
-          lastLoginDate: cloudProfile.lastLoginDate || user.lastLoginDate || new Date().toISOString().split("T")[0],
-          yetiHighScore: Math.max(Number(cloudProfile.yetiHighScore ?? 0), user.yetiHighScore),
-          yetiGamesPlayed: Math.max(Number(cloudProfile.yetiGamesPlayed ?? 0), user.yetiGamesPlayed)
-        };
-
-        onChangeUser(mergedProfile);
-        await saveFirebaseUserProfile(zkAddress, mergedProfile);
-      } else {
-        const hasClaimed = user.claimedWelcomeXP || false;
-        const newXp = hasClaimed ? user.xp : user.xp + 50;
-        const updatedProfile = {
-          ...user,
-          walletAddress: zkAddress,
-          claimedWelcomeXP: true,
-          xp: newXp
-        };
-        onChangeUser(updatedProfile);
-        await saveFirebaseUserProfile(zkAddress, updatedProfile);
-      }
-      setShowZkLogin(false);
-      setZkEmail("");
-    } catch (err: any) {
-      console.error("Profile zkLogin failed:", err);
-      setZkError("Verification failed. Please try again.");
-    } finally {
-      setZkLoading(false);
-    }
-  };
-
   const [avatarPrompt, setAvatarPrompt] = useState<string>("");
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState<boolean>(false);
   const [generatedAvatars, setGeneratedAvatars] = useState<string[]>([]);
@@ -558,8 +473,8 @@ export function ProfileWidget({
               </span>
               <p className="text-[10px] text-[#6D5D6E] font-sans leading-normal">
                 {user.walletAddress 
-                  ? "Your SUI wallet is connected! You can now mint your module badges as real on-chain NFTs."
-                  : "Connect a SUI extension wallet to mint your track achievements as authentic on-chain NFT badges."}
+                  ? "Your SUI wallet is connected! Once badge minting goes live, you will be able to mint your module badges as real on-chain NFTs."
+                  : "Connect a SUI extension wallet to be ready to mint your track achievements as authentic on-chain NFT badges (Coming Soon)."}
               </p>
               
               <div className="flex justify-center pt-1">
@@ -686,6 +601,7 @@ export function ProfileWidget({
           <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono mb-4 flex items-center gap-1.5">
             <Award size={16} className="text-[#D67B52]" />
             <span>Sui Kiosk NFT Inventory</span>
+            <span className="text-[9px] font-mono font-bold text-white bg-[#D67B52] px-1.5 py-0.5 rounded border border-[#3c3c3c] uppercase tracking-wider animate-pulse ml-auto">Coming Soon</span>
           </h3>
 
           <div className="space-y-3 font-sans pb-4">
@@ -781,11 +697,10 @@ export function ProfileWidget({
                   <>
                     <span className="font-mono text-[#D67B52] font-bold">Price: $0.00 MIST</span>
                     <button
-                      onClick={() => handleMintBadge("worthless-nft", "Certified Worthless Shard")}
-                      disabled={isMinting !== null || !user.walletAddress}
-                      className={`px-3 py-1 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold rounded-lg border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer transition-all active:translate-y-[1px] disabled:opacity-40 disabled:cursor-not-allowed`}
+                      disabled={true}
+                      className="px-3 py-1 bg-stone-100 text-stone-400 font-mono font-bold text-[9px] rounded-lg border-2 border-[#3c3c3c] cursor-not-allowed select-none"
                     >
-                      {isMinting === "worthless-nft" ? "Claiming..." : "Claim NFT"}
+                      Coming Soon
                     </button>
                   </>
                 )}
@@ -819,6 +734,7 @@ export function ProfileWidget({
             <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono flex items-center gap-2">
               <Award className="text-[#D67B52]" size={18} />
               <span>Sui Kiosk: Certified Badge Showcase</span>
+              <span className="text-[9px] font-mono font-bold text-white bg-[#D67B52] px-1.5 py-0.5 rounded border border-[#3c3c3c] uppercase tracking-wider animate-pulse ml-1">Coming Soon</span>
             </h3>
             <p className="text-xs text-[#6D5D6E] mt-1 font-sans">
               Displaying verified NFT medals minted from the educational move package executions. Hover any unlocked badge to view its acquisition details.
@@ -1272,7 +1188,7 @@ function BadgeMintRow({ id, title, isCompleted, mintedData, onMint, isMinting, w
             {mintedData 
               ? `Minted id: ${mintedData.tokenId.slice(0, 8)}...`
               : isCompleted 
-                ? "Certificate Earned" 
+                ? "Certificate Earned (Coming Soon)" 
                 : "Awaiting Assessment"
             }
           </span>
@@ -1286,15 +1202,10 @@ function BadgeMintRow({ id, title, isCompleted, mintedData, onMint, isMinting, w
           </span>
         ) : isCompleted ? (
           <button
-            onClick={onMint}
-            disabled={isMinting || !walletConnected}
-            className={`px-3 py-1.5 text-[9px] font-mono font-bold rounded-lg tracking-wider cursor-pointer border-2 border-[#3c3c3c] transition-all ${
-              !walletConnected
-                ? "bg-[#E8E1D9] text-gray-400 cursor-not-allowed border-[#3c3c3c]/50"
-                : "bg-[#D67B52] text-white hover:bg-[#D67B52]/90 shadow-[1px_1px_0px_0px_#3c3c3c]"
-            }`}
+            disabled={true}
+            className="px-3 py-1.5 text-[9px] font-mono font-bold rounded-lg tracking-wider bg-[#E8E1D9] text-[#6D5D6E] border-2 border-[#3c3c3c] cursor-not-allowed select-none opacity-80"
           >
-            {isMinting ? "Minting..." : "Mint Badge"}
+            Coming Soon
           </button>
         ) : (
           <span className="text-[9px] font-mono text-[#6D5D6E] uppercase tracking-widest flex items-center gap-1 select-none font-bold">

@@ -1279,10 +1279,10 @@ export default function App() {
                     {user.completedTracks.includes(activeTrackId) && (
                       <div className="p-3 bg-purple-50 border-2 border-purple-300 rounded-2xl text-xs text-purple-900 shadow-[2px_2px_0px_0px_#3c3c3c] font-semibold">
                         <div className="font-bold text-purple-700 flex items-center justify-center gap-1 font-mono uppercase text-[10px] tracking-wider mb-1">
-                          <Award size={12} /> Special Unlock! Sui Kiosk NFT badge ready
+                          <Award size={12} /> Special Unlock! Sui Kiosk NFT badge (Coming Soon)
                         </div>
                         <p className="text-[11px] text-[#6D5D6E] mb-2 leading-relaxed">
-                          you have successfully finished all curriculum steps under {activeTrack.title}! visit your Sui profile below to mint onto Kiosk.
+                          you have successfully finished all curriculum steps under {activeTrack.title}! visit your Sui profile below to view your achievements.
                         </p>
                       </div>
                     )}
