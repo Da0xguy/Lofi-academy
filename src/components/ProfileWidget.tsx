@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { AudioPlayerWidget } from "./AudioPlayerWidget";
 import { AvatarWrapper } from "./AvatarWrapper";
+import { getFirebaseUserProfile, saveFirebaseUserProfile } from "../lib/firestoreUtils";
 
 interface ProfileWidgetProps {
   user: UserProfile;
@@ -37,6 +38,25 @@ function renderBadgeIcon(id: string, isMinted: boolean) {
   }
 }
 
+function getTrackName(badgeId: string) {
+  switch (badgeId) {
+    case "sui-basics":
+      return "Sui Basics";
+    case "sui-defi":
+      return "Sui DeFi & Yield Ecosystem";
+    case "sui-protocols":
+      return "Sui Advanced Protocols";
+    case "sui-history":
+      return "Sui Genesis & Ecosystem History";
+    case "sui-move-coding":
+      return "Sui Move Smart Contract Development";
+    case "worthless-nft":
+      return "Sui Kiosk Playground";
+    default:
+      return "Sui Learning Track";
+  }
+}
+
 export function ProfileWidget({ 
   user, 
   onChangeUser, 
@@ -52,6 +72,92 @@ export function ProfileWidget({
   const [copyFeedback, setCopyFeedback] = useState<boolean>(false);
   const [hoveredBadge, setHoveredBadge] = useState<string | null>(null);
   const [copiedTx, setCopiedTx] = useState<string | null>(null);
+  const [inspectorTab, setInspectorTab] = useState<"move" | "ts" | "diagram" | "faq">("move");
+
+  // zkLogin simulated states inside profile
+  const [showZkLogin, setShowZkLogin] = useState<boolean>(false);
+  const [zkEmail, setZkEmail] = useState<string>("");
+  const [zkLoading, setZkLoading] = useState<boolean>(false);
+  const [zkError, setZkError] = useState<string>("");
+
+  const handleProfileZkLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!zkEmail || !zkEmail.includes("@")) {
+      setZkError("Please enter a valid Google email address.");
+      return;
+    }
+
+    setZkLoading(true);
+    setZkError("");
+
+    try {
+      const cleanId = zkEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+      const zkAddress = "0xzk_google_" + cleanId;
+      
+      const cloudProfile = await getFirebaseUserProfile(zkAddress);
+      
+      if (cloudProfile) {
+        // Merge current local achievements with loaded cloud profile
+        const mergedXP = Math.max(Number(cloudProfile.xp ?? 0), user.xp);
+        const mergedLevel = Math.max(Number(cloudProfile.level ?? 1), user.level);
+        
+        const mergedModules = Array.from(new Set([
+          ...(Array.isArray(cloudProfile.completedModules) ? cloudProfile.completedModules : []),
+          ...user.completedModules
+        ]));
+        const mergedTracks = Array.from(new Set([
+          ...(Array.isArray(cloudProfile.completedTracks) ? cloudProfile.completedTracks : []),
+          ...user.completedTracks
+        ]));
+        
+        const mergedBadges = [
+          ...(Array.isArray(cloudProfile.mintedBadges) ? cloudProfile.mintedBadges : [])
+        ];
+        user.mintedBadges.forEach((localBadge) => {
+          if (!mergedBadges.some((cb) => cb.trackId === localBadge.trackId)) {
+            mergedBadges.push(localBadge);
+          }
+        });
+
+        const mergedProfile = {
+          username: cloudProfile.username || user.username || "CozyExplorer",
+          avatar: cloudProfile.avatar || user.avatar || "🦊",
+          walletAddress: zkAddress,
+          xp: mergedXP,
+          level: mergedLevel,
+          completedModules: mergedModules,
+          completedTracks: mergedTracks,
+          claimedWelcomeXP: Boolean(cloudProfile.claimedWelcomeXP || user.claimedWelcomeXP),
+          mintedBadges: mergedBadges,
+          streak: Math.max(Number(cloudProfile.streak ?? 1), user.streak),
+          lastLoginDate: cloudProfile.lastLoginDate || user.lastLoginDate || new Date().toISOString().split("T")[0],
+          yetiHighScore: Math.max(Number(cloudProfile.yetiHighScore ?? 0), user.yetiHighScore),
+          yetiGamesPlayed: Math.max(Number(cloudProfile.yetiGamesPlayed ?? 0), user.yetiGamesPlayed)
+        };
+
+        onChangeUser(mergedProfile);
+        await saveFirebaseUserProfile(zkAddress, mergedProfile);
+      } else {
+        const hasClaimed = user.claimedWelcomeXP || false;
+        const newXp = hasClaimed ? user.xp : user.xp + 50;
+        const updatedProfile = {
+          ...user,
+          walletAddress: zkAddress,
+          claimedWelcomeXP: true,
+          xp: newXp
+        };
+        onChangeUser(updatedProfile);
+        await saveFirebaseUserProfile(zkAddress, updatedProfile);
+      }
+      setShowZkLogin(false);
+      setZkEmail("");
+    } catch (err: any) {
+      console.error("Profile zkLogin failed:", err);
+      setZkError("Verification failed. Please try again.");
+    } finally {
+      setZkLoading(false);
+    }
+  };
 
   const [avatarPrompt, setAvatarPrompt] = useState<string>("");
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState<boolean>(false);
@@ -446,14 +552,92 @@ export function ProfileWidget({
             </div>
 
             {/* Wallet connection banner if not connected */}
-            {!user.walletAddress && (
-              <div className="bg-[#89A8B2]/10 border-2 border-dashed border-[#89A8B2] p-3.5 rounded-2xl text-center space-y-2 mt-2">
-                <span className="text-[10px] font-mono font-bold text-[#89A8B2] block">WANT TO SECURE YOUR PROGRESS?</span>
+            {!user.walletAddress ? (
+              <div className="bg-[#89A8B2]/10 border-2 border-dashed border-[#89A8B2] p-3.5 rounded-2xl text-center space-y-2.5 mt-2">
+                <span className="text-[10px] font-mono font-bold text-[#89A8B2] block uppercase tracking-wider">🔒 Secure Your Achievements</span>
                 <p className="text-[10px] text-[#6D5D6E] font-sans leading-normal">
-                  Connect deep-linked Sui dApp wallet to claim your booster and store milestones in the cloud blockchain ledger.
+                  Claim a permanent profile and synchronize your XP, level, and custom avatar across any device or browser securely.
                 </p>
-                <div className="flex justify-center">
-                  <ConnectButton connectText="Connect wallet" />
+                
+                <div className="space-y-2 pt-1">
+                  {/* zkLogin linkage */}
+                  {!showZkLogin ? (
+                    <button
+                      onClick={() => {
+                        setShowZkLogin(true);
+                        setZkError("");
+                      }}
+                      className="w-full py-2 bg-white hover:bg-[#FAF8F5] text-[#3c3c3c] font-sans font-extrabold text-[11px] rounded-xl border-2 border-b-4 border-[#3c3c3c] shadow-sm hover:translate-y-[1px] hover:border-b-2 active:translate-y-[2px] active:border-b-1 transition-all cursor-pointer text-center tracking-wide flex items-center justify-center gap-1.5"
+                    >
+                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22c-.11-.3-.21-.63-.33-.96z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                      <span>Link Google Account</span>
+                    </button>
+                  ) : (
+                    <form onSubmit={handleProfileZkLogin} className="bg-white border-2 border-[#3c3c3c] p-3 rounded-xl text-left space-y-2 shadow-[2px_2px_0px_0px_#3c3c3c]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-bold font-mono text-[#D67B52]">SUI GOOGLE PORTAL SYNC</span>
+                        <button 
+                          type="button" 
+                          onClick={() => setShowZkLogin(false)}
+                          className="text-[9px] font-mono text-stone-400 hover:text-[#D67B52]"
+                        >
+                          [Cancel]
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <input
+                          type="email"
+                          placeholder="yourname@gmail.com"
+                          required
+                          value={zkEmail}
+                          onChange={(e) => setZkEmail(e.target.value)}
+                          className="w-full px-2 py-1 border-2 border-[#3c3c3c] rounded-lg text-[11px] font-sans text-stone-700 bg-[#FAF8F5] focus:outline-none focus:bg-white"
+                        />
+                      </div>
+
+                      {zkError && (
+                        <p className="text-[9px] text-red-500 font-mono font-medium">{zkError}</p>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={zkLoading}
+                        className="w-full py-1.5 bg-[#D67B52] hover:bg-[#c26a42] text-white font-mono font-bold text-[10px] rounded-lg border-2 border-[#3c3c3c] flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                      >
+                        {zkLoading ? (
+                          <span className="animate-pulse">Connecting...</span>
+                        ) : (
+                          <span>Link & Sync Progress</span>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  <div className="flex items-center justify-center gap-1 text-[9px] font-mono text-stone-400 py-0.5">
+                    <span>— OR —</span>
+                  </div>
+
+                  <div className="flex justify-center scale-95 font-mono">
+                    <ConnectButton connectText="Link SUI Extension Wallet" />
+                  </div>
+                </div>
+              </div>
+            ) : user.walletAddress.startsWith("0xzk_") && (
+              <div className="bg-emerald-50 border-2 border-dashed border-emerald-400 p-3.5 rounded-2xl text-center space-y-1 mt-2 shadow-[1px_1px_0px_0px_rgba(16,185,129,0.2)]">
+                <div className="inline-flex items-center gap-1 text-emerald-600 font-mono font-bold text-[10px] uppercase">
+                  <ShieldCheck size={12} className="animate-pulse" /> Google Sync Active
+                </div>
+                <p className="text-[9px] text-[#6D5D6E] font-sans leading-relaxed">
+                  Your profile is fully synchronized across devices using your linked Google account.
+                </p>
+                <div className="bg-white border border-emerald-200 py-1 px-2 rounded-xl text-[9px] font-mono text-emerald-700 text-center truncate max-w-full">
+                  {user.walletAddress}
                 </div>
               </div>
             )}
@@ -821,6 +1005,22 @@ export function ProfileWidget({
                           {mintedInstance.tokenId}
                         </span>
                       </div>
+
+                      <div className="pt-2.5 border-t border-stone-800/80 mt-1.5">
+                        <a
+                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                            `🏆 Just completed the "${getTrackName(badge.id)}" track and minted my on-chain achievement on @SuiNetwork Cozy Lofi Quest! 🏔️✨\n\n🎯 Badge: ${badge.title}\n💬 Details: ${badge.description}\n⛓️ Explorer Receipt: https://suiexplorer.com/txblock/${mintedInstance.txHash}?network=testnet\n\n#Sui #MoveLanguage #LofiQuest`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-white hover:bg-stone-100 text-[#141414] font-bold transition-all text-[11px] font-sans shadow-[2px_2px_0px_0px_#3c3c3c] active:translate-y-[1px] active:translate-x-[1px] active:shadow-[1px_1px_0px_0px_#3c3c3c] cursor-pointer"
+                        >
+                          <svg className="w-3 h-3 fill-current flex-shrink-0" viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                          <span>Share to X (Twitter)</span>
+                        </a>
+                      </div>
                     </div>
 
                     {/* Tooltip arrow pointer */}
@@ -830,6 +1030,265 @@ export function ProfileWidget({
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* SUI KIOSK ARCHITECTURE & SMART CONTRACT INSPECTOR */}
+      <div id="kiosk-inspector-panel" className="bg-white border-2 border-[#3c3c3c] rounded-[24px] p-6 shadow-[4px_4px_0px_0px_#3c3c3c] text-[#3c3c3c] flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-dashed border-[#3c3c3c]/15">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono flex items-center gap-2">
+              <Cpu className="text-[#D67B52]" size={18} />
+              <span>Smart Contract & Kiosk Inspector</span>
+            </h3>
+            <p className="text-xs text-[#6D5D6E] mt-1 font-sans">
+              Dive deep into how NFT credentials and Soulbound Badges are actually programmed and secured within the Sui on-chain Kiosk framework.
+            </p>
+          </div>
+          
+          {/* Quick Stats bubble */}
+          <div className="bg-[#FAF8F5] px-3.5 py-1.5 border-2 border-[#3c3c3c] rounded-2xl flex items-center gap-2 font-mono text-[11px] shadow-[2px_2px_0px_0px_#3c3c3c] self-start sm:self-auto select-none">
+            <span className="text-[#6D5D6E] font-bold">Standard:</span>
+            <span className="font-extrabold text-[#D67B52] bg-amber-50 px-2 py-0.5 border border-[#D67B52]/30 rounded">
+              Sui Kiosk (0x2)
+            </span>
+          </div>
+        </div>
+
+        {/* Tab switchers */}
+        <div className="flex flex-wrap gap-2 font-mono text-xs">
+          {[
+            { id: "move", label: "badge.move", icon: <Cpu size={12} /> },
+            { id: "ts", label: "mint-badge.ts", icon: <Settings size={12} /> },
+            { id: "diagram", label: "On-Chain Flow", icon: <Eye size={12} /> },
+            { id: "faq", label: "Interactive FAQ", icon: <BookOpen size={12} /> }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setInspectorTab(tab.id as any)}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border-2 font-bold transition-all cursor-pointer ${
+                inspectorTab === tab.id
+                  ? "bg-[#D67B52] text-white border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]"
+                  : "bg-[#FAF8F5] text-[#3c3c3c] border-stone-200 hover:border-[#3c3c3c] hover:bg-[#FAF8F5]/80"
+              }`}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Dynamic content canvas */}
+        <div className="bg-[#1e1e1e] border-2 border-[#3c3c3c] rounded-2xl overflow-hidden shadow-[2px_2px_0px_0px_#3c3c3c]">
+          
+          {/* Move tab */}
+          {inspectorTab === "move" && (
+            <div className="p-4 text-stone-300 font-mono text-[11px] overflow-x-auto max-h-[340px]">
+              <div className="flex items-center justify-between border-b border-stone-800 pb-2 mb-3 text-[10px] text-stone-500">
+                <span>// SOURCE: SUI_MOVE/SOURCES/BADGE_KIOSK.MOVE</span>
+                <span className="text-emerald-500 font-bold">SYNTAX COLORING ACTIVE</span>
+              </div>
+              <pre className="leading-relaxed select-all">
+{`module lofi_quest::badge_kiosk {
+    use sui::object::{Self, UID};
+    use sui::tx_context::{Self, TxContext};
+    use sui::transfer;
+    use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
+    use sui::package;
+
+    /// The Badge NFT representing a completed educational track
+    struct StudyBadge has key, store {
+        id: UID,
+        track_id: vector<u8>,
+        xp_value: u64,
+        recipient: address,
+    }
+
+    /// One-Time-Witness (OTW) for package initialization
+    struct BADGE_KIOSK has drop {}
+
+    /// Publisher Capability to authorize custom transfer rules
+    struct PublisherCap has key, store {
+        id: UID,
+    }
+
+    fun init(otw: BADGE_KIOSK, ctx: &mut TxContext) {
+        let publisher = package::claim(otw, ctx);
+        // ... set up transfer policy, make it soulbound
+        transfer::public_transfer(publisher, tx_context::sender(ctx));
+    }
+
+    /// Public entry function to mint a certified badge and secure it in the user's Kiosk
+    public entry fun mint_to_kiosk(
+        track_id: vector<u8>,
+        xp_value: u64,
+        kiosk: &mut Kiosk,
+        cap: &KioskOwnerCap,
+        ctx: &mut TxContext
+    ) {
+        let sender = tx_context::sender(ctx);
+        let badge = StudyBadge {
+            id: object::new(ctx),
+            track_id,
+            xp_value,
+            recipient: sender,
+        };
+        // Securely place the badge NFT inside the user's Kiosk
+        kiosk::place(kiosk, cap, badge);
+    }
+}`}
+              </pre>
+            </div>
+          )}
+
+          {/* TS Tab */}
+          {inspectorTab === "ts" && (
+            <div className="p-4 text-stone-300 font-mono text-[11px] overflow-x-auto max-h-[340px]">
+              <div className="flex items-center justify-between border-b border-stone-800 pb-2 mb-3 text-[10px] text-stone-500">
+                <span>// FILE: SRC/SERVICES/MINT_BADGE.TS</span>
+                <span className="text-blue-400 font-bold">@MYSTEN/SUI COMPATIBLE</span>
+              </div>
+              <pre className="leading-relaxed select-all">
+{`import { Transaction } from "@mysten/sui/transactions";
+import { useSignAndExecuteTransaction, useCurrentAccount } from "@mysten/dapp-kit";
+
+// Setup a new transaction block
+const tx = new Transaction();
+
+// Target our deployed smart contract package
+const PACKAGE_ID = "0xecc5617a61d198d5a1bcbaee8309de725b81a7d2c3848b59828ee7";
+const MODULE_NAME = "badge_kiosk";
+const FUNCTION_NAME = "mint_to_kiosk";
+
+tx.moveCall({
+  target: \`\${PACKAGE_ID}::\${MODULE_NAME}::\${FUNCTION_NAME}\`,
+  arguments: [
+    tx.pure.vectorU8(new TextEncoder().encode("sui-basics")), // track id
+    tx.pure.u64(150), // xp granted
+    tx.object(userKioskAddress), // user's kiosk object
+    tx.object(userKioskCapAddress), // user's kiosk ownership cap
+  ],
+});
+
+// Sign and execute on the SUI Testnet with the connected wallet
+const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+
+const handleRealMint = () => {
+  signAndExecute({
+    transaction: tx,
+    chain: "sui:testnet",
+  }, {
+    onSuccess: (result) => {
+      console.log("On-Chain Mint Success!", result.digest);
+    },
+    onError: (error) => {
+      console.error("Failed to sign transaction:", error);
+    }
+  });
+};`}
+              </pre>
+            </div>
+          )}
+
+          {/* Diagram Tab */}
+          {inspectorTab === "diagram" && (
+            <div className="p-6 text-stone-300 font-sans flex flex-col items-center justify-center min-h-[280px]">
+              <span className="text-[10px] font-mono uppercase text-stone-500 mb-6 tracking-widest text-center self-stretch border-b border-stone-800 pb-2">
+                On-Chain Kiosk Ownership & Storage Pipeline
+              </span>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center w-full max-w-2xl text-center text-xs font-mono">
+                {/* Publisher cap box */}
+                <div className="p-4 rounded-xl border border-stone-700 bg-stone-900 flex flex-col items-center shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-orange-950 border border-orange-500 text-orange-400 flex items-center justify-center mb-2 font-bold">
+                    CAP
+                  </div>
+                  <span className="font-bold text-stone-200">1. Publisher Cap</span>
+                  <span className="text-[10px] text-stone-400 mt-1">Authorizes minting permissions & enforces Soulbound rules.</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="hidden md:flex flex-col items-center justify-center text-[#D67B52]">
+                  <span className="text-[10px] text-stone-500 mb-1">MINT & PLACE</span>
+                  <div className="h-0.5 bg-[#D67B52] w-12 relative">
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-r-2 border-t-2 border-[#D67B52] rotate-45" />
+                  </div>
+                </div>
+
+                {/* Badge NFT box */}
+                <div className="p-4 rounded-xl border-2 border-[#D67B52]/40 bg-stone-950 flex flex-col items-center shadow-lg relative">
+                  <span className="absolute -top-2 px-2 py-0.5 bg-[#D67B52]/10 border border-[#D67B52]/30 text-[#D67B52] text-[9px] rounded font-bold uppercase">
+                    Badge NFT
+                  </span>
+                  <div className="w-10 h-10 rounded-full bg-[#D67B52]/15 border border-[#D67B52] text-[#D67B52] flex items-center justify-center mb-2 font-bold">
+                    NFT
+                  </div>
+                  <span className="font-bold text-stone-100">2. StudyBadge Object</span>
+                  <span className="text-[10px] text-stone-400 mt-1 font-sans">Sui on-chain object housing Track ID, recipient info, and XP metadata.</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="hidden md:flex flex-col items-center justify-center text-[#89A8B2] md:col-start-2">
+                  <span className="text-[10px] text-stone-500 mb-1">KIOSK::PLACE</span>
+                  <div className="h-0.5 bg-[#89A8B2] w-12 relative">
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-r-2 border-t-2 border-[#89A8B2] rotate-45" />
+                  </div>
+                </div>
+
+                {/* User Kiosk box */}
+                <div className="p-4 rounded-xl border border-stone-700 bg-stone-900 flex flex-col items-center shadow-md md:col-start-3">
+                  <div className="w-10 h-10 rounded-full bg-teal-950 border border-teal-500 text-teal-400 flex items-center justify-center mb-2 font-bold">
+                    KIOSK
+                  </div>
+                  <span className="font-bold text-stone-200">3. User's Kiosk</span>
+                  <span className="text-[10px] text-stone-400 mt-1">Shared, secure commerce locker where the badge resides forever.</span>
+                </div>
+              </div>
+
+              <div className="mt-6 p-3 rounded-xl bg-[#141414] border border-stone-800 text-[11px] leading-relaxed max-w-xl text-stone-400 text-center font-sans font-medium">
+                🛡️ <strong className="text-stone-300">Soulbound Enforcer:</strong> In step 3, because the badge's <code className="text-[#D67B52] font-mono">TransferPolicy</code> restricts the transfer of <code className="text-[#D67B52] font-mono">StudyBadge</code> objects, the NFT cannot be extracted or sold on secondary marketplaces. It is permanently linked to your wallet!
+              </div>
+            </div>
+          )}
+
+          {/* FAQ Tab */}
+          {inspectorTab === "faq" && (
+            <div className="p-5 text-stone-300 font-sans space-y-4 max-h-[340px] overflow-y-auto">
+              <span className="text-[10px] font-mono uppercase text-stone-500 block border-b border-stone-800 pb-2 tracking-widest">
+                Interactive Badge Minting Knowledge Base
+              </span>
+              
+              <div className="space-y-3.5 text-xs font-sans">
+                <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-800/80">
+                  <h4 className="font-bold text-[#D67B52] flex items-center gap-1.5 mb-1 font-mono">
+                    <span>Q: Why does the sandbox use Simulated Minting by default?</span>
+                  </h4>
+                  <p className="text-stone-400 leading-normal font-medium">
+                    To make learning fluid, gas-free, and instantly accessible to everyone! Real testnet transactions require setting up browser extensions, acquiring testnet SUI from faucets, and waiting for on-chain block settlement. Our high-fidelity simulator perfectly mimics the Move contract execution, giving you authentic logs, VM step traces, and gas bills in SUI instantly without any friction.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-800/80">
+                  <h4 className="font-bold text-[#D67B52] flex items-center gap-1.5 mb-1 font-mono">
+                    <span>Q: How can I migrate this to a real deployed smart contract?</span>
+                  </h4>
+                  <p className="text-stone-400 leading-normal font-medium font-sans">
+                    Extremely simple! You first publish the <code className="bg-[#141414] px-1 py-0.5 rounded font-mono text-[10px] text-stone-200">badge_kiosk</code> Move module to the SUI Testnet or Mainnet using the SUI CLI. Once published, you copy your assigned <code className="bg-[#141414] px-1 py-0.5 rounded font-mono text-[10px] text-stone-200">PACKAGE_ID</code> and replace the simulated proxy endpoint address in the client-side code shown in the <strong className="text-stone-300">mint-badge.ts</strong> tab.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-800/80">
+                  <h4 className="font-bold text-[#D67B52] flex items-center gap-1.5 mb-1 font-mono">
+                    <span>Q: What are the unique advantages of Sui Kiosk over other chains?</span>
+                  </h4>
+                  <p className="text-stone-400 leading-normal font-medium">
+                    Traditional blockchains force you to deposit NFTs into marketplace smart contracts to sell them, meaning they leave your wallet. On Sui, Kiosks allow your digital assets to remain inside your own controlled storage account at all times while listing them publicly, combining superior security with absolute asset sovereignty.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 

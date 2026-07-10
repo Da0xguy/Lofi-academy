@@ -274,11 +274,13 @@ export default function App() {
   const [isSyncingFirebase, setIsSyncingFirebase] = useState<boolean>(false);
   const loadedFirebaseWalletRef = React.useRef<string | null>(null);
 
-  // Load and merge user profile from Firebase Firestore when SUI wallet address changes
+  // Load and merge user profile from Firebase Firestore when SUI wallet address or zkLogin changes
   useEffect(() => {
     const syncWalletWithFirebase = async () => {
-      if (currentAccount?.address) {
-        const walletLower = currentAccount.address.toLowerCase();
+      const activeAddress = currentAccount?.address || (user.walletAddress && user.walletAddress.startsWith("0xzk_") ? user.walletAddress : null);
+      
+      if (activeAddress) {
+        const walletLower = activeAddress.toLowerCase();
         
         if (loadedFirebaseWalletRef.current === walletLower) {
           return;
@@ -289,28 +291,51 @@ export default function App() {
           const cloudProfile = await getFirebaseUserProfile(walletLower);
           
           if (cloudProfile) {
-            setUser({
-              username: cloudProfile.username || "CozyExplorer",
-              avatar: cloudProfile.avatar || "🦊",
-              walletAddress: currentAccount.address,
-              xp: Number(cloudProfile.xp ?? 0),
-              level: Number(cloudProfile.level ?? 1),
-              completedModules: Array.isArray(cloudProfile.completedModules) ? cloudProfile.completedModules : [],
-              completedTracks: Array.isArray(cloudProfile.completedTracks) ? cloudProfile.completedTracks : [],
-              claimedWelcomeXP: Boolean(cloudProfile.claimedWelcomeXP),
-              mintedBadges: Array.isArray(cloudProfile.mintedBadges) ? cloudProfile.mintedBadges : [],
-              streak: Number(cloudProfile.streak ?? 1),
-              lastLoginDate: cloudProfile.lastLoginDate || new Date().toISOString().split("T")[0],
-              yetiHighScore: Number(cloudProfile.yetiHighScore ?? 0),
-              yetiGamesPlayed: Number(cloudProfile.yetiGamesPlayed ?? 0)
+            const mergedXP = Math.max(Number(cloudProfile.xp ?? 0), user.xp);
+            const mergedLevel = Math.max(Number(cloudProfile.level ?? 1), user.level);
+            
+            const mergedModules = Array.from(new Set([
+              ...(Array.isArray(cloudProfile.completedModules) ? cloudProfile.completedModules : []),
+              ...user.completedModules
+            ]));
+            const mergedTracks = Array.from(new Set([
+              ...(Array.isArray(cloudProfile.completedTracks) ? cloudProfile.completedTracks : []),
+              ...user.completedTracks
+            ]));
+            
+            const mergedBadges = [
+              ...(Array.isArray(cloudProfile.mintedBadges) ? cloudProfile.mintedBadges : [])
+            ];
+            user.mintedBadges.forEach((localBadge) => {
+              if (!mergedBadges.some((cb) => cb.trackId === localBadge.trackId)) {
+                mergedBadges.push(localBadge);
+              }
             });
+
+            const mergedProfile = {
+              username: cloudProfile.username || user.username || "CozyExplorer",
+              avatar: cloudProfile.avatar || user.avatar || "🦊",
+              walletAddress: activeAddress,
+              xp: mergedXP,
+              level: mergedLevel,
+              completedModules: mergedModules,
+              completedTracks: mergedTracks,
+              claimedWelcomeXP: Boolean(cloudProfile.claimedWelcomeXP || user.claimedWelcomeXP),
+              mintedBadges: mergedBadges,
+              streak: Math.max(Number(cloudProfile.streak ?? 1), user.streak),
+              lastLoginDate: cloudProfile.lastLoginDate || user.lastLoginDate || new Date().toISOString().split("T")[0],
+              yetiHighScore: Math.max(Number(cloudProfile.yetiHighScore ?? 0), user.yetiHighScore),
+              yetiGamesPlayed: Math.max(Number(cloudProfile.yetiGamesPlayed ?? 0), user.yetiGamesPlayed)
+            };
+
+            setUser(mergedProfile);
+            await saveFirebaseUserProfile(walletLower, mergedProfile);
           } else {
-            // Document doesn't exist yet. Claim welcome gift if not already claimed, and write initial record to Firestore
             const hasClaimed = user.claimedWelcomeXP || false;
             const newXp = hasClaimed ? user.xp : user.xp + 50;
             const updatedProfile = {
               ...user,
-              walletAddress: currentAccount.address,
+              walletAddress: activeAddress,
               claimedWelcomeXP: true,
               xp: newXp
             };
@@ -325,7 +350,7 @@ export default function App() {
         }
       } else {
         loadedFirebaseWalletRef.current = null;
-        if (user.walletAddress !== null) {
+        if (user.walletAddress && !user.walletAddress.startsWith("0xzk_")) {
           setUser((prev) => ({
             ...prev,
             walletAddress: null
@@ -335,7 +360,7 @@ export default function App() {
     };
     
     syncWalletWithFirebase();
-  }, [currentAccount?.address]);
+  }, [currentAccount?.address, user.walletAddress]);
 
   // Streak bonus claim option
   const [claimedStreakBonus, setClaimedStreakBonus] = useState<boolean>(false);
@@ -752,41 +777,7 @@ export default function App() {
     );
   }
 
-  // Restrict app workspace usage completely if the wallet is disconnected
-  if (appLaunched && !currentAccount) {
-    return (
-      <div className="min-h-screen bg-[#F9F6F0] flex flex-col items-center justify-center p-6 selection:bg-[#D67B52] selection:text-white relative">
-        <CustomCursor />
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white border-4 border-[#3c3c3c] rounded-3xl p-8 shadow-[6px_6px_0px_0px_#3c3c3c] text-center flex flex-col items-center gap-5 relative z-10"
-        >
-          <div className="w-16 h-16 bg-red-100 border-2 border-[#3c3c3c] rounded-2xl flex items-center justify-center text-[#D67B52] animate-bounce shadow-[2px_2px_0px_0px_#3c3c3c]">
-            <Lock size={28} />
-          </div>
-          <h2 className="text-2xl font-bold font-serif text-[#3c3c3c]">Sui Wallet Disconnected</h2>
-          <p className="text-xs text-[#6D5D6E] font-medium leading-relaxed font-sans">
-            Your Sui Wallet address was disconnected. To continue using the academy questroom, you must keep an active wallet connected.
-          </p>
-          <div className="p-1 scale-105 rounded-xl bg-white border-2 border-[#3c3c3c] mt-2 shadow-[2px_2px_0px_0px_#3c3c3c] font-mono">
-            <ConnectButton connectText="Reconnect SUI Wallet" />
-          </div>
-          <button 
-            onClick={handleReturnToLanding}
-            className="text-stone-500 font-mono text-xs hover:text-[#D67B52] cursor-pointer mt-4"
-            title="Return to Guided Introduction"
-          >
-            <span className="hidden md:inline underline">&larr; Return to Guided Introduction</span>
-            <span className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#3c3c3c] border-2 border-[#3c3c3c] rounded-xl font-bold shadow-[2px_2px_0px_0px_#3c3c3c] active:translate-y-[1px] hover:bg-[#F3EFEA]">
-              <X size={13} />
-              <span>Exit Intro</span>
-            </span>
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
+
 
   return (
     <motion.div

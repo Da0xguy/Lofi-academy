@@ -19,7 +19,7 @@ service cloud.firestore {
         && data.username.size() <= 128
         && data.avatar is string 
         && data.avatar.size() >= 1 
-        && data.avatar.size() <= 32
+        && data.avatar.size() <= 600000
         && (data.walletAddress == null || (data.walletAddress is string && data.walletAddress.size() <= 128))
         && (data.xp is int || data.xp is float || !('xp' in data))
         && (data.level is int || data.level is float || !('level' in data))

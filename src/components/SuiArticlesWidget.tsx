@@ -207,6 +207,30 @@ const INITIAL_ARTICLES: Article[] = [
       "Democratized learning paths: Funding free educational resources and developer academies worldwide."
     ],
     externalLink: "https://sui.io/grants-hub/"
+  },
+  {
+    id: "lofi-foundation-water-systems",
+    title: "Lofi Foundation: Delivering Sustainable Clean Water Systems Globally",
+    category: "Foundation",
+    date: "2026-07-10",
+    readTime: "5 min read",
+    views: 1890,
+    likes: 672,
+    author: "Gazette Eco-Report",
+    avatarChar: "news",
+    summary: "An inside look at how the Lofi Foundation is bridging digital technology with physical aid, funding and engineering sustainable clean water networks across developing regions worldwide.",
+    intro: "While Web3 technology progresses rapidly in digital spaces, the Lofi Foundation believes the true test of decentralized community power lies in creating tangible, life-saving impact. Today, we examine their incredible initiatives building sustainable water infrastructure around the globe.",
+    bodyParagraphs: [
+      "Access to clean, reliable water is the cornerstone of health, education, and economic growth. In many remote and developing areas, families spend hours walking to fetch unsafe drinking water. To tackle this, the Lofi Foundation directs a portion of network revenues and community-driven charitable pools to build solar-powered water filtration wells, rain-harvesting containers, and robust community aqueducts.",
+      "By leveraging smart contract transparency, donors can track every dollar from a digital transaction directly to the physical deployment of water pipes and sensors in countries like Kenya, India, and Peru. Each water kiosk is equipped with IoT (Internet of Things) flow sensors that report system health back to the blockchain. This allows real-time diagnostics, ensuring that if a pump breaks, funds are automatically released for local engineers to resolve the issue within hours, not weeks.",
+      "Moreover, the Lofi Foundation trains local community members as dedicated water stewards. By teaching maintenance skills and establishing community-led water boards, the projects are fully self-sufficient and independent. This ensures that these life-saving water systems continue to flow cleanly and reliably for generations to come, uniting lofi technology with a legacy of clean water."
+    ],
+    takeaways: [
+      "IoT On-Chain Monitoring: Real-time flow sensors stream diagnostic telemetry on-chain to trigger automated repair funds.",
+      "Solar-Powered Purification: Clean energy micro-grids power reverse-osmosis filtration units in remote villages.",
+      "Community Self-Sustenance: Local community members are certified as water stewards, ensuring long-term project viability."
+    ],
+    externalLink: "https://sui.io/global-impact-projects/"
   }
 ];
 
@@ -215,7 +239,10 @@ export function SuiArticlesWidget() {
     const saved = localStorage.getItem("sui_yeti_articles");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.some((a: any) => a.id === "lofi-foundation-water-systems")) {
+          return parsed;
+        }
       } catch (err) {}
     }
     return INITIAL_ARTICLES;
