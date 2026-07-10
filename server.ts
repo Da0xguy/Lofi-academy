@@ -137,7 +137,9 @@ app.post("/api/sui/leaderboard", async (req, res) => {
       finalProfile = {
         username: username || data.username || `Yeti-${cleanWallet.substring(2, 6)}`,
         avatar: avatar || data.avatar || "🐻",
-        walletAddress: cleanWallet,
+        walletAddress: data.walletAddress || (cleanWallet.includes("@") ? null : cleanWallet),
+        email: data.email || (cleanWallet.includes("@") ? cleanWallet : null),
+        password: data.password || null,
         xp: Math.max(Number(data.xp ?? 0), Number(xp ?? 0)),
         level: Math.max(Number(data.level ?? 1), Number(level ?? 1)),
         completedModules: data.completedModules || [],
@@ -167,7 +169,9 @@ app.post("/api/sui/leaderboard", async (req, res) => {
       finalProfile = {
         username: username || `Yeti-${cleanWallet.substring(2, 6)}`,
         avatar: avatar || "🐻",
-        walletAddress: cleanWallet,
+        walletAddress: cleanWallet.includes("@") ? null : cleanWallet,
+        email: cleanWallet.includes("@") ? cleanWallet : null,
+        password: null,
         xp: Number(xp ?? 0),
         level: Number(level ?? 1),
         completedModules: [],

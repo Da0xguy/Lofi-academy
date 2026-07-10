@@ -272,25 +272,32 @@ export default function App() {
 
   const currentAccount = useCurrentAccount();
   const [isSyncingFirebase, setIsSyncingFirebase] = useState<boolean>(false);
-  const loadedFirebaseWalletRef = React.useRef<string | null>(null);
+  const loadedFirebaseEmailRef = React.useRef<string | null>(null);
 
-  // Load and merge user profile from Firebase Firestore when SUI wallet address or zkLogin changes
+  // Load and merge user profile from Firebase Firestore when Email or SUI wallet address changes
   useEffect(() => {
-    const syncWalletWithFirebase = async () => {
-      const activeAddress = currentAccount?.address || (user.walletAddress && user.walletAddress.startsWith("0xzk_") ? user.walletAddress : null);
-      
-      if (activeAddress) {
-        const walletLower = activeAddress.toLowerCase();
+    const syncEmailWithFirebase = async () => {
+      // Primary synchronization key is user.email
+      if (user.email) {
+        const emailLower = user.email.toLowerCase();
         
-        if (loadedFirebaseWalletRef.current === walletLower) {
+        if (loadedFirebaseEmailRef.current === emailLower) {
+          // If already loaded/synced this email, and a new SUI wallet is connected, link/sync it
+          if (currentAccount?.address && user.walletAddress !== currentAccount.address) {
+            setUser((prev) => ({
+              ...prev,
+              walletAddress: currentAccount.address
+            }));
+          }
           return;
         }
         
         setIsSyncingFirebase(true);
         try {
-          const cloudProfile = await getFirebaseUserProfile(walletLower);
+          const cloudProfile = await getFirebaseUserProfile(emailLower);
           
           if (cloudProfile) {
+            // Merge cloud progress with local progress, taking the highest metrics
             const mergedXP = Math.max(Number(cloudProfile.xp ?? 0), user.xp);
             const mergedLevel = Math.max(Number(cloudProfile.level ?? 1), user.level);
             
@@ -312,10 +319,15 @@ export default function App() {
               }
             });
 
+            // Auto-link SUI wallet if connected
+            const activeWallet = cloudProfile.walletAddress || currentAccount?.address || user.walletAddress || null;
+
             const mergedProfile = {
               username: cloudProfile.username || user.username || "CozyExplorer",
               avatar: cloudProfile.avatar || user.avatar || "🦊",
-              walletAddress: activeAddress,
+              email: user.email,
+              password: user.password,
+              walletAddress: activeWallet,
               xp: mergedXP,
               level: mergedLevel,
               completedModules: mergedModules,
@@ -329,38 +341,31 @@ export default function App() {
             };
 
             setUser(mergedProfile);
-            await saveFirebaseUserProfile(walletLower, mergedProfile);
+            await saveFirebaseUserProfile(emailLower, mergedProfile);
           } else {
-            const hasClaimed = user.claimedWelcomeXP || false;
-            const newXp = hasClaimed ? user.xp : user.xp + 50;
+            // First time this email is used, initialize profile in cloud
+            const activeWallet = currentAccount?.address || user.walletAddress || null;
             const updatedProfile = {
               ...user,
-              walletAddress: activeAddress,
-              claimedWelcomeXP: true,
-              xp: newXp
+              walletAddress: activeWallet,
+              claimedWelcomeXP: true
             };
-            await saveFirebaseUserProfile(walletLower, updatedProfile);
+            await saveFirebaseUserProfile(emailLower, updatedProfile);
             setUser(updatedProfile);
           }
-          loadedFirebaseWalletRef.current = walletLower;
+          loadedFirebaseEmailRef.current = emailLower;
         } catch (error) {
-          console.error("Firebase syncing failed, relying on local backup:", error);
+          console.error("Firebase email syncing failed:", error);
         } finally {
           setIsSyncingFirebase(false);
         }
       } else {
-        loadedFirebaseWalletRef.current = null;
-        if (user.walletAddress && !user.walletAddress.startsWith("0xzk_")) {
-          setUser((prev) => ({
-            ...prev,
-            walletAddress: null
-          }));
-        }
+        loadedFirebaseEmailRef.current = null;
       }
     };
     
-    syncWalletWithFirebase();
-  }, [currentAccount?.address, user.walletAddress]);
+    syncEmailWithFirebase();
+  }, [user.email, currentAccount?.address]);
 
   // Streak bonus claim option
   const [claimedStreakBonus, setClaimedStreakBonus] = useState<boolean>(false);
@@ -422,10 +427,10 @@ export default function App() {
     localStorage.setItem("sui_yeti_user", JSON.stringify(user));
     
     // Auto-sync profile updates directly into Firestore
-    if (user.walletAddress && loadedFirebaseWalletRef.current === user.walletAddress.toLowerCase()) {
+    if (user.email && loadedFirebaseEmailRef.current === user.email.toLowerCase()) {
       const saveToFirestore = async () => {
         try {
-          await saveFirebaseUserProfile(user.walletAddress!, user);
+          await saveFirebaseUserProfile(user.email!.toLowerCase(), user);
         } catch (error) {
           console.error("Failed to sync profile update to Firebase:", error);
         }

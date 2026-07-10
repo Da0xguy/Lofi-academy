@@ -39,6 +39,8 @@ export interface UserProfile {
   username: string;
   avatar: string;
   walletAddress: string | null;
+  email?: string | null;
+  password?: string | null;
   xp: number;
   level: number;
   completedModules: string[]; // module ids

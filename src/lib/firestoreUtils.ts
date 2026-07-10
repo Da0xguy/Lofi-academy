@@ -36,13 +36,13 @@ export function handleFirestoreError(
 }
 
 /**
- * Loads a user's profile from Firestore keyed by SUI wallet address
+ * Loads a user's profile from Firestore keyed by a unique identifier (email or wallet address)
  */
-export async function getFirebaseUserProfile(wallet: string) {
-  const cleanWallet = wallet.toLowerCase().trim();
-  const path = `users/${cleanWallet}`;
+export async function getFirebaseUserProfile(userId: string) {
+  const cleanId = userId.toLowerCase().trim();
+  const path = `users/${cleanId}`;
   try {
-    const userDocRef = doc(db, "users", cleanWallet);
+    const userDocRef = doc(db, "users", cleanId);
     const userSnapshot = await getDoc(userDocRef);
     if (userSnapshot.exists()) {
       return userSnapshot.data();
@@ -56,16 +56,18 @@ export async function getFirebaseUserProfile(wallet: string) {
 /**
  * Saves or updates a user's profile in Firestore
  */
-export async function saveFirebaseUserProfile(wallet: string, profileData: any) {
-  const cleanWallet = wallet.toLowerCase().trim();
-  const path = `users/${cleanWallet}`;
+export async function saveFirebaseUserProfile(userId: string, profileData: any) {
+  const cleanId = userId.toLowerCase().trim();
+  const path = `users/${cleanId}`;
   try {
-    const userDocRef = doc(db, "users", cleanWallet);
+    const userDocRef = doc(db, "users", cleanId);
     // Standardizing the payload to prevent shadow/Ghost fields
     const sanitizedPayload = {
       username: profileData.username || "CozyExplorer",
       avatar: profileData.avatar || "🦊",
-      walletAddress: cleanWallet,
+      walletAddress: profileData.walletAddress || null,
+      email: profileData.email || null,
+      password: profileData.password || null,
       xp: Number(profileData.xp ?? 0),
       level: Number(profileData.level ?? 1),
       completedModules: Array.isArray(profileData.completedModules) ? profileData.completedModules : [],

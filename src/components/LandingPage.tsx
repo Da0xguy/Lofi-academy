@@ -58,34 +58,86 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
   const [brewedSips, setBrewedSips] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<"sui" | "web3" | "move">("sui");
 
-  // zkLogin simulated states
-  const [zkEmail, setZkEmail] = useState<string>("");
-  const [showZkLogin, setShowZkLogin] = useState<boolean>(false);
-  const [zkLoading, setZkLoading] = useState<boolean>(false);
-  const [zkError, setZkError] = useState<string>("");
+  // Custom Email & Password credential states
+  const [authEmail, setAuthEmail] = useState<string>("");
+  const [authPassword, setAuthPassword] = useState<string>("");
+  const [authUsername, setAuthUsername] = useState<string>("");
+  const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<string>("");
 
-  const handleZkLogin = async (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!zkEmail || !zkEmail.includes("@")) {
-      setZkError("Please enter a valid Google email address.");
+    if (!authEmail || !authEmail.includes("@")) {
+      setAuthError("Please enter a valid email address.");
+      return;
+    }
+    if (!authPassword || authPassword.length < 6) {
+      setAuthError("Password must be at least 6 characters long.");
       return;
     }
 
-    setZkLoading(true);
-    setZkError("");
+    setAuthLoading(true);
+    setAuthError("");
 
     try {
-      const cleanId = zkEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
-      const zkAddress = "0xzk_google_" + cleanId;
-      
-      const cloudProfile = await getFirebaseUserProfile(zkAddress);
-      
-      if (cloudProfile) {
+      const emailLower = authEmail.toLowerCase().trim();
+      const cloudProfile = await getFirebaseUserProfile(emailLower);
+
+      if (isSignUp) {
+        if (cloudProfile) {
+          setAuthError("An account with this email already exists. Please Sign In.");
+          setAuthLoading(false);
+          return;
+        }
+
+        const fallbackUsername = authUsername.trim() || emailLower.split("@")[0] || "CozyExplorer";
+        const newProfile = {
+          username: fallbackUsername,
+          avatar: "🦊",
+          walletAddress: null,
+          email: emailLower,
+          password: authPassword,
+          xp: 50, // Welcome gift XP!
+          level: 1,
+          completedModules: [],
+          completedTracks: [],
+          claimedWelcomeXP: true,
+          mintedBadges: [],
+          streak: 1,
+          lastLoginDate: new Date().toISOString().split("T")[0],
+          yetiHighScore: 0,
+          yetiGamesPlayed: 0
+        };
+
+        await saveFirebaseUserProfile(emailLower, newProfile);
+        if (setUser) {
+          setUser(newProfile);
+        }
+        setShowAuthModal(false);
+        onLaunch();
+      } else {
+        // Sign In
+        if (!cloudProfile) {
+          setAuthError("No account found with this email. Please check your spelling or Sign Up.");
+          setAuthLoading(false);
+          return;
+        }
+
+        if (cloudProfile.password !== authPassword) {
+          setAuthError("Incorrect password. Please try again.");
+          setAuthLoading(false);
+          return;
+        }
+
         if (setUser) {
           setUser({
             username: cloudProfile.username || "CozyExplorer",
             avatar: cloudProfile.avatar || "🦊",
-            walletAddress: zkAddress,
+            walletAddress: cloudProfile.walletAddress || null,
+            email: cloudProfile.email || emailLower,
+            password: cloudProfile.password,
             xp: Number(cloudProfile.xp ?? 0),
             level: Number(cloudProfile.level ?? 1),
             completedModules: Array.isArray(cloudProfile.completedModules) ? cloudProfile.completedModules : [],
@@ -98,49 +150,15 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
             yetiGamesPlayed: Number(cloudProfile.yetiGamesPlayed ?? 0)
           });
         }
-      } else {
-        const hasClaimed = user?.claimedWelcomeXP || false;
-        const newXp = hasClaimed ? (user?.xp ?? 0) : (user?.xp ?? 0) + 50;
-        
-        const initialProfile = {
-          username: user?.username || "CozyExplorer",
-          avatar: user?.avatar || "🦊",
-          walletAddress: zkAddress,
-          xp: newXp,
-          level: user?.level || 1,
-          completedModules: user?.completedModules || [],
-          completedTracks: user?.completedTracks || [],
-          claimedWelcomeXP: true,
-          mintedBadges: user?.mintedBadges || [],
-          streak: user?.streak || 1,
-          lastLoginDate: new Date().toISOString().split("T")[0],
-          yetiHighScore: user?.yetiHighScore || 0,
-          yetiGamesPlayed: user?.yetiGamesPlayed || 0
-        };
-        
-        await saveFirebaseUserProfile(zkAddress, initialProfile);
-        if (setUser) {
-          setUser(initialProfile);
-        }
+        setShowAuthModal(false);
+        onLaunch();
       }
-
-      onLaunch();
     } catch (err: any) {
-      console.error("zkLogin failed:", err);
-      setZkError("Connection failed. Please check your credentials.");
+      console.error("Authentication error:", err);
+      setAuthError("Communication failed. Please check internet connection.");
     } finally {
-      setZkLoading(false);
+      setAuthLoading(false);
     }
-  };
-
-  const handleGuestEntry = () => {
-    if (setUser) {
-      setUser((prev: any) => ({
-        ...prev,
-        walletAddress: null
-      }));
-    }
-    onLaunch();
   };
 
   // Autoplay carousel slide scrolling properties
@@ -553,112 +571,213 @@ export function LandingPage({ onLaunch, userXP, isDarkMode = false, toggleDarkMo
 
           {/* Sturdy Rounded Call to Action Buttons */}
           <div className="flex flex-col gap-4 max-w-md mx-auto lg:mx-0 w-full">
-            {isWalletConnected ? (
+            {user && user.email ? (
               <>
                 {/* 3D chunky primary button */}
                 <button
                   onClick={onLaunch}
-                  className="w-full py-4.5 bg-[#D67B52] hover:bg-[#c26a42] text-white font-sans font-extrabold text-lg rounded-2xl border-2 border-b-6 border-[#3c3c3c] shadow-md hover:translate-y-[2px] hover:border-b-4 active:translate-y-[4px] active:border-b-2 transition-all cursor-pointer text-center uppercase tracking-wider font-mono"
+                  className="w-full py-4.5 bg-[#D67B52] hover:bg-[#c26a42] text-white font-sans font-extrabold text-lg rounded-2xl border-2 border-[#3c3c3c] shadow-[4px_4px_0px_0px_#3c3c3c] hover:translate-y-[2px] active:translate-y-[4px] transition-all cursor-pointer text-center uppercase tracking-wider font-mono flex items-center justify-center gap-2"
                 >
-                  ENTER ACADEMY NOW
+                  <span>🚀 ENTER ACADEMY NOW</span>
                 </button>
                 
+                <div className="bg-[#FAF8F5] border-2 border-[#3c3c3c] p-3 rounded-2xl text-center space-y-1">
+                  <span className="text-[10px] font-bold font-mono text-stone-500 block">ACTIVE SESSION</span>
+                  <div className="text-xs font-mono text-emerald-600 font-bold truncate">
+                    👤 {user.username} ({user.email})
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (setUser) {
+                        setUser({
+                          username: "CozyExplorer",
+                          avatar: "🦊",
+                          walletAddress: null,
+                          email: null,
+                          password: null,
+                          xp: 0,
+                          level: 1,
+                          completedModules: [],
+                          completedTracks: [],
+                          claimedWelcomeXP: false,
+                          mintedBadges: [],
+                          streak: 1,
+                          lastLoginDate: new Date().toISOString().split("T")[0],
+                          yetiHighScore: 0,
+                          yetiGamesPlayed: 0
+                        });
+                        localStorage.removeItem("sui_yeti_user");
+                      }
+                    }}
+                    className="text-[9px] font-mono text-red-500 hover:underline cursor-pointer"
+                  >
+                    [Sign Out]
+                  </button>
+                </div>
+
                 <a
                   href="#how-it-works-anchor"
-                  className="w-full py-4 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-sans font-extrabold text-sm rounded-2xl border-2 border-b-6 border-[#3c3c3c] hover:translate-y-[2px] hover:border-b-4 active:translate-y-[4px] active:border-b-2 transition-all text-center uppercase tracking-wide cursor-pointer font-mono"
+                  className="w-full py-3.5 bg-white hover:bg-[#F3EFEA] text-[#3c3c3c] font-sans font-extrabold text-sm rounded-2xl border-2 border-[#3c3c3c] shadow-[3px_3px_0px_0px_#3c3c3c] hover:translate-y-[1px] active:translate-y-[2px] transition-all text-center uppercase tracking-wide cursor-pointer font-mono"
                 >
                   How it works
                 </a>
               </>
             ) : (
-              <div className="bg-[#FAF8F5] border-4 border-[#3c3c3c] p-6 rounded-3xl shadow-[4px_4px_0px_0px_#3c3c3c] space-y-4 text-center">
+              <div className="bg-[#FAF8F5] border-4 border-[#3c3c3c] p-6 rounded-3xl shadow-[6px_6px_0px_0px_#3c3c3c] space-y-4 text-center">
                 <div className="inline-flex items-center gap-1.5 bg-[#89A8B2]/10 border-2 border-[#3c3c3c] px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#89A8B2] uppercase">
                   ⭐ Cozy Learning Space
                 </div>
                 
                 <p className="text-xs text-[#6D5D6E] font-semibold leading-relaxed max-w-sm mx-auto">
-                  Connect your SUI wallet or authenticate instantly with your Google account via zkLogin to securely sync your progress, achievements, and custom avatars across all devices!
+                  Create a profile using your email and password to securely sync your learning milestones, level-ups, mini-game high scores, and custom badges across all devices!
                 </p>
 
-                <div className="flex flex-col gap-2 pt-2">
-                  {/* zkLogin Toggle */}
-                  {!showZkLogin ? (
-                    <button
-                      onClick={() => {
-                        setShowZkLogin(true);
-                        setZkError("");
-                      }}
-                      className="w-full py-3 bg-white hover:bg-[#FAF8F5] text-[#3c3c3c] font-sans font-extrabold text-xs rounded-xl border-2 border-b-4 border-[#3c3c3c] shadow-sm hover:translate-y-[1px] hover:border-b-2 active:translate-y-[2px] active:border-b-1 transition-all cursor-pointer text-center tracking-wide flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22c-.11-.3-.21-.63-.33-.96z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                      </svg>
-                      <span>Continue with Google</span>
-                    </button>
-                  ) : (
-                    <form onSubmit={handleZkLogin} className="bg-white border-2 border-[#3c3c3c] p-3.5 rounded-2xl text-left space-y-2.5 shadow-[2px_2px_0px_0px_#3c3c3c]">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold font-mono text-[#D67B52]">SUI SECURE GOOGLE PORTAL</span>
-                        <button 
-                          type="button" 
-                          onClick={() => setShowZkLogin(false)}
-                          className="text-[10px] font-mono text-stone-400 hover:text-[#D67B52]"
-                        >
-                          [Cancel]
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-stone-500 font-mono block">GOOGLE ACCOUNT EMAIL</label>
-                        <input
-                          type="email"
-                          placeholder="e.g. yourname@gmail.com"
-                          required
-                          value={zkEmail}
-                          onChange={(e) => setZkEmail(e.target.value)}
-                          className="w-full px-3 py-1.5 border-2 border-[#3c3c3c] rounded-lg text-xs font-sans text-stone-700 bg-[#FAF8F5] focus:outline-none focus:bg-white"
-                        />
-                      </div>
+                <div className="flex flex-col gap-3 pt-2">
+                  {/* Beautiful Primary Log In / Register trigger */}
+                  <button
+                    onClick={() => {
+                      setIsSignUp(false);
+                      setShowAuthModal(true);
+                      setAuthError("");
+                    }}
+                    className="w-full py-4 bg-[#D67B52] hover:bg-[#c26a42] text-white font-sans font-extrabold text-sm rounded-2xl border-2 border-b-6 border-[#3c3c3c] shadow-sm hover:translate-y-[2px] hover:border-b-4 active:translate-y-[4px] active:border-b-2 transition-all cursor-pointer text-center uppercase tracking-wide flex items-center justify-center gap-2 font-mono"
+                  >
+                    🔑 Sign In / Create Account
+                  </button>
 
-                      {zkError && (
-                        <p className="text-[10px] text-red-500 font-mono font-medium">{zkError}</p>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={zkLoading}
-                        className="w-full py-2 bg-[#D67B52] hover:bg-[#c26a42] text-white font-mono font-bold text-xs rounded-xl border-2 border-[#3c3c3c] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      >
-                        {zkLoading ? (
-                          <span className="animate-pulse">Verifying Google account...</span>
-                        ) : (
-                          <>
-                            <Sparkles size={12} />
-                            <span>Verify & Authenticate</span>
-                          </>
-                        )}
-                      </button>
-                      
-                      <span className="text-[8px] text-[#6D5D6E] font-mono leading-tight block text-center mt-1">
-                        🔒 Authenticate securely using your Google account to keep your progress and badges synchronized.
-                      </span>
-                    </form>
-                  )}
-
-                  {/* Standard Connect Wallet Trigger */}
-                  <div className="pt-2 border-t border-[#3c3c3c]/10 flex flex-col items-center gap-1.5">
-                    <span className="text-[9px] font-mono text-stone-400">OR CONNECT SUI WALLET EXTENSION</span>
-                    <div className="scale-95">
-                      <ConnectButton connectText="Connect SUI Wallet" />
-                    </div>
-                  </div>
+                  <a
+                    href="#how-it-works-anchor"
+                    className="w-full py-3.5 bg-white hover:bg-[#FAF8F5] text-[#3c3c3c] font-sans font-bold text-xs rounded-xl border-2 border-[#3c3c3c] hover:translate-y-[1px] active:translate-y-[2px] transition-all text-center uppercase tracking-wide cursor-pointer font-mono"
+                  >
+                    Learn more &gt;
+                  </a>
                 </div>
               </div>
             )}
           </div>
+
+          {/* Modern credential Auth Modal popup */}
+          {showAuthModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                className="w-full max-w-md bg-[#FAF8F5] border-4 border-[#3c3c3c] rounded-3xl p-6 relative shadow-[8px_8px_0px_0px_#3c3c3c] text-left"
+              >
+                {/* Close Button */}
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setShowAuthModal(false);
+                    setAuthError("");
+                  }}
+                  className="absolute top-4 right-4 bg-white hover:bg-stone-100 border-2 border-[#3c3c3c] text-[#3c3c3c] font-black w-8 h-8 rounded-full flex items-center justify-center cursor-pointer shadow-[2px_2px_0px_0px_#3c3c3c] hover:translate-y-[1px] active:translate-y-[2px]"
+                >
+                  ✕
+                </button>
+
+                {/* Modal Tabs */}
+                <div className="flex border-b-4 border-[#3c3c3c] mb-6 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(false);
+                      setAuthError("");
+                    }}
+                    className={`flex-1 py-2 font-mono font-black text-xs uppercase tracking-wider text-center ${
+                      !isSignUp 
+                        ? "bg-[#D67B52] text-white border-t-2 border-l-2 border-r-2 border-[#3c3c3c] rounded-t-xl translate-y-[4px]" 
+                        : "text-stone-500 hover:text-[#3c3c3c]"
+                    }`}
+                  >
+                    🔑 Sign In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(true);
+                      setAuthError("");
+                    }}
+                    className={`flex-1 py-2 font-mono font-black text-xs uppercase tracking-wider text-center ${
+                      isSignUp 
+                        ? "bg-[#D67B52] text-white border-t-2 border-l-2 border-r-2 border-[#3c3c3c] rounded-t-xl translate-y-[4px]" 
+                        : "text-stone-500 hover:text-[#3c3c3c]"
+                    }`}
+                  >
+                    ✨ Create Account
+                  </button>
+                </div>
+
+                <h3 className="text-lg font-black font-sans text-[#3c3c3c] mb-2 uppercase tracking-tight">
+                  {isSignUp ? "Join the Cozy Academy" : "Welcome Back"}
+                </h3>
+                <p className="text-xs text-[#6D5D6E] font-medium leading-relaxed mb-4">
+                  {isSignUp 
+                    ? "Create an account to keep your consensus XP, learning streak, badges, and avatars safely backed up in the cloud!"
+                    : "Sign in using your email and password to instantly restore your progress on any device."}
+                </p>
+
+                {/* Form */}
+                <form onSubmit={handleAuthSubmit} className="space-y-4">
+                  <div className="space-y-1 text-left">
+                    <label className="text-[10px] font-bold text-stone-500 font-mono block uppercase">Email Address</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="you@example.com"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      className="w-full px-3 py-2 border-2 border-[#3c3c3c] rounded-xl text-xs font-sans text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D67B52]"
+                    />
+                  </div>
+
+                  {isSignUp && (
+                    <div className="space-y-1 text-left">
+                      <label className="text-[10px] font-bold text-stone-500 font-mono block uppercase">Username (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. CozyYeti"
+                        value={authUsername}
+                        onChange={(e) => setAuthUsername(e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-[#3c3c3c] rounded-xl text-xs font-sans text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D67B52]"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-1 text-left">
+                    <label className="text-[10px] font-bold text-stone-500 font-mono block uppercase">Password</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      className="w-full px-3 py-2 border-2 border-[#3c3c3c] rounded-xl text-xs font-sans text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D67B52]"
+                    />
+                  </div>
+
+                  {authError && (
+                    <div className="bg-red-50 border-2 border-red-300 text-red-600 px-3 py-2 rounded-xl text-xs font-mono font-medium text-left">
+                      ⚠️ {authError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full py-3 bg-[#D67B52] hover:bg-[#c26a42] text-white font-mono font-bold text-sm rounded-xl border-2 border-[#3c3c3c] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 hover:translate-y-[1px] active:translate-y-[2px]"
+                  >
+                    {authLoading ? (
+                      <span className="animate-pulse">Processing...</span>
+                    ) : (
+                      <span>{isSignUp ? "Create & Open Academy" : "Verify & Open Academy"}</span>
+                    )}
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
 
         </div>
 

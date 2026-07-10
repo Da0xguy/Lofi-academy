@@ -551,96 +551,27 @@ export function ProfileWidget({
               </button>
             </div>
 
-            {/* Wallet connection banner if not connected */}
-            {!user.walletAddress ? (
-              <div className="bg-[#89A8B2]/10 border-2 border-dashed border-[#89A8B2] p-3.5 rounded-2xl text-center space-y-2.5 mt-2">
-                <span className="text-[10px] font-mono font-bold text-[#89A8B2] block uppercase tracking-wider">🔒 Secure Your Achievements</span>
-                <p className="text-[10px] text-[#6D5D6E] font-sans leading-normal">
-                  Claim a permanent profile and synchronize your XP, level, and custom avatar across any device or browser securely.
-                </p>
-                
-                <div className="space-y-2 pt-1">
-                  {/* zkLogin linkage */}
-                  {!showZkLogin ? (
-                    <button
-                      onClick={() => {
-                        setShowZkLogin(true);
-                        setZkError("");
-                      }}
-                      className="w-full py-2 bg-white hover:bg-[#FAF8F5] text-[#3c3c3c] font-sans font-extrabold text-[11px] rounded-xl border-2 border-b-4 border-[#3c3c3c] shadow-sm hover:translate-y-[1px] hover:border-b-2 active:translate-y-[2px] active:border-b-1 transition-all cursor-pointer text-center tracking-wide flex items-center justify-center gap-1.5"
-                    >
-                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22c-.11-.3-.21-.63-.33-.96z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                      </svg>
-                      <span>Link Google Account</span>
-                    </button>
-                  ) : (
-                    <form onSubmit={handleProfileZkLogin} className="bg-white border-2 border-[#3c3c3c] p-3 rounded-xl text-left space-y-2 shadow-[2px_2px_0px_0px_#3c3c3c]">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-bold font-mono text-[#D67B52]">SUI GOOGLE PORTAL SYNC</span>
-                        <button 
-                          type="button" 
-                          onClick={() => setShowZkLogin(false)}
-                          className="text-[9px] font-mono text-stone-400 hover:text-[#D67B52]"
-                        >
-                          [Cancel]
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <input
-                          type="email"
-                          placeholder="yourname@gmail.com"
-                          required
-                          value={zkEmail}
-                          onChange={(e) => setZkEmail(e.target.value)}
-                          className="w-full px-2 py-1 border-2 border-[#3c3c3c] rounded-lg text-[11px] font-sans text-stone-700 bg-[#FAF8F5] focus:outline-none focus:bg-white"
-                        />
-                      </div>
-
-                      {zkError && (
-                        <p className="text-[9px] text-red-500 font-mono font-medium">{zkError}</p>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={zkLoading}
-                        className="w-full py-1.5 bg-[#D67B52] hover:bg-[#c26a42] text-white font-mono font-bold text-[10px] rounded-lg border-2 border-[#3c3c3c] flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
-                      >
-                        {zkLoading ? (
-                          <span className="animate-pulse">Connecting...</span>
-                        ) : (
-                          <span>Link & Sync Progress</span>
-                        )}
-                      </button>
-                    </form>
-                  )}
-
-                  <div className="flex items-center justify-center gap-1 text-[9px] font-mono text-stone-400 py-0.5">
-                    <span>— OR —</span>
-                  </div>
-
-                  <div className="flex justify-center scale-95 font-mono">
-                    <ConnectButton connectText="Link SUI Extension Wallet" />
-                  </div>
-                </div>
+            {/* Optional SUI Wallet Integration */}
+            <div className="bg-[#89A8B2]/10 border-2 border-dashed border-[#89A8B2] p-4 rounded-2xl text-center space-y-3 mt-2">
+              <span className="text-[10px] font-mono font-bold text-[#89A8B2] block uppercase tracking-wider">
+                🔗 SUI BLOCKCHAIN INTEGRATION (OPTIONAL)
+              </span>
+              <p className="text-[10px] text-[#6D5D6E] font-sans leading-normal">
+                {user.walletAddress 
+                  ? "Your SUI wallet is connected! You can now mint your module badges as real on-chain NFTs."
+                  : "Connect a SUI extension wallet to mint your track achievements as authentic on-chain NFT badges."}
+              </p>
+              
+              <div className="flex justify-center pt-1">
+                <ConnectButton connectText="Connect SUI Wallet" />
               </div>
-            ) : user.walletAddress.startsWith("0xzk_") && (
-              <div className="bg-emerald-50 border-2 border-dashed border-emerald-400 p-3.5 rounded-2xl text-center space-y-1 mt-2 shadow-[1px_1px_0px_0px_rgba(16,185,129,0.2)]">
-                <div className="inline-flex items-center gap-1 text-emerald-600 font-mono font-bold text-[10px] uppercase">
-                  <ShieldCheck size={12} className="animate-pulse" /> Google Sync Active
-                </div>
-                <p className="text-[9px] text-[#6D5D6E] font-sans leading-relaxed">
-                  Your profile is fully synchronized across devices using your linked Google account.
-                </p>
-                <div className="bg-white border border-emerald-200 py-1 px-2 rounded-xl text-[9px] font-mono text-emerald-700 text-center truncate max-w-full">
-                  {user.walletAddress}
-                </div>
-              </div>
-            )}
+
+              {user.email && (
+                <span className="text-[8px] text-[#89A8B2] font-mono block">
+                  Active Account: {user.email}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

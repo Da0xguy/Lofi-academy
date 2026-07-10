@@ -21,6 +21,8 @@ service cloud.firestore {
         && data.avatar.size() >= 1 
         && data.avatar.size() <= 600000
         && (data.walletAddress == null || (data.walletAddress is string && data.walletAddress.size() <= 128))
+        && (data.email == null || (data.email is string && data.email.size() <= 256))
+        && (data.password == null || (data.password is string && data.password.size() <= 256))
         && (data.xp is int || data.xp is float || !('xp' in data))
         && (data.level is int || data.level is float || !('level' in data))
         && (data.completedModules is list || !('completedModules' in data))
@@ -33,16 +35,16 @@ service cloud.firestore {
         && (data.yetiGamesPlayed is int || !('yetiGamesPlayed' in data));
     }
     
-    // Users Collection matched by lowercase wallet address
-    match /users/{walletAddress} {
+    // Users Collection matched by lowercase wallet address or email key
+    match /users/{userId} {
       // Allow single document get operations
-      allow get: if isValidId(walletAddress);
+      allow get: if isValidId(userId);
 
       // Allow list operations to fetch leaderboard ranks
       allow list: if true;
       
       // Allow writes only if structure is perfectly safe and matches validated constraints
-      allow create, update: if isValidId(walletAddress) && isValidUserProfile(request.resource.data);
+      allow create, update: if isValidId(userId) && isValidUserProfile(request.resource.data);
     }
   }
 }
