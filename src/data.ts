@@ -430,6 +430,152 @@ export const initialTracks: LearningTrack[] = [
             explanation: "Gas sponsorship allows an external address to pay transaction gas fees, offering a completely frictionless Web2-like user onboarding flow."
           }
         ]
+      },
+      {
+        id: "basics-general-quiz",
+        title: "General Sui Basics Quiz",
+        description: "The ultimate cozy final assessment covering all fundamental Sui blockchain concepts.",
+        xpValue: 150,
+        isGeneralQuiz: true,
+        requiredXp: 250,
+        steps: [
+          {
+            id: "gqs1",
+            title: "The Grand Basics Review",
+            content: "welcome back explorer! you have traveled through the snowy paths of Sui Basics. you've mastered the parallel highway, looked inside secure Move objects, understood staking epoch transitions, and managed gas budgets. now, yeti has prepared a comprehensive general quiz to crown your basics journey! get a warm hot chocolate and let's go! 🐻🍫🏔️",
+            yetiMood: "excited",
+            chalkboardHeader: "THE GRAND REVIEW"
+          },
+          {
+            id: "gqs2",
+            title: "Quiz Rules & High-XP Crown",
+            content: "this final general quiz gathers questions from all six modules. because of its breadth, passing this module will grant you a whopping 150 XP completion bonus! stay frosty, think of Yeti's lessons, and prove your master developer title under the winter sky.",
+            yetiMood: "proud",
+            chalkboardHeader: "CROWN OF COZY BASICS"
+          }
+        ],
+        quiz: [
+          {
+            id: "gq_q1",
+            question: "Sui's high performance and sub-second latency is primarily achieved by:",
+            options: [
+              "Processing independent transactions in parallel",
+              "Storing all records in a single sequential MySQL database",
+              "Halving the block reward every twelve hours",
+              "Relying on off-chain web2 proxy servers"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Sui's parallel execution engine identifies independent transactions and runs them simultaneously, achieving massive throughput without sequential block queues."
+          },
+          {
+            id: "gq_q2",
+            question: "In Sui Move, which structural 'Ability' is intentionally omitted from financial resources to prevent duplication?",
+            options: [
+              "key",
+              "store",
+              "copy",
+              "drop"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "The 'copy' ability is omitted from coin or vault structs to prevent duplication or counterfeiting, ensuring strict resource safety rules are checked by the compiler bytecode verifier."
+          },
+          {
+            id: "gq_q3",
+            question: "When you delegate SUI coins to a validator, at what point do delegation or unstaking actions take effect on-chain?",
+            options: [
+              "At the boundary of an epoch (roughly every 24 hours)",
+              "Immediately with sub-second finality",
+              "Only when the validator restarts their node server",
+              "At the end of the calendar month"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Validator stake delegation parameters and unstaking operations settle at the turn of an epoch, which marks a coordinated 24-hour cycle of node states."
+          },
+          {
+            id: "gq_q4",
+            question: "How does a transaction declare to the Sui parallelizer that it is independent of other transactions?",
+            options: [
+              "By declaring which on-chain Objects it will read or write beforehand",
+              "By sending a different type of gas currency",
+              "By attaching a high-priority tip amount",
+              "By running on a higher-latency server core"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Move transactions state access declarations (the exact objects accessed) let Sui validators know which transactions are unrelated and can safely run in parallel."
+          },
+          {
+            id: "gq_q5",
+            question: "Which Sui Object type allows multiple users to concurrently modify its internal fields, but requires full consensus sequencing?",
+            options: [
+              "Immutable Objects",
+              "Shared Objects",
+              "Address Owned Objects",
+              "Dynamic Field Children"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Shared Objects are accessible by anyone, which means validator consensus sequencing is required to safely order competing modifications."
+          },
+          {
+            id: "gq_q6",
+            question: "What happens to the on-chain storage deposit if you delete an obsolete or expired object from the Sui network?",
+            options: [
+              "It is locked in the validator pool forever",
+              "You receive a partial storage rebate refund",
+              "The network deletes your wallet",
+              "The object remains on-chain as a dummy pointer"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Sui encourages state minimization by giving users and developers partial storage rebates when they prune and delete long-lived, expired objects."
+          },
+          {
+            id: "gq_q7",
+            question: "Which of the following describes the core safety promise of Programmable Transaction Blocks (PTBs) on Sui?",
+            options: [
+              "They allow executing a series of commands atomically, reverting all changes if any single command fails",
+              "They require each command to be signed and submitted on a separate epoch",
+              "They double the transaction fees for security",
+              "They run strictly on the user's browser without validator consensus"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Programmable Transaction Blocks (PTBs) allow chaining up to 1,024 commands in a single transaction, executing atomically—either all succeed, or all revert, maintaining absolute state safety."
+          },
+          {
+            id: "gq_q8",
+            question: "In the Sui Move object-centric model, what is the key difference between address-owned objects and shared objects?",
+            options: [
+              "Address-owned objects require a full BFT consensus protocol for simple transactions",
+              "Address-owned objects bypass full consensus and execute via fast-path, while shared objects require consensus",
+              "Shared objects can only be accessed by validators",
+              "Address-owned objects cannot be deleted to receive storage rebates"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Transactions involving only address-owned objects bypass full consensus via fast-path execution, enabling sub-second finality, whereas shared objects require consensus to safely sequence concurrent writes."
+          },
+          {
+            id: "gq_q9",
+            question: "Which feature of Sui Move allows developers to dynamically attach auxiliary fields or children to an existing parent object at runtime?",
+            options: [
+              "Dynamic Fields",
+              "Vector Arrays",
+              "Hardcoded Struct Pointers",
+              "Immutable Epoch Registry"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Dynamic Fields and Dynamic Object Fields allow dynamically attaching child objects to parent objects at runtime on Sui, enabling scalable on-chain collections and gaming inventories."
+          },
+          {
+            id: "gq_q10",
+            question: "What unit of denomination is used to pay for gas fees on Sui, where 1 SUI is equivalent to 1,000,000,000 of this unit?",
+            options: [
+              "Gwei",
+              "MIST",
+              "Satoshi",
+              "Yeti"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "MIST is the smallest unit of gas currency on Sui. 1 SUI is exactly equal to 1,000,000,000 (1 billion) MIST."
+          }
+        ]
       }
     ]
   },
@@ -839,6 +985,145 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 0,
             explanation: "Blockchains run in deterministic sandboxes. Oracle feeds bridge off-chain asset indices into on-chain Move contracts safely."
+          }
+        ]
+      },
+      {
+        id: "defi-general-quiz",
+        title: "General DeFi on Sui Quiz",
+        description: "The ultimate cozy final assessment covering all decentralized finance concepts on Sui.",
+        xpValue: 180,
+        isGeneralQuiz: true,
+        requiredXp: 350,
+        steps: [
+          {
+            id: "dgqs1",
+            title: "Grand DeFi Review",
+            content: "welcome back, finance pioneer! you have climbed the snowy mountains of Sui DeFi. you've unlocked liquidity pools, lending vaults, staking systems, and oracle price feeds. now, yeti has prepared a comprehensive general quiz to crown your DeFi journey! grab a cozy hot beverage and let's go! 🐻☕📈",
+            yetiMood: "excited",
+            chalkboardHeader: "THE GRAND DEFI REVIEW"
+          }
+        ],
+        quiz: [
+          {
+            id: "dgq_q1",
+            question: "What is the standard mathematical formula used by Constant Product AMMs like Cetus?",
+            options: [
+              "x + y = k",
+              "x * y = k",
+              "x^2 + y^2 = k",
+              "x / y = k"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Constant Product Market Maker protocols use the formula x * y = k, keeping the product of reserve balances constant to determine exchange rates."
+          },
+          {
+            id: "dgq_q2",
+            question: "What is 'slippage' in a decentralized exchange swap?",
+            options: [
+              "The latency of network nodes",
+              "The price difference between transaction submission and block execution",
+              "The refund returned to a liquidity provider",
+              "The fee paid to validators during high traffic"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Slippage occurs when the execution price of a swap deviates from the price seen when the user first submitted the transaction, usually due to concurrent pool activity."
+          },
+          {
+            id: "dgq_q3",
+            question: "What is the primary benefit of Concentrated Liquidity (CLMM) over traditional AMMs?",
+            options: [
+              "It spreads liquidity evenly between zero and infinity",
+              "It allows liquidity providers to allocate capital within specific custom price ranges, boosting fee efficiency",
+              "It completely eliminates the possibility of smart contract bugs",
+              "It guarantees gas fees are always free"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Concentrated Liquidity (CLMM) allows providers to deploy capital within a targeted price range, generating much higher fee yield and reducing trading slippage."
+          },
+          {
+            id: "dgq_q4",
+            question: "Impermanent loss primarily affects which group of DeFi participants?",
+            options: [
+              "Token Swappers",
+              "Liquidity Providers (LPs) in AMM pools",
+              "Stakers delegating to validators",
+              "Borrowers in lending vaults"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Impermanent Loss occurs for Liquidity Providers when the ratio of pooled tokens shifts dramatically compared to simply holding them in a private wallet."
+          },
+          {
+            id: "dgq_q5",
+            question: "How does a Smart Order Router help traders achieve the best swap rate?",
+            options: [
+              "By splitting or routing swaps through multiple pools automatically in a single atomic transaction",
+              "By deleting high-gas transactions automatically",
+              "By borrowing tokens from a validator",
+              "By delaying the trade until prices go down"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "A Smart Order Router finds the optimal path across various liquidity pools, splitting or chaining trades to minimize slippage and maximize output."
+          },
+          {
+            id: "dgq_q6",
+            question: "In overcollateralized lending protocols, why must users deposit more value than they borrow?",
+            options: [
+              "To pay for hidden validator bonuses",
+              "To secure the protocol against market volatility and prevent bad debt",
+              "To register their wallet address on-chain",
+              "To staking for validators in the epoch"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Overcollateralization ensures that if the collateral value drops, the loan remains backed by physical on-chain assets, protecting lenders from defaults."
+          },
+          {
+            id: "dgq_q7",
+            question: "What happens when a borrower's Health Factor drops below the liquidation threshold?",
+            options: [
+              "The protocol sends them a direct email warning",
+              "A portion of their collateral is liquidated by third-party searchers to pay off the debt",
+              "Their wallet is blacklisted from the blockchain",
+              "The borrow interest rate drops to zero"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "If a loan's Health Factor falls below 1.0, third-party liquidators can buy the user's collateral at a discount to repay the outstanding debt, securing the protocol."
+          },
+          {
+            id: "dgq_q8",
+            question: "What are Liquid Staking Tokens (LSTs) like afSUI or haSUI?",
+            options: [
+              "Tokens that represent delegated SUI and accumulate staking rewards, but remain liquid and tradable in DeFi",
+              "Tokens that can only be spent in the metaverse",
+              "Tokens that have zero transaction fees",
+              "Tokens that are backed by physical gold bars"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "Liquid Staking Tokens represent staked SUI, allowing users to earn validator yield while keeping a liquid token to trade, swap, or deposit in DeFi."
+          },
+          {
+            id: "dgq_q9",
+            question: "What unique property ensures that a 'Flash Loan' is completely risk-free for lending protocols?",
+            options: [
+              "It is limited to a maximum of 10 SUI",
+              "The entire transaction block reverts if the borrower does not pay back the loan in the same execution thread",
+              "Validators guarantee the repayment out of the storage fund",
+              "It requires a high-priority multi-sig approval"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Flash loans are atomic; if the borrowing contract does not repay the capital plus fees within the same transaction block, the entire execution reverts, as if the loan never happened."
+          },
+          {
+            id: "dgq_q10",
+            question: "What describes Pyth's On-Demand 'Pull-Model' Oracle architecture?",
+            options: [
+              "It pushes prices to the blockchain every second regardless of activity",
+              "Traders pull verified off-chain pricing certificates and submit them directly inside their transaction block when needed",
+              "It requires manual daily updates by validators",
+              "It queries the prices using off-chain Google Chrome extensions"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Pyth's Pull-Model allows users to fetch verified off-chain prices and append them directly to their transactions, eliminating unnecessary periodic gas fees."
           }
         ]
       }
@@ -2662,6 +2947,106 @@ export const initialTracks: LearningTrack[] = [
             ],
             correctAnswerIndex: 1,
             explanation: "The Move Prover mathematically evaluates the system's invariants, ensuring that no state combination can ever bypass the defined specifications."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "lofi-foundation",
+    title: "Lofi Foundation",
+    description: "Learn how lofi design, cozy visual layouts, background beats, and ambient animations are built and optimized on Sui's high-speed canvas.",
+    iconName: "Music",
+    difficulty: "Beginner",
+    modules: [
+      {
+        id: "lofi-philosophy",
+        title: "The Philosophy of Cozy UX",
+        description: "Why soft aesthetics, calming layouts, and low-stress flows optimize learning.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "lfs1",
+            title: "Why Cozy Visual Design?",
+            content: "Welcome, developer traveler! Let's talk about Cozy UX. traditional blockchain apps look intimidating, with fast-moving numbers, sharp red charts, and complex terminal outputs. Cozy UX uses soft earthy tones, vintage borders, and hand-drawn aesthetics to reduce user stress and make space for focused study. 🐻☕",
+            yetiMood: "chill",
+            chalkboardHeader: "CALMING USER ENVIRONMENTS"
+          },
+          {
+            id: "lfs2",
+            title: "Auditory Harmony in Code",
+            content: "did you know that background lo-fi hip hop rhythms can increase task focus and slow heart rates? low-frequency loops and vintage crackles mimic white noise, covering distracting environmental sounds. in this academy, yeti is humming beautiful, relaxing rhythms to help you write flawless bytecode! 🎧🐻",
+            yetiMood: "excited",
+            chalkboardHeader: "AMBIENT SOUND MECHANICS"
+          },
+          {
+            id: "lfs3",
+            title: "Gamification & Playful Companions",
+            content: "the brain processes challenges better when paired with playful context. adding custom characters, progress paths, and rewards makes complex tech like smart contract programming feel like an adventure! yeti is here as your trusted mountain tutor, turning scary errors into cozy lessons. 🌲🎒",
+            yetiMood: "proud",
+            chalkboardHeader: "THE ADVENTUROUS MIND"
+          }
+        ],
+        quiz: [
+          {
+            id: "lfq1",
+            question: "What is the primary benefit of Cozy UX in decentralized educational portals?",
+            options: [
+              "It increases gas costs",
+              "It reduces user stress and cognitive load through soft tones and playful guidance",
+              "It turns off the transaction parallelizer",
+              "It replaces your browser with a retro video game console"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Cozy UX lowers learning barriers and cognitive pressure by using warm palettes, playful tutors, and slow tempos, encouraging long-term retention."
+          },
+          {
+            id: "lfq2",
+            question: "Why are lofi background rhythms integrated into learning environments?",
+            options: [
+              "They block validators from reading transactions",
+              "They act as white noise to shield focus and establish a relaxing mental rhythm",
+              "They are required to mint NFTs on Sui",
+              "They make the bytecode compile faster"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Low-frequency beats and ambient sounds operate as cozy auditory shields, helping developers filter out external noise and retain deep focus."
+          }
+        ]
+      },
+      {
+        id: "lofi-gamification",
+        title: "Sui Progress Path Gamification",
+        description: "How interactive trail maps, nodes, and achievements are represented as on-chain rewards.",
+        xpValue: 45,
+        steps: [
+          {
+            id: "lfg1",
+            title: "Designing the Trail",
+            content: "look at our cozy quest map! instead of a dry list of lessons, we've designed an interactive mountain trail. each node is a module checkpoint. connection paths are drawn with bezier curves to simulate natural, hand-drawn mountain trails. active nodes drift up and down with subtle floating animations to invite your clicks! 🏔️✨",
+            yetiMood: "excited",
+            chalkboardHeader: "BEZIER PATH SYSTEMS"
+          },
+          {
+            id: "lfg2",
+            title: "NFT Badges as Achievements",
+            content: "when you conquer a curriculum track, you don't just get a simple text congratulation. you earn the right to mint a unique SUI Kiosk NFT badge! stored as an address-owned object, this badge acts as permanent, verifiable proof of your on-chain mastery, secured inside your own crypto inventory! 🎓🐻",
+            yetiMood: "proud",
+            chalkboardHeader: "VERIFIABLE ACHIEVEMENTS"
+          }
+        ],
+        quiz: [
+          {
+            id: "lfg_q1",
+            question: "How are student badges stored on the Sui network?",
+            options: [
+              "In a central spreadsheet",
+              "As unique, address-owned on-chain Objects",
+              "In the validator's local hard drive only",
+              "As a simple cookie inside the browser"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Because Sui uses an object-centric model, completed course badges are minted as unique, secure, first-class Objects owned directly by the student's wallet."
           }
         ]
       }

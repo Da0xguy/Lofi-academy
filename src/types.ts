@@ -13,6 +13,7 @@ export interface QuizQuestion {
   options: string[];
   correctAnswerIndex: number;
   explanation: string;
+  hint?: string;
 }
 
 export interface TrackModule {
@@ -24,6 +25,8 @@ export interface TrackModule {
   quiz: QuizQuestion[];
   videoUrl?: string;
   videoTitle?: string;
+  isGeneralQuiz?: boolean;
+  requiredXp?: number;
 }
 
 export interface LearningTrack {

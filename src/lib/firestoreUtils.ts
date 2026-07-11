@@ -36,6 +36,21 @@ export function handleFirestoreError(
 }
 
 /**
+ * Helper to determine if a Firestore error is caused by connection issues/offline mode
+ */
+export function isOfflineError(error: any): boolean {
+  if (!error) return false;
+  const msg = (error.message || String(error)).toLowerCase();
+  return (
+    msg.includes("offline") ||
+    msg.includes("could not reach") ||
+    msg.includes("unreachable") ||
+    msg.includes("network") ||
+    error.code === "unavailable"
+  );
+}
+
+/**
  * Loads a user's profile from Firestore keyed by a unique identifier (email or wallet address)
  */
 export async function getFirebaseUserProfile(userId: string) {
@@ -48,7 +63,10 @@ export async function getFirebaseUserProfile(userId: string) {
       return userSnapshot.data();
     }
     return null;
-  } catch (error) {
+  } catch (error: any) {
+    if (isOfflineError(error)) {
+      throw new Error("Failed to connect to Firestore because you are offline. Please check your internet connection.");
+    }
     handleFirestoreError(error, OperationType.GET, path);
   }
 }
@@ -59,35 +77,41 @@ export async function getFirebaseUserProfile(userId: string) {
 export async function saveFirebaseUserProfile(userId: string, profileData: any) {
   const cleanId = userId.toLowerCase().trim();
   const path = `users/${cleanId}`;
+  
+  // Standardizing the payload to prevent shadow/Ghost fields
+  const sanitizedPayload = {
+    username: profileData.username || "CozyExplorer",
+    avatar: profileData.avatar || "🦊",
+    walletAddress: profileData.walletAddress || null,
+    email: profileData.email || null,
+    password: profileData.password || null,
+    xp: Number(profileData.xp ?? 0),
+    level: Number(profileData.level ?? 1),
+    completedModules: Array.isArray(profileData.completedModules) ? profileData.completedModules : [],
+    completedTracks: Array.isArray(profileData.completedTracks) ? profileData.completedTracks : [],
+    claimedWelcomeXP: Boolean(profileData.claimedWelcomeXP),
+    mintedBadges: Array.isArray(profileData.mintedBadges) ? profileData.mintedBadges.map((b: any) => ({
+      trackId: String(b.trackId || ""),
+      tokenId: String(b.tokenId || ""),
+      txHash: String(b.txHash || ""),
+      mintedAt: String(b.mintedAt || "")
+    })) : [],
+    streak: Number(profileData.streak ?? 1),
+    lastLoginDate: profileData.lastLoginDate || new Date().toISOString().split("T")[0],
+    yetiHighScore: Number(profileData.yetiHighScore ?? 0),
+    yetiGamesPlayed: Number(profileData.yetiGamesPlayed ?? 0)
+  };
+
   try {
     const userDocRef = doc(db, "users", cleanId);
-    // Standardizing the payload to prevent shadow/Ghost fields
-    const sanitizedPayload = {
-      username: profileData.username || "CozyExplorer",
-      avatar: profileData.avatar || "🦊",
-      walletAddress: profileData.walletAddress || null,
-      email: profileData.email || null,
-      password: profileData.password || null,
-      xp: Number(profileData.xp ?? 0),
-      level: Number(profileData.level ?? 1),
-      completedModules: Array.isArray(profileData.completedModules) ? profileData.completedModules : [],
-      completedTracks: Array.isArray(profileData.completedTracks) ? profileData.completedTracks : [],
-      claimedWelcomeXP: Boolean(profileData.claimedWelcomeXP),
-      mintedBadges: Array.isArray(profileData.mintedBadges) ? profileData.mintedBadges.map((b: any) => ({
-        trackId: String(b.trackId || ""),
-        tokenId: String(b.tokenId || ""),
-        txHash: String(b.txHash || ""),
-        mintedAt: String(b.mintedAt || "")
-      })) : [],
-      streak: Number(profileData.streak ?? 1),
-      lastLoginDate: profileData.lastLoginDate || new Date().toISOString().split("T")[0],
-      yetiHighScore: Number(profileData.yetiHighScore ?? 0),
-      yetiGamesPlayed: Number(profileData.yetiGamesPlayed ?? 0)
-    };
-    
     await setDoc(userDocRef, sanitizedPayload);
     return sanitizedPayload;
-  } catch (error) {
+  } catch (error: any) {
+    if (isOfflineError(error)) {
+      console.warn(`[Firestore Offline] setDoc offline queueing for ${cleanId}`);
+      // Return the sanitized local payload so the UI can proceed offline
+      return sanitizedPayload;
+    }
     handleFirestoreError(error, OperationType.WRITE, path);
   }
 }

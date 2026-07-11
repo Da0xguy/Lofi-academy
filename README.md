@@ -40,6 +40,9 @@ The application features a secure, full-stack email-and-password-based account s
 ### 6. Interactive SUI Kiosk NFT Showcase (Coming Soon)
 A dedicated, retro-styled showcase area models Sui's unique **Kiosk** system. Completed track achievements are displayed as custom certificate badges. While the application currently displays these under a **Coming Soon** simulated placeholder (for easy playground exploration), the layout is fully styled and pre-configured to bind to real on-chain SUI transactions, preparing users to mint their educational achievements as authentic on-chain NFTs.
 
+### 7. Interactive Sui Trail Map
+An elegant, visual serpentine map connects the modules of each curriculum track. The dotted path dynamically lights up and fills with solid color as modules are completed. Featuring custom tooltips, progress percentages, and an animated Yeti 🐻 tracker indicating the user's current milestone, this game-like dashboard offers a tactile representation of progress.
+
 ---
 
 ## 📂 Codebase Directory Structure
@@ -68,6 +71,7 @@ A dedicated, retro-styled showcase area models Sui's unique **Kiosk** system. Co
         ├── YachtChalkboard.tsx  # Dynamic lesson slide manager, quiz screens, and navigation
         ├── ProfileWidget.tsx    # User stats cabinet tracking progress badges and level progressions
         ├── DeFiSimulator.tsx    # Sandbox transaction-block mock compiling loop
+        ├── SuiTrailMap.tsx      # Serpentine visual trail map connecting active syllabus modules
         ├── LeaderboardWidget.tsx# Real-time ranking feed synced from database
         ├── AudioPlayerWidget.tsx# Retro cassette-styled lofi soundtrack synthesizer
         └── TutorFloatingWidget.tsx # Interactive AI Yeti chatbot interface

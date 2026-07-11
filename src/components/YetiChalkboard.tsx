@@ -21,6 +21,13 @@ export function YetiChalkboard({
   yetiStudyAsset
 }: YetiChalkboardProps) {
 
+  const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
+
+  // Reset collapse when switching steps
+  React.useEffect(() => {
+    setIsExpanded(false);
+  }, [step.id]);
+
   // Global accessibility keyboard listener to toggle pages using ArrowLeft & ArrowRight
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -127,9 +134,30 @@ export function YetiChalkboard({
                   <span>{step.title}</span>
                 </h4>
 
-                <p className="text-yellow-50/90 leading-relaxed font-sans text-sm tracking-wide font-medium">
-                  {step.content}
-                </p>
+                <div className="space-y-1">
+                  {/* Mobile-optimized collapsible preview */}
+                  <div className="block md:hidden">
+                    <p className="text-yellow-50/90 leading-relaxed font-sans text-sm tracking-wide font-medium">
+                      {step.content.length > 140 && !isExpanded
+                        ? `${step.content.slice(0, 140)}...`
+                        : step.content}
+                    </p>
+                    {step.content.length > 140 && (
+                      <button
+                        type="button"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="mt-1.5 px-3 py-1 bg-emerald-950/40 border border-emerald-800/60 hover:bg-emerald-950/60 text-yellow-300 font-mono text-[10px] font-black rounded-lg transition-all cursor-pointer inline-flex items-center gap-1"
+                      >
+                        <span>{isExpanded ? "Show Less ↩" : "Read Full Lesson 📖"}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Desktop view: Always show full text */}
+                  <p className="hidden md:block text-yellow-50/90 leading-relaxed font-sans text-sm tracking-wide font-medium">
+                    {step.content}
+                  </p>
+                </div>
 
                 {step.highlightCode && (
                   <div className="rounded-xl border-2 border-emerald-950 bg-black/55 p-3.5 font-mono text-xs text-emerald-300 overflow-x-auto selection:bg-teal-900/40 shadow-inner">

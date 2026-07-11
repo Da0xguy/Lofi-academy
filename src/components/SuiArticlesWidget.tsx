@@ -253,6 +253,12 @@ export function SuiArticlesWidget() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [aiAnalysis, setAiAnalysis] = useState<string>("");
   const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
+  const [isArticleExpanded, setIsArticleExpanded] = useState<boolean>(false);
+
+  // Reset collapse when switching active article
+  useEffect(() => {
+    setIsArticleExpanded(false);
+  }, [activeArticle.id]);
 
   useEffect(() => {
     localStorage.setItem("sui_yeti_articles", JSON.stringify(articles));
@@ -432,12 +438,38 @@ export function SuiArticlesWidget() {
                 "{activeArticle.intro}"
               </div>
 
-              <div className="space-y-4 text-xs sm:text-[13px] text-stone-700 leading-relaxed">
-                {activeArticle.bodyParagraphs.map((para, i) => (
-                  <p key={i} className="text-justify font-medium">
-                    {para}
-                  </p>
-                ))}
+              {/* Editorial paragraphs - Responsive collapse on mobile */}
+              <div className="space-y-4 text-xs sm:text-[13px] text-stone-700 leading-relaxed font-sans">
+                {/* On Mobile: Show first paragraph + toggle if collapsed, or show all if expanded */}
+                <div className="block md:hidden space-y-4">
+                  {activeArticle.bodyParagraphs.map((para, i) => {
+                    // Only render first paragraph if not expanded
+                    if (i > 0 && !isArticleExpanded) return null;
+                    return (
+                      <p key={i} className="text-justify font-medium">
+                        {para}
+                      </p>
+                    );
+                  })}
+                  {activeArticle.bodyParagraphs.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setIsArticleExpanded(!isArticleExpanded)}
+                      className="w-full mt-2 py-2.5 bg-[#FAF8F5] border-2 border-dashed border-[#3c3c3c]/35 hover:bg-[#FAF8F5]/80 text-[#D67B52] rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <span>{isArticleExpanded ? "Collapse Article ↩" : `Expand Full Article (${activeArticle.bodyParagraphs.length - 1} more paragraphs) ☕`}</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* On Desktop: Always show all paragraphs */}
+                <div className="hidden md:block space-y-4">
+                  {activeArticle.bodyParagraphs.map((para, i) => (
+                    <p key={i} className="text-justify font-medium">
+                      {para}
+                    </p>
+                  ))}
+                </div>
               </div>
 
               {/* Key Bullet Highlights Panel */}

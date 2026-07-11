@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { initialTracks } from "./data";
 import { LearningTrack, TrackModule, UserProfile, MintResult } from "./types";
 import { YetiChalkboard } from "./components/YetiChalkboard";
+import SuiTrailMap from "./components/SuiTrailMap";
 import { DeFiSimulator } from "./components/DeFiSimulator";
 import { LeaderboardWidget } from "./components/LeaderboardWidget";
 import { ProfileWidget } from "./components/ProfileWidget";
@@ -238,6 +239,8 @@ export default function App() {
   const [isQuestionSubmitted, setIsQuestionSubmitted] = useState<boolean>(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState<number>(0);
   const [quizXPAccumulated, setQuizXPAccumulated] = useState<number>(0);
+  const [isHintUnlocked, setIsHintUnlocked] = useState<boolean>(false);
+  const [hintError, setHintError] = useState<string | null>(null);
 
   // User details state
   const [user, setUser] = useState<UserProfile>(() => {
@@ -354,8 +357,12 @@ export default function App() {
             setUser(updatedProfile);
           }
           loadedFirebaseEmailRef.current = emailLower;
-        } catch (error) {
-          console.error("Firebase email syncing failed:", error);
+        } catch (error: any) {
+          if (error instanceof Error && error.message.includes("offline")) {
+            console.warn("[Firestore Sync] Device/Firestore is offline. Utilizing cached local progress.");
+          } else {
+            console.error("Firebase email syncing failed:", error);
+          }
         } finally {
           setIsSyncingFirebase(false);
         }
@@ -533,8 +540,21 @@ export default function App() {
 
   // Enter active classroom step by step slide
   const handleStartModule = (mod: TrackModule) => {
+    // Check if user has enough XP for general quizzes
+    const requiredXp = mod.requiredXp || 0;
+    if (requiredXp > 0 && user.xp < requiredXp) {
+      alert(`🏔️ Yeti shakes his head: This grand general quiz requires at least ${requiredXp} XP to unlock!\n\nTake other module lessons and earn more XP first! (Your XP: ${user.xp})`);
+      return;
+    }
+
     setActiveModuleId(mod.id);
-    setFlowState("classroom");
+    
+    // Direct direction for general quizzes
+    if (mod.isGeneralQuiz || mod.id.includes("general") || mod.id.includes("quiz")) {
+      setFlowState("quiz");
+    } else {
+      setFlowState("classroom");
+    }
     setActiveStepIndex(0);
     
     // Clear quiz variables
@@ -543,6 +563,8 @@ export default function App() {
     setIsQuestionSubmitted(false);
     setCorrectAnswersCount(0);
     setQuizXPAccumulated(0);
+    setIsHintUnlocked(false);
+    setHintError(null);
   };
 
   // Action: Step next
@@ -580,6 +602,8 @@ export default function App() {
       setCurrentQuestionIndex((prev) => prev + 1);
       setSelectedOptionIndex(null);
       setIsQuestionSubmitted(false);
+      setIsHintUnlocked(false);
+      setHintError(null);
     } else {
       // Calculate final quiz score
       const quizLength = activeModule.quiz.length;
@@ -648,6 +672,21 @@ export default function App() {
       setFlowState("quiz-result");
       setLeaderboardRefreshCode((prev) => prev + 1); // trigger leaderboard update!
     }
+  };
+
+  // Ask Yeti for a hint (consumes 15 XP)
+  const handleUnlockHint = () => {
+    if (user.xp < 15) {
+      setHintError("You need at least 15 XP to ask Yeti for help!");
+      setTimeout(() => setHintError(null), 4000);
+      return;
+    }
+    setUser((prev) => ({
+      ...prev,
+      xp: Math.max(0, prev.xp - 15)
+    }));
+    setIsHintUnlocked(true);
+    setHintError(null);
   };
 
   // Action: Receive badge mint receipt
@@ -1065,28 +1104,53 @@ export default function App() {
                   <span className="text-xs text-[#6D5D6E] font-mono hidden md:inline font-semibold">Pass assessments with 70%+ score to earn badge.</span>
                 </div>
 
+                {/* Sui Trail Progress Path Map */}
+                <SuiTrailMap
+                  activeTrack={activeTrack}
+                  completedModules={user.completedModules}
+                  activeModuleId={activeModuleId}
+                  onSelectModule={handleStartModule}
+                  userXp={user.xp}
+                />
+
                 <div className="space-y-4">
                   {activeTrack.modules.map((mod, index) => {
                     const isCompleted = user.completedModules.includes(mod.id);
+                    const requiredXp = (mod as any).requiredXp || 0;
+                    const isXpLocked = requiredXp > 0 && user.xp < requiredXp;
+                    
                     return (
                       <div
                         key={mod.id}
-                        className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-[#F3EFEA] hover:bg-white rounded-2xl border-2 border-[#3c3c3c] gap-4 transition-all shadow-[2px_2px_0px_0px_#3c3c3c]/15 hover:shadow-[3px_3px_0px_0px_#3c3c3c]"
+                        className={`flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-2xl border-2 border-[#3c3c3c] gap-4 transition-all ${
+                          isXpLocked 
+                            ? "bg-[#eae6e1] opacity-75 border-dashed" 
+                            : "bg-[#F3EFEA] hover:bg-white shadow-[2px_2px_0px_0px_#3c3c3c]/15 hover:shadow-[3px_3px_0px_0px_#3c3c3c]"
+                        }`}
                       >
                         <div className="flex items-start gap-3">
                           <span className="text-lg bg-white p-2 rounded-xl border-2 border-[#3c3c3c] shrink-0 font-bold shadow-[1px_1px_0px_0px_#3c3c3c]">
-                            {isCompleted ? "🤩" : index === 0 ? "🔥" : "🔒"}
+                            {isXpLocked ? "🔒" : isCompleted ? "🤩" : index === 0 ? "🔥" : "🐻"}
                           </span>
                           <div>
                             <h4 className="font-bold text-[#3c3c3c] text-sm flex items-center gap-2">
                               <span>Module {index + 1}: {mod.title}</span>
+                              {isXpLocked && (
+                                <span className="text-[10px] bg-rose-100 text-rose-700 font-mono px-2 py-0.2 rounded border border-rose-400 uppercase font-bold">
+                                  {requiredXp} XP Required
+                                </span>
+                              )}
                               {isCompleted && (
                                 <span className="text-[10px] bg-emerald-100 text-emerald-700 font-mono px-2 py-0.2 rounded border-2 border-emerald-600 uppercase font-bold">
                                   Done
                                 </span>
                               )}
                             </h4>
-                            <p className="text-xs text-[#6D5D6E] mt-1 font-medium">{mod.description}</p>
+                            <p className="text-xs text-[#6D5D6E] mt-1 font-medium">
+                              {isXpLocked 
+                                ? `Yeti locked this final assessment. Earn at least ${requiredXp} XP to unlock and test your wisdom.` 
+                                : mod.description}
+                            </p>
                           </div>
                         </div>
 
@@ -1098,9 +1162,21 @@ export default function App() {
 
                           <button
                             onClick={() => handleStartModule(mod)}
-                            className="px-5 py-2 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs hover:scale-102 flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer active:translate-y-[1px]"
+                            className={`px-5 py-2 border-2 border-[#3c3c3c] font-bold rounded-xl text-xs hover:scale-102 flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_0px_#3c3c3c] cursor-pointer active:translate-y-[1px] ${
+                              isXpLocked
+                                ? "bg-stone-300 text-stone-500 cursor-not-allowed opacity-80"
+                                : "bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white"
+                            }`}
                           >
-                            <span>{isCompleted ? "Review Module ☕" : "Start Quest"}</span>
+                            <span>
+                              {isXpLocked 
+                                ? `Need ${requiredXp} XP 🔒` 
+                                : isCompleted 
+                                ? "Review Module ☕" 
+                                : (mod as any).isGeneralQuiz || mod.id.includes("general") 
+                                ? "Challenge Quiz 🏆" 
+                                : "Start Quest"}
+                            </span>
                           </button>
                         </div>
                       </div>
@@ -1168,45 +1244,86 @@ export default function App() {
                 </div>
 
                 {/* Question */}
-                <div className="space-y-5">
-                  <h3 className="text-base font-bold text-[#3c3c3c] font-sans tracking-wide leading-relaxed">
-                    🌟 {activeModule.quiz[currentQuestionIndex].question}
-                  </h3>
+                <div className="overflow-hidden relative min-h-[340px] flex flex-col justify-start">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentQuestionIndex}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -50 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="space-y-5 w-full"
+                    >
+                      <h3 className="text-base font-bold text-[#3c3c3c] font-sans tracking-wide leading-relaxed">
+                        🌟 {activeModule.quiz[currentQuestionIndex].question}
+                      </h3>
 
-                  {/* Options List */}
-                  <div className="space-y-2.5">
-                    {activeModule.quiz[currentQuestionIndex].options.map((option, oIdx) => {
-                      const isSelected = selectedOptionIndex === oIdx;
-                      const isCorrect = oIdx === activeModule.quiz[currentQuestionIndex].correctAnswerIndex;
-                      
-                      let optionStyle = "border-2 border-[#3c3c3c] bg-white text-[#3c3c3c] hover:bg-[#F3EFEA] shadow-[2px_2px_0px_0px_#3c3c3c]";
-                      if (isQuestionSubmitted) {
-                        if (isCorrect) {
-                          optionStyle = "border-2 border-emerald-600 bg-emerald-50 text-emerald-700 shadow-[2px_2px_0px_0px_#10b981]";
-                        } else if (isSelected) {
-                          optionStyle = "border-2 border-rose-600 bg-rose-50 text-rose-700 shadow-[2px_2px_0px_0px_#f43f5e]";
-                        } else {
-                          optionStyle = "border-[#3c3c3c]/20 bg-gray-50 text-gray-400 opacity-60 shadow-none";
-                        }
-                      } else if (isSelected) {
-                        optionStyle = "border-2 border-[#D67B52] bg-[#fdfaf7] text-[#D67B52] shadow-[2px_2px_0px_0px_#D67B52] font-semibold";
-                      }
+                      {/* Options List */}
+                      <div className="space-y-2.5">
+                        {activeModule.quiz[currentQuestionIndex].options.map((option, oIdx) => {
+                          const isSelected = selectedOptionIndex === oIdx;
+                          const isCorrect = oIdx === activeModule.quiz[currentQuestionIndex].correctAnswerIndex;
+                          
+                          let optionStyle = "border-2 border-[#3c3c3c] bg-white text-[#3c3c3c] hover:bg-[#F3EFEA] shadow-[2px_2px_0px_0px_#3c3c3c]";
+                          if (isQuestionSubmitted) {
+                            if (isCorrect) {
+                              optionStyle = "border-2 border-emerald-600 bg-emerald-50 text-emerald-700 shadow-[2px_2px_0px_0px_#10b981]";
+                            } else if (isSelected) {
+                              optionStyle = "border-2 border-rose-600 bg-rose-50 text-rose-700 shadow-[2px_2px_0px_0px_#f43f5e]";
+                            } else {
+                              optionStyle = "border-[#3c3c3c]/20 bg-gray-50 text-gray-400 opacity-60 shadow-none";
+                            }
+                          } else if (isSelected) {
+                            optionStyle = "border-2 border-[#D67B52] bg-[#fdfaf7] text-[#D67B52] shadow-[2px_2px_0px_0px_#D67B52] font-semibold";
+                          } else if (isHintUnlocked && isCorrect) {
+                            optionStyle = "border-2 border-amber-500 bg-amber-50/75 text-amber-950 shadow-[2px_2px_0px_0px_#f59e0b] font-bold animate-pulse";
+                          }
 
-                      return (
-                        <button
-                          key={oIdx}
-                          disabled={isQuestionSubmitted}
-                          onClick={() => setSelectedOptionIndex(oIdx)}
-                          className={`w-full text-left p-3.5 rounded-xl text-[12px] font-mono transition-all flex items-start gap-2 cursor-pointer ${optionStyle}`}
-                        >
-                          <span className="font-bold uppercase text-[10px] bg-[#3c3c3c] px-1.5 py-0.5 rounded text-white shrink-0 mt-0.5">
-                            {String.fromCharCode(65 + oIdx)}
-                          </span>
-                          <span>{option}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                          return (
+                            <motion.button
+                              key={oIdx}
+                              disabled={isQuestionSubmitted}
+                              onClick={() => setSelectedOptionIndex(oIdx)}
+                              whileHover={!isQuestionSubmitted ? { scale: 1.015, x: 4 } : {}}
+                              whileTap={!isQuestionSubmitted ? { scale: 0.985 } : {}}
+                              transition={{ duration: 0.15 }}
+                              className={`w-full text-left p-3.5 rounded-xl text-[12px] font-mono transition-all flex items-start justify-between gap-2 cursor-pointer ${optionStyle}`}
+                            >
+                              <div className="flex items-start gap-2">
+                                <span className="font-bold uppercase text-[10px] bg-[#3c3c3c] px-1.5 py-0.5 rounded text-white shrink-0 mt-0.5">
+                                  {String.fromCharCode(65 + oIdx)}
+                                </span>
+                                <span>{option}</span>
+                              </div>
+                              {isHintUnlocked && isCorrect && !isQuestionSubmitted && (
+                                <span className="text-[9px] bg-amber-500 text-white font-sans font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 animate-bounce shadow-sm">
+                                  <Lightbulb size={10} className="fill-white" />
+                                  <span>Yeti Hint</span>
+                                </span>
+                              )}
+                            </motion.button>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                  {/* Yeti's Cozy Hint Speech Bubble */}
+                  {isHintUnlocked && (
+                    <div className="p-4 bg-amber-50/40 border-2 border-amber-500 rounded-2xl flex gap-3 shadow-[2px_2px_0px_0px_#f59e0b] relative overflow-hidden animate-fade-in">
+                      <div className="text-3xl shrink-0 select-none">🐻</div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-mono font-black text-amber-700 block uppercase tracking-wider">
+                          Yeti's Cozy Assessment Clue:
+                        </span>
+                        <p className="text-stone-700 text-[11px] leading-relaxed font-sans font-medium">
+                          {activeModule.quiz[currentQuestionIndex].hint || 
+                           `yeti sniffed this carefully! remember that ${activeModule.quiz[currentQuestionIndex].explanation.split('.')[0].toLowerCase()}. look for the option that perfectly represents this on-chain concept!`}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Immediate Answer feedback and walkthrough explanation */}
                   {isQuestionSubmitted && (
@@ -1235,7 +1352,35 @@ export default function App() {
                   )}
 
                   {/* Answer Navigation Action Button */}
-                  <div className="pt-3 border-t-2 border-dashed border-[#3c3c3c]/20 flex justify-end">
+                  <div className="pt-3 border-t-2 border-dashed border-[#3c3c3c]/20 flex items-center justify-between gap-3 flex-wrap">
+                    {/* Yeti Hint Trigger Button */}
+                    {!isQuestionSubmitted ? (
+                      <div className="flex flex-col gap-1.5">
+                        {!isHintUnlocked ? (
+                          <button
+                            type="button"
+                            onClick={handleUnlockHint}
+                            className="px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-[#D67B52] border-2 border-[#D67B52] hover:border-amber-600 font-extrabold rounded-xl text-[11px] font-mono cursor-pointer transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_0px_#D67B52] active:translate-y-[1px]"
+                          >
+                            <span>🐻 Ask Yeti for Hint</span>
+                            <span className="bg-[#D67B52] text-white px-1.5 py-0.2 rounded text-[9px] font-mono font-black">-15 XP</span>
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-amber-600 font-mono font-bold flex items-center gap-1">
+                            <Lightbulb size={12} className="text-amber-500" />
+                            <span>Yeti's guidance is unlocked!</span>
+                          </span>
+                        )}
+                        {hintError && (
+                          <span className="text-[9px] text-rose-600 font-mono font-bold animate-pulse">
+                            ⚠️ {hintError}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <div /> // empty placeholder to preserve right alignment for Next Question
+                    )}
+
                     {!isQuestionSubmitted ? (
                       <button
                         onClick={handleSubmitAnswer}
@@ -1253,7 +1398,6 @@ export default function App() {
                       </button>
                     )}
                   </div>
-                </div>
               </div>
             )}
 
