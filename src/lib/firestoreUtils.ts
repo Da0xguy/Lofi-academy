@@ -1,6 +1,3 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
-
 export enum OperationType {
   CREATE = "create",
   UPDATE = "update",
@@ -46,6 +43,7 @@ export function isOfflineError(error: any): boolean {
     msg.includes("could not reach") ||
     msg.includes("unreachable") ||
     msg.includes("network") ||
+    msg.includes("failed to fetch") ||
     error.code === "unavailable"
   );
 }
@@ -57,10 +55,13 @@ export async function getFirebaseUserProfile(userId: string) {
   const cleanId = userId.toLowerCase().trim();
   const path = `users/${cleanId}`;
   try {
-    const userDocRef = doc(db, "users", cleanId);
-    const userSnapshot = await getDoc(userDocRef);
-    if (userSnapshot.exists()) {
-      return userSnapshot.data();
+    const response = await fetch(`/api/user/profile/${encodeURIComponent(cleanId)}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const resData = await response.json();
+    if (resData.success && resData.exists) {
+      return resData.data;
     }
     return null;
   } catch (error: any) {
@@ -103,8 +104,20 @@ export async function saveFirebaseUserProfile(userId: string, profileData: any) 
   };
 
   try {
-    const userDocRef = doc(db, "users", cleanId);
-    await setDoc(userDocRef, sanitizedPayload);
+    const response = await fetch(`/api/user/profile/${encodeURIComponent(cleanId)}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(sanitizedPayload)
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const resData = await response.json();
+    if (resData.success) {
+      return resData.data;
+    }
     return sanitizedPayload;
   } catch (error: any) {
     if (isOfflineError(error)) {

@@ -148,7 +148,7 @@ export function YetiChalkboard({
                         onClick={() => setIsExpanded(!isExpanded)}
                         className="mt-1.5 px-3 py-1 bg-emerald-950/40 border border-emerald-800/60 hover:bg-emerald-950/60 text-yellow-300 font-mono text-[10px] font-black rounded-lg transition-all cursor-pointer inline-flex items-center gap-1"
                       >
-                        <span>{isExpanded ? "Show Less ↩" : "Read Full Lesson 📖"}</span>
+                        <span>{isExpanded ? "Show Less" : "Read Full Lesson"}</span>
                       </button>
                     )}
                   </div>
@@ -173,8 +173,8 @@ export function YetiChalkboard({
 
           {/* Chalk Ledge & Navigation Block */}
           <div className="mt-6 pt-3 border-t-2 border-solid border-emerald-800/40 flex items-center justify-between">
-            <span className="text-[10px] text-emerald-200/50 flex items-center gap-0.5 font-mono font-bold">
-              <span>✏️</span> chalkboard: active move compilation view
+            <span className="text-[10px] text-emerald-200/50 flex items-center gap-1 font-mono font-bold">
+              <span>Chalkboard:</span> active move compilation view
             </span>
 
             <div className="flex items-center gap-3">
@@ -194,7 +194,7 @@ export function YetiChalkboard({
                 onClick={onNext}
                 className="px-5 py-1.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white shadow-[2px_2px_0px_0px_#3c3c3c] font-mono border-2 border-[#3c3c3c] rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer active:translate-y-[1px]"
               >
-                <span>{stepIndex === totalSteps - 1 ? "Start Assessment ✏️" : "Next Part"}</span>
+                <span>{stepIndex === totalSteps - 1 ? "Start Assessment" : "Next Part"}</span>
               </button>
             </div>
           </div>

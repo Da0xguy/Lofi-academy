@@ -240,6 +240,37 @@ app.post("/api/sui/leaderboard", async (req, res) => {
   }
 });
 
+// 2A. Get Single User Profile
+app.get("/api/user/profile/:userId", async (req, res) => {
+  try {
+    const cleanId = req.params.userId.toLowerCase().trim();
+    const userDocRef = doc(db, "users", cleanId);
+    const userSnapshot = await getDoc(userDocRef);
+    if (userSnapshot.exists()) {
+      res.json({ success: true, exists: true, data: userSnapshot.data() });
+    } else {
+      res.json({ success: true, exists: false, data: null });
+    }
+  } catch (err: any) {
+    console.error("Firestore user profile get failed:", err);
+    res.status(500).json({ success: false, error: err?.message || String(err) });
+  }
+});
+
+// 2B. Save Single User Profile
+app.post("/api/user/profile/:userId", async (req, res) => {
+  try {
+    const cleanId = req.params.userId.toLowerCase().trim();
+    const profileData = req.body;
+    const userDocRef = doc(db, "users", cleanId);
+    await setDoc(userDocRef, profileData);
+    res.json({ success: true, data: profileData });
+  } catch (err: any) {
+    console.error("Firestore user profile save failed:", err);
+    res.status(500).json({ success: false, error: err?.message || String(err) });
+  }
+});
+
 // 2B. Secure Game Score Validation & Firestore Sync
 app.post("/api/sui/game/save-score", async (req, res) => {
   const { wallet, score, elapsedSeconds, signature } = req.body;

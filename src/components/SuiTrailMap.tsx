@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { LearningTrack, TrackModule } from "../types";
-import { Award, Compass, Sparkles, Map, CheckCircle2, ChevronRight, HelpCircle } from "lucide-react";
+import { Award, Compass, Sparkles, Map, CheckCircle2, ChevronRight, HelpCircle, Lock, Star } from "lucide-react";
+import YETI_BADGE_ASSET from "../assets/images/yeti_badge_1779633396226.png";
 
 interface SuiTrailMapProps {
   activeTrack: LearningTrack;
@@ -22,9 +23,9 @@ export default function SuiTrailMap({
   const modules = activeTrack?.modules || [];
   const totalModules = modules.length;
 
-  // Calculate coordinates for a larger, more immersive SVG viewport of 1200 x 360
+  // Calculate coordinates for a larger, more immersive SVG viewport of 1200 x 480
   const width = 1200;
-  const height = 360;
+  const height = 480;
 
   const getCoordinates = (index: number) => {
     if (totalModules <= 1) {
@@ -36,8 +37,8 @@ export default function SuiTrailMap({
     const stepX = (endX - startX) / (totalModules - 1);
     
     const x = startX + index * stepX;
-    // Elegant grand serpentine wave: alternating with generous vertical range
-    const y = index % 2 === 0 ? 95 : 255;
+    // Elegant grand serpentine wave: alternating with generous vertical range for taller board
+    const y = index % 2 === 0 ? 110 : 370;
     return { x, y };
   };
 
@@ -48,7 +49,7 @@ export default function SuiTrailMap({
     const midX = (p1.x + p2.x) / 2;
     const midY = (p1.y + p2.y) / 2;
     // Larger alternating control offset for majestic natural curved trails
-    const offset = index % 2 === 0 ? 28 : -28;
+    const offset = index % 2 === 0 ? 38 : -38;
     return `M ${p1.x} ${p1.y} Q ${midX} ${midY + offset} ${p2.x} ${p2.y}`;
   };
 
@@ -149,7 +150,7 @@ export default function SuiTrailMap({
         {/* Background Grass and Terrain Texture styling */}
         <div className="absolute inset-0 bg-[#A6CFBE]/10 opacity-70 pointer-events-none" />
 
-        <div className="min-w-[1200px] h-[360px] relative">
+        <div className="min-w-[1200px] h-[480px] relative">
           <svg className="absolute inset-0 w-full h-full pointer-events-none select-none">
             {/* Definitions for gorgeous visual filters and gradients */}
             <defs>
@@ -165,41 +166,41 @@ export default function SuiTrailMap({
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
-
+ 
               {/* Rivers & Paths Gradients */}
               <linearGradient id="river-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#4A809C" />
                 <stop offset="50%" stopColor="#5CA5C6" />
                 <stop offset="100%" stopColor="#2E6280" />
               </linearGradient>
-
+ 
               <linearGradient id="completed-path-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#F59E0B" />
                 <stop offset="100%" stopColor="#D67B52" />
               </linearGradient>
             </defs>
-
+ 
             {/* Base Grid Texture */}
             <rect width="100%" height="100%" fill="url(#gamic-dots)" rx="12" />
-
+ 
             {/* Beautiful Mountains Scenic Backdrop */}
             <g opacity="0.25">
               {/* Mountain 1 */}
-              <polygon points="80,180 180,50 280,180" fill="#3A6B54" />
-              <polygon points="180,50 145,90 180,110 215,90" fill="#FAF8F5" /> {/* snowy peak */}
+              <polygon points="80,240 180,90 280,240" fill="#3A6B54" />
+              <polygon points="180,90 145,130 180,150 215,130" fill="#FAF8F5" /> {/* snowy peak */}
               
               {/* Mountain 2 */}
-              <polygon points="540,180 660,40 780,180" fill="#3A6B54" />
-              <polygon points="660,40 625,80 660,100 695,80" fill="#FAF8F5" /> {/* snowy peak */}
-
+              <polygon points="540,240 660,100 780,240" fill="#3A6B54" />
+              <polygon points="660,100 625,140 660,160 695,140" fill="#FAF8F5" /> {/* snowy peak */}
+ 
               {/* Mountain 3 */}
-              <polygon points="950,180 1060,60 1170,180" fill="#2E5C46" />
-              <polygon points="1060,60 1030,95 1060,115 1090,95" fill="#FAF8F5" /> {/* snowy peak */}
+              <polygon points="950,240 1060,120 1170,240" fill="#2E5C46" />
+              <polygon points="1060,120 1030,155 1060,175 1090,155" fill="#FAF8F5" /> {/* snowy peak */}
             </g>
-
+ 
             {/* Winding Blue River: "Sui Spring" */}
             <path
-              d="M 330 0 C 350 100, 270 200, 300 360"
+              d="M 330 0 C 350 150, 270 300, 300 480"
               fill="none"
               stroke="url(#river-grad)"
               strokeWidth="22"
@@ -208,41 +209,73 @@ export default function SuiTrailMap({
             />
             {/* Shimmer water highlights */}
             <path
-              d="M 330 0 C 350 100, 270 200, 300 360"
+              d="M 330 0 C 350 150, 270 300, 300 480"
               fill="none"
               stroke="#E0F2FE"
               strokeWidth="2"
               strokeDasharray="12,18"
               opacity="0.4"
             />
-
+ 
             {/* Retro wooden bridge graphics crossing the river */}
             <g opacity="0.95">
-              <rect x="270" y="160" width="45" height="24" rx="2" fill="#8B4513" stroke="#3c3c3c" strokeWidth="2" />
+              <rect x="270" y="220" width="45" height="24" rx="2" fill="#8B4513" stroke="#3c3c3c" strokeWidth="2" />
               {/* bridge steps */}
-              <line x1="281" y1="160" x2="281" y2="184" stroke="#D2B48C" strokeWidth="1.5" />
-              <line x1="292" y1="160" x2="292" y2="184" stroke="#D2B48C" strokeWidth="1.5" />
-              <line x1="303" y1="160" x2="303" y2="184" stroke="#D2B48C" strokeWidth="1.5" />
+              <line x1="281" y1="220" x2="281" y2="244" stroke="#D2B48C" strokeWidth="1.5" />
+              <line x1="292" y1="220" x2="292" y2="244" stroke="#D2B48C" strokeWidth="1.5" />
+              <line x1="303" y1="220" x2="303" y2="244" stroke="#D2B48C" strokeWidth="1.5" />
             </g>
-
+ 
             {/* Forests and Nature scenery */}
             {/* Forest Cluster A */}
-            <text x="40" y="280" className="text-xl opacity-85 select-none">🌲</text>
-            <text x="70" y="300" className="text-2xl opacity-85 select-none">🌲</text>
-            <text x="55" y="325" className="text-lg opacity-75 select-none">🪵</text>
-
+            <g transform="translate(40, 355)">
+              <polygon points="10,0 20,20 0,20" fill="#2d6a4f" stroke="#3c3c3c" strokeWidth="1.5" />
+              <polygon points="10,-8 17,10 3,10" fill="#40916c" stroke="#3c3c3c" strokeWidth="1.5" />
+              <rect x="8" y="20" width="4" height="6" fill="#8B4513" stroke="#3c3c3c" strokeWidth="1" />
+            </g>
+            <g transform="translate(70, 375)">
+              <polygon points="12,0 24,24 0,24" fill="#1b4332" stroke="#3c3c3c" strokeWidth="1.5" />
+              <polygon points="12,-10 20,12 4,12" fill="#2d6a4f" stroke="#3c3c3c" strokeWidth="1.5" />
+              <rect x="10" y="24" width="4" height="7" fill="#8B4513" stroke="#3c3c3c" strokeWidth="1" />
+            </g>
+            <g transform="translate(55, 415)">
+              <rect x="0" y="0" width="16" height="6" rx="1.5" fill="#a0522d" stroke="#3c3c3c" strokeWidth="1.2" transform="rotate(-15)" />
+              <rect x="2" y="4" width="16" height="6" rx="1.5" fill="#8b4513" stroke="#3c3c3c" strokeWidth="1.2" transform="rotate(10)" />
+            </g>
+ 
             {/* Cute Campfire space */}
-            <text x="440" y="80" className="text-xl opacity-90 select-none animate-pulse">🔥</text>
-            <text x="430" y="98" className="text-[10px] font-mono font-extrabold fill-stone-700">Yeti Camp</text>
-            <circle cx="448" cy="78" r="16" stroke="#D67B52" strokeWidth="1.5" strokeDasharray="3,3" fill="none" opacity="0.4" />
-
+            <g transform="translate(440, 108)" className="animate-pulse">
+              <line x1="2" y1="18" x2="18" y2="10" stroke="#8b4513" strokeWidth="3" strokeLinecap="round" />
+              <line x1="18" y1="18" x2="2" y2="10" stroke="#8b4513" strokeWidth="3" strokeLinecap="round" />
+              <path d="M10,2 C10,2 16,8 14,14 C12,18 8,18 6,14 C4,8 10,2 10,2 Z" fill="#ff4500" stroke="#3c3c3c" strokeWidth="1" />
+              <path d="M10,6 C10,6 13,10 12,14 C11,16 9,16 8,14 C7,10 10,6 10,6 Z" fill="#ff8c00" />
+            </g>
+            <text x="430" y="148" className="text-[10px] font-mono font-extrabold fill-stone-700">Yeti Camp</text>
+            <circle cx="448" cy="128" r="16" stroke="#D67B52" strokeWidth="1.5" strokeDasharray="3,3" fill="none" opacity="0.4" />
+ 
             {/* Forest Cluster B */}
-            <text x="820" y="90" className="text-lg opacity-85 select-none">🌲</text>
-            <text x="800" y="75" className="text-base opacity-85 select-none">⛺</text>
-            <text x="840" y="80" className="text-lg opacity-85 select-none">🌲</text>
+            <g transform="translate(820, 68)">
+              <polygon points="10,0 20,20 0,20" fill="#2d6a4f" stroke="#3c3c3c" strokeWidth="1.5" />
+              <polygon points="10,-8 17,10 3,10" fill="#40916c" stroke="#3c3c3c" strokeWidth="1.5" />
+              <rect x="8" y="20" width="4" height="6" fill="#8B4513" stroke="#3c3c3c" strokeWidth="1" />
+            </g>
+            <g transform="translate(800, 56)">
+              <polygon points="12,0 24,18 0,18" fill="#d67b52" stroke="#3c3c3c" strokeWidth="1.5" />
+              <polygon points="12,6 20,18 4,18" fill="#eae1d9" stroke="#3c3c3c" strokeWidth="1" />
+              <line x1="12" y1="0" x2="12" y2="18" stroke="#3c3c3c" strokeWidth="1" />
+            </g>
+            <g transform="translate(840, 62)">
+              <polygon points="10,0 20,20 0,20" fill="#1b4332" stroke="#3c3c3c" strokeWidth="1.5" />
+              <polygon points="10,-8 17,10 3,10" fill="#2d6a4f" stroke="#3c3c3c" strokeWidth="1.5" />
+              <rect x="8" y="20" width="4" height="6" fill="#8B4513" stroke="#3c3c3c" strokeWidth="1" />
+            </g>
 
             {/* Forest Cluster C */}
-            <text x="1100" y="315" className="text-2xl opacity-85 select-none">⛷️</text>
+            <g transform="translate(1100, 290)">
+              <line x1="5" y1="0" x2="5" y2="28" stroke="#3c3c3c" strokeWidth="2" strokeLinecap="round" />
+              <polygon points="5,2 25,7 5,12" fill="#89a8b2" stroke="#3c3c3c" strokeWidth="1.5" />
+              <circle cx="5" cy="0" r="2.5" fill="#3c3c3c" />
+            </g>
             <text x="1115" y="335" className="text-[10px] font-mono font-black fill-stone-700">Sui Peak</text>
 
             {/* Connecting paths segment-by-segment with glowing neon states */}
@@ -373,10 +406,15 @@ export default function SuiTrailMap({
                   >
                     {/* Tiny speech bubble next to Yeti */}
                     <div className="bg-white border border-[#3c3c3c] px-1.5 py-0.5 rounded-md text-[7px] font-mono font-bold text-[#3c3c3c] shadow-sm mb-1 whitespace-nowrap">
-                      👋 Cozy camp here!
+                      Cozy camp here!
                     </div>
-                    <span className="text-3xl drop-shadow-[0_2px_3px_rgba(0,0,0,0.25)]">🐻</span>
-                    <span className="bg-[#D67B52] text-white text-[7px] font-mono font-black px-1.5 py-0.2 rounded border border-[#FAF8F5] uppercase tracking-wider -mt-1 shadow-md whitespace-nowrap">
+                    <img 
+                      src={YETI_BADGE_ASSET} 
+                      alt="You" 
+                      className="w-10 h-10 rounded-full border-2 border-[#D67B52] shadow-md object-cover bg-white pointer-events-none" 
+                      referrerPolicy="no-referrer"
+                    />
+                    <span className="bg-[#D67B52] text-white text-[7px] font-mono font-black px-1.5 py-0.2 rounded border border-[#FAF8F5] uppercase tracking-wider mt-1 shadow-md whitespace-nowrap">
                       YOU
                     </span>
                   </div>
@@ -393,9 +431,9 @@ export default function SuiTrailMap({
                     id={`trail-node-${mod.id}`}
                   >
                     {isXpLocked ? (
-                      <span className="text-xs drop-shadow-sm">🔒</span>
+                      <Lock size={12} className="text-stone-400" />
                     ) : isCompleted ? (
-                      <span className="text-base drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]">⭐</span>
+                      <Star size={14} className="text-amber-500 fill-amber-300 drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)] animate-pulse" />
                     ) : (
                       <span className="text-[11px] font-black">{index + 1}</span>
                     )}
@@ -463,7 +501,7 @@ export default function SuiTrailMap({
           <Sparkles size={11} className="text-[#D67B52]" />
           <span>Light up the connection lines by proving your smart contract capability!</span>
         </span>
-        <span className="hidden sm:inline">🌲 Cozy campfires are warm.</span>
+        <span className="hidden sm:inline">Cozy campfires are warm.</span>
       </div>
     </div>
   );

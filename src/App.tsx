@@ -37,7 +37,10 @@ import {
   X,
   Tv,
   BookOpen,
-  Twitter
+  Twitter,
+  Moon,
+  Sun,
+  HelpCircle
 } from "lucide-react";
 
 import { SuiArticlesWidget } from "./components/SuiArticlesWidget";
@@ -96,6 +99,24 @@ const getModuleVideo = (module: TrackModule) => {
 // Pre-generated static assets mapped from tools outputs
 import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png";
 import YETI_BADGE_ASSET from "./assets/images/yeti_badge_1779633396226.png";
+
+import SUI_BASICS_IMAGE from "./assets/images/sui_basics_thumbnail_1783783912295.jpg";
+import SUI_DEFI_IMAGE from "./assets/images/sui_defi_thumbnail_1783783923939.jpg";
+import SUI_PROTOCOLS_IMAGE from "./assets/images/sui_protocols_thumbnail_1783783935982.jpg";
+import SUI_HISTORY_IMAGE from "./assets/images/sui_history_thumbnail_1783783947579.jpg";
+import SUI_MOVE_CODING_IMAGE from "./assets/images/sui_move_coding_thumbnail_1783783961981.jpg";
+import SUI_SDK_INDEXING_IMAGE from "./assets/images/sui_sdk_indexing_thumbnail_1783783974108.jpg";
+import SUI_CONTRACT_TESTING_IMAGE from "./assets/images/sui_contract_testing_thumbnail_1783783987062.jpg";
+
+const TRACK_IMAGES: Record<string, string> = {
+  "sui-basics": SUI_BASICS_IMAGE,
+  "sui-defi": SUI_DEFI_IMAGE,
+  "sui-protocols": SUI_PROTOCOLS_IMAGE,
+  "sui-history": SUI_HISTORY_IMAGE,
+  "sui-move-coding": SUI_MOVE_CODING_IMAGE,
+  "sui-sdk-indexing": SUI_SDK_INDEXING_IMAGE,
+  "sui-contract-testing": SUI_CONTRACT_TESTING_IMAGE,
+};
 
 export default function App() {
   // 1-hour background music mix player
@@ -201,7 +222,7 @@ export default function App() {
         } else if (next < 40) {
           setLoadingStatus("Checking Narwhal mempool sequencers & validators...");
         } else if (next < 60) {
-          setLoadingStatus("Compiling Move Entry Modules (assisted by Yeti 🐻)...");
+          setLoadingStatus("Compiling Move Entry Modules (assisted by Yeti)...");
         } else if (next < 80) {
           setLoadingStatus("Adjusting gas optimization fee parameters... OK.");
         } else if (next < 95) {
@@ -543,7 +564,7 @@ export default function App() {
     // Check if user has enough XP for general quizzes
     const requiredXp = mod.requiredXp || 0;
     if (requiredXp > 0 && user.xp < requiredXp) {
-      alert(`🏔️ Yeti shakes his head: This grand general quiz requires at least ${requiredXp} XP to unlock!\n\nTake other module lessons and earn more XP first! (Your XP: ${user.xp})`);
+      alert(`Yeti shakes his head: This grand general quiz requires at least ${requiredXp} XP to unlock!\n\nTake other module lessons and earn more XP first! (Your XP: ${user.xp})`);
       return;
     }
 
@@ -796,7 +817,10 @@ export default function App() {
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2 bg-[#89A8B2]/10 border-2 border-[#3c3c3c]/30 px-3 py-2 rounded-xl text-stone-600 font-medium text-xs font-serif">
-            <span>💡 <strong>Study Tip:</strong> SUI utilizes secure, object-centric Move language paradigms, preventing dangerous re-entrancy attacks!</span>
+            <span className="flex items-center gap-1.5">
+              <Lightbulb size={13} className="text-amber-500 fill-amber-300 animate-pulse shrink-0" />
+              <span><strong>Study Tip:</strong> SUI utilizes secure, object-centric Move language paradigms, preventing dangerous re-entrancy attacks!</span>
+            </span>
           </div>
         </motion.div>
       </div>
@@ -914,8 +938,8 @@ export default function App() {
                 transition={{ duration: 1.6, ease: "easeInOut" }}
               >
                 <span className="text-[#6D5D6E] font-bold hidden sm:inline">Lvl:</span>
-                <span className="sm:hidden text-[#89A8B2]" title="Level">🏆</span>
-                <strong className="text-[#89A8B2] font-extrabold">{user.level}</strong>
+                <Trophy size={14} className="sm:hidden text-[#89A8B2] shrink-0" title="Level" />
+                <strong className="text-[#89A8B2] font-extrabold ml-1 sm:ml-0">{user.level}</strong>
                 <AnimatePresence>
                   {animateLevelUpHUD && (
                     <motion.span 
@@ -927,7 +951,7 @@ export default function App() {
                       transition={{ duration: 1.5, ease: "easeOut" }}
                       className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black uppercase text-green-700 bg-green-50 border border-green-500 px-1 py-0.5 rounded-md shadow-xs pointer-events-none whitespace-nowrap z-50 animate-bounce"
                     >
-                      ⭐ Level Up! ⭐
+                      Level Up! ✨
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -938,7 +962,7 @@ export default function App() {
             <div className="flex items-center gap-1.5 bg-white border-2 border-[#3c3c3c] px-2.5 sm:px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
               <Flame size={14} className="text-orange-500 animate-pulse fill-orange-500" />
               <span className="text-[#6D5D6E] font-bold hidden sm:inline">Streak:</span>
-              <strong className="text-orange-500 font-extrabold">{user.streak}<span className="hidden sm:inline"> Day</span>🔥</strong>
+              <strong className="text-orange-500 font-extrabold">{user.streak}<span className="hidden sm:inline"> Day</span></strong>
               
               {!claimedStreakBonus ? (
                 <button
@@ -966,7 +990,9 @@ export default function App() {
                 className="px-3 py-1.5 bg-white border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs font-bold text-[#3c3c3c] hover:scale-102 transition-all cursor-pointer flex items-center gap-1.5 active:translate-y-[1px]"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               >
-                <span>{darkMode ? "🌙" : "☀️"}</span>
+                <span className="flex items-center justify-center shrink-0">
+                  {darkMode ? <Moon size={13} className="text-indigo-400 fill-indigo-400" /> : <Sun size={13} className="text-amber-500 fill-amber-500" />}
+                </span>
                 <span className="hidden sm:inline">{darkMode ? "Dark" : "Light"}</span>
               </button>
             </div>
@@ -987,8 +1013,8 @@ export default function App() {
             title="Read blockchain mechanics & about pages again"
           >
             <Sparkles size={13} className="animate-pulse shrink-0" />
-            <span className="hidden sm:inline">Introduction Guide 📖</span>
-            <span className="sm:hidden">Intro 📖</span>
+            <span className="hidden sm:inline">Introduction Guide</span>
+            <span className="sm:hidden">Intro</span>
           </button>
 
           {[
@@ -1075,6 +1101,16 @@ export default function App() {
                           ) : null}
                         </div>
 
+                        {/* Beautiful generated lofi illustration thumbnail */}
+                        <div className="w-full h-24 rounded-2xl overflow-hidden border-2 border-[#3c3c3c] mb-3 relative bg-[#eae6e1] shadow-[1px_1px_0px_0px_#3c3c3c]">
+                          <img 
+                            src={TRACK_IMAGES[track.id] || "https://picsum.photos/seed/" + track.id + "/300/150"} 
+                            alt={track.title} 
+                            className="w-full h-full object-cover" 
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+
                         <h3 className="font-bold text-sm tracking-tight text-[#3c3c3c]">{track.title}</h3>
                         <p className="text-xs text-[#6D5D6E] mt-1 lines-clamp-2 leading-relaxed h-11 overflow-hidden font-medium">
                           {track.description}
@@ -1129,8 +1165,16 @@ export default function App() {
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <span className="text-lg bg-white p-2 rounded-xl border-2 border-[#3c3c3c] shrink-0 font-bold shadow-[1px_1px_0px_0px_#3c3c3c]">
-                            {isXpLocked ? "🔒" : isCompleted ? "🤩" : index === 0 ? "🔥" : "🐻"}
+                          <span className="bg-white p-2.5 rounded-xl border-2 border-[#3c3c3c] shrink-0 font-bold shadow-[1px_1px_0px_0px_#3c3c3c] flex items-center justify-center w-10 h-10">
+                            {isXpLocked ? (
+                              <Lock size={15} className="text-stone-400" />
+                            ) : isCompleted ? (
+                              <CheckCircle size={15} className="text-[#10b981]" />
+                            ) : index === 0 ? (
+                              <Flame size={15} className="text-[#D67B52]" />
+                            ) : (
+                              <BookOpen size={15} className="text-[#89A8B2]" />
+                            )}
                           </span>
                           <div>
                             <h4 className="font-bold text-[#3c3c3c] text-sm flex items-center gap-2">
@@ -1170,11 +1214,11 @@ export default function App() {
                           >
                             <span>
                               {isXpLocked 
-                                ? `Need ${requiredXp} XP 🔒` 
+                                ? `Need ${requiredXp} XP` 
                                 : isCompleted 
-                                ? "Review Module ☕" 
+                                ? "Review Module" 
                                 : (mod as any).isGeneralQuiz || mod.id.includes("general") 
-                                ? "Challenge Quiz 🏆" 
+                                ? "Challenge Quiz" 
                                 : "Start Quest"}
                             </span>
                           </button>
@@ -1192,7 +1236,9 @@ export default function App() {
                 {/* Visual title guide header */}
                 <div className="flex items-center justify-between bg-[#F3EFEA] p-3 sm:p-4 rounded-2xl border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs text-[#3c3c3c] min-w-0 gap-2">
                   <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 truncate">
-                    <span className="text-[#D67B52] animate-spin shrink-0">☕</span>
+                    <span className="text-[#D67B52] animate-spin shrink-0">
+                      <Sparkles size={14} className="animate-pulse" />
+                    </span>
                     {/* Desktop layout: Full Track and Class */}
                     <div className="hidden md:flex items-center gap-2 truncate">
                       <span className="text-[#6D5D6E] font-bold">Track: <strong className="text-[#3c3c3c] font-extrabold">{activeTrack.title}</strong></span>
@@ -1254,12 +1300,26 @@ export default function App() {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                       className="space-y-5 w-full"
                     >
-                      <h3 className="text-base font-bold text-[#3c3c3c] font-sans tracking-wide leading-relaxed">
-                        🌟 {activeModule.quiz[currentQuestionIndex].question}
+                      <h3 className="text-base font-bold text-[#3c3c3c] font-sans tracking-wide leading-relaxed flex items-start gap-2">
+                        <HelpCircle size={18} className="text-[#D67B52] shrink-0 mt-0.5" />
+                        <span>{activeModule.quiz[currentQuestionIndex].question}</span>
                       </h3>
 
                       {/* Options List */}
-                      <div className="space-y-2.5">
+                      <motion.div 
+                        variants={{
+                          hidden: { opacity: 0 },
+                          show: {
+                            opacity: 1,
+                            transition: {
+                              staggerChildren: 0.08,
+                            }
+                          }
+                        }}
+                        initial="hidden"
+                        animate="show"
+                        className="space-y-2.5"
+                      >
                         {activeModule.quiz[currentQuestionIndex].options.map((option, oIdx) => {
                           const isSelected = selectedOptionIndex === oIdx;
                           const isCorrect = oIdx === activeModule.quiz[currentQuestionIndex].correctAnswerIndex;
@@ -1284,9 +1344,21 @@ export default function App() {
                               key={oIdx}
                               disabled={isQuestionSubmitted}
                               onClick={() => setSelectedOptionIndex(oIdx)}
-                              whileHover={!isQuestionSubmitted ? { scale: 1.015, x: 4 } : {}}
+                              variants={{
+                                hidden: { opacity: 0, y: 15, x: -5 },
+                                show: { opacity: 1, y: 0, x: 0, transition: { type: "spring", stiffness: 220, damping: 16 } }
+                              }}
+                              whileHover={!isQuestionSubmitted ? { scale: 1.015, x: 5 } : {}}
                               whileTap={!isQuestionSubmitted ? { scale: 0.985 } : {}}
-                              transition={{ duration: 0.15 }}
+                              animate={
+                                isQuestionSubmitted && isSelected
+                                  ? isCorrect
+                                    ? { scale: [1, 1.04, 1, 1.02, 1], transition: { duration: 0.45 } }
+                                    : { x: [0, -6, 6, -4, 4, 0], transition: { duration: 0.45 } }
+                                  : isSelected
+                                  ? { scale: 1.01 }
+                                  : { scale: 1 }
+                              }
                               className={`w-full text-left p-3.5 rounded-xl text-[12px] font-mono transition-all flex items-start justify-between gap-2 cursor-pointer ${optionStyle}`}
                             >
                               <div className="flex items-start gap-2">
@@ -1304,7 +1376,7 @@ export default function App() {
                             </motion.button>
                           );
                         })}
-                      </div>
+                      </motion.div>
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -1312,7 +1384,12 @@ export default function App() {
                   {/* Yeti's Cozy Hint Speech Bubble */}
                   {isHintUnlocked && (
                     <div className="p-4 bg-amber-50/40 border-2 border-amber-500 rounded-2xl flex gap-3 shadow-[2px_2px_0px_0px_#f59e0b] relative overflow-hidden animate-fade-in">
-                      <div className="text-3xl shrink-0 select-none">🐻</div>
+                      <img 
+                        src={YETI_BADGE_ASSET} 
+                        alt="Yeti" 
+                        className="w-10 h-10 rounded-full border-2 border-[#D67B52] shadow-sm object-cover bg-white pointer-events-none shrink-0" 
+                        referrerPolicy="no-referrer"
+                      />
                       <div className="space-y-1">
                         <span className="text-[10px] font-mono font-black text-amber-700 block uppercase tracking-wider">
                           Yeti's Cozy Assessment Clue:
@@ -1362,7 +1439,15 @@ export default function App() {
                             onClick={handleUnlockHint}
                             className="px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-[#D67B52] border-2 border-[#D67B52] hover:border-amber-600 font-extrabold rounded-xl text-[11px] font-mono cursor-pointer transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_0px_#D67B52] active:translate-y-[1px]"
                           >
-                            <span>🐻 Ask Yeti for Hint</span>
+                            <span className="flex items-center gap-1.5">
+                              <img 
+                                src={YETI_BADGE_ASSET} 
+                                alt="Yeti" 
+                                className="w-4 h-4 rounded-full object-cover border border-[#D67B52]/40" 
+                                referrerPolicy="no-referrer"
+                              />
+                              <span>Ask Yeti for Hint</span>
+                            </span>
                             <span className="bg-[#D67B52] text-white px-1.5 py-0.2 rounded text-[9px] font-mono font-black">-15 XP</span>
                           </button>
                         ) : (
@@ -1394,7 +1479,7 @@ export default function App() {
                         onClick={handleNextQuestion}
                         className="px-6 py-2 bg-[#89A8B2] hover:bg-[#89A8B2]/90 text-white border-2 border-[#3c3c3c] font-bold rounded-xl text-xs font-mono cursor-pointer transition-all shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center gap-1"
                       >
-                        <span>{currentQuestionIndex === activeModule.quiz.length - 1 ? "Get Results 🏆" : "Next Question"}</span>
+                        <span>{currentQuestionIndex === activeModule.quiz.length - 1 ? "Get Results" : "Next Question"}</span>
                       </button>
                     )}
                   </div>
@@ -1404,7 +1489,14 @@ export default function App() {
             {/* QUIZ COMPLETION RESULT SCREEN */}
             {flowState === "quiz-result" && (
               <div className="max-w-md mx-auto bg-white border-4 border-[#3c3c3c] rounded-3xl p-6 shadow-[6px_6px_0px_0px_#3c3c3c] relative text-center text-[#3c3c3c]">
-                <span className="text-4xl block mb-3">🏔️</span>
+                <div className="flex justify-center mb-3">
+                  <img 
+                    src={YETI_BADGE_ASSET} 
+                    alt="Yeti Approved" 
+                    className="w-16 h-16 rounded-full border-4 border-[#3c3c3c] shadow-md object-cover bg-white" 
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
                 
                 {correctAnswersCount / activeModule.quiz.length >= 0.7 ? (
                   <div className="space-y-4">
@@ -1499,7 +1591,7 @@ export default function App() {
                 ) : (
                   <div className="space-y-4">
                     <h2 className="text-lg font-bold text-rose-600 font-serif">
-                      ❄️ Yeti's Chalet: Study Session Needed
+                      Yeti's Chalet: Study Session Needed
                     </h2>
                     <p className="text-xs text-[#6D5D6E] font-mono leading-normal font-medium">
                       your score of <strong className="text-[#3c3c3c]">{correctAnswersCount}/{activeModule.quiz.length}</strong> ({Math.round((correctAnswersCount / activeModule.quiz.length) * 100)}%) is slightly below the 70% threshold required to complete this module. 
@@ -1736,16 +1828,21 @@ export default function App() {
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#89A8B2] via-[#E8A0BF] to-[#D67B52]" />
 
               <div className="absolute top-3 right-3 text-stone-400 font-mono text-[9px] select-none font-bold">
-                Yeti Milestone! 🐻
+                Yeti Milestone!
               </div>
 
               {/* Big colorful emoji/sparkle center pop */}
               <motion.div 
-                animate={{ scale: [1, 1.2, 0.95, 1.1, 1], rotate: [0, 5, -5, 5, 0] }}
-                transition={{ duration: 1.2, ease: "easeInOut", repeat: Infinity, repeatDelay: 2 }}
-                className="w-20 h-20 bg-[#F3EFEA] border-3 border-[#3c3c3c] rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-[3px_3px_0px_0px_#3c3c3c] mt-2"
+                animate={{ scale: [1, 1.08, 0.98, 1.05, 1], rotate: [0, 5, -5, 5, 0] }}
+                transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
+                className="w-20 h-20 bg-[#F3EFEA] border-3 border-[#3c3c3c] rounded-3xl mx-auto overflow-hidden shadow-[3px_3px_0px_0px_#3c3c3c] mt-2 flex items-center justify-center"
               >
-                🎓
+                <img 
+                  src={YETI_BADGE_ASSET} 
+                  alt="Milestone" 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer"
+                />
               </motion.div>
 
               <h2 className="text-3xl font-extrabold font-serif text-[#3c3c3c] mt-4 tracking-tight">
@@ -1754,10 +1851,10 @@ export default function App() {
 
               <p className="font-mono text-xs font-bold text-[#89A8B2] mt-1.5 uppercase tracking-wide">
                 Rank: {
-                  user.level === 5 ? "🎓 Lofi Mastery Yeti" :
-                  user.level === 4 ? "🦉 Parallel Sage" :
-                  user.level === 3 ? "⚔️ Move Tactician" :
-                  user.level === 2 ? "🎒 Sui Apprentice" : "❄️ Cozy Explorer"
+                  user.level === 5 ? "Lofi Mastery Yeti" :
+                  user.level === 4 ? "Parallel Sage" :
+                  user.level === 3 ? "Move Tactician" :
+                  user.level === 2 ? "Sui Apprentice" : "Cozy Explorer"
                 }
               </p>
 
@@ -1766,10 +1863,10 @@ export default function App() {
                   NEW REWARD ✓
                 </span>
                 <p className="font-bold text-[#3c3c3c] mb-1">
-                  {user.level === 5 ? "👑 Total Academy Mastery achieved!" :
-                   user.level === 4 ? "🚀 Parallel Gas refunds enabled at Swap Desk!" :
-                   user.level === 3 ? "⚡ Risk factors and smart router unlocked!" :
-                   "🔓 New smart contract modules ready on Classroom syllabus!"}
+                  {user.level === 5 ? "Total Academy Mastery achieved!" :
+                   user.level === 4 ? "Parallel Gas refunds enabled at Swap Desk!" :
+                   user.level === 3 ? "Risk factors and smart router unlocked!" :
+                   "New smart contract modules ready on Classroom syllabus!"}
                 </p>
                 <span className="text-[11px] font-mono text-[#89A8B2] font-semibold block mt-1">
                   {user.level === 5 ? "+500 CLAY Rank multiplier bonus granted." :
@@ -1800,7 +1897,7 @@ export default function App() {
       {/* Footer copyright */}
       <footer className="border-t-4 border-[#3c3c3c] bg-[#F3EFEA] p-4 text-center text-[10px] text-[#6D5D6E] font-mono">
         <p className="flex items-center justify-center gap-1 select-none font-bold">
-          <span>🏔️</span>
+          <Compass size={12} className="text-[#6D5D6E]" />
           <span>© 2026 Lofi Academy. Built for CLAY Hackathon. All rights preserved.</span>
         </p>
       </footer>
