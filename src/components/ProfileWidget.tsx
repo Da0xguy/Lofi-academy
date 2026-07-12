@@ -7,6 +7,28 @@ import { AudioPlayerWidget } from "./AudioPlayerWidget";
 import { AvatarWrapper } from "./AvatarWrapper";
 import { getFirebaseUserProfile, saveFirebaseUserProfile } from "../lib/firestoreUtils";
 
+import SUI_BASICS_IMAGE from "../assets/images/sui_basics_thumbnail_1783783912295.jpg";
+import SUI_DEFI_IMAGE from "../assets/images/sui_defi_thumbnail_1783783923939.jpg";
+import SUI_PROTOCOLS_IMAGE from "../assets/images/sui_protocols_thumbnail_1783783935982.jpg";
+import SUI_HISTORY_IMAGE from "../assets/images/sui_history_thumbnail_1783783947579.jpg";
+import SUI_MOVE_CODING_IMAGE from "../assets/images/sui_move_coding_thumbnail_1783783961981.jpg";
+import SUI_SDK_INDEXING_IMAGE from "../assets/images/sui_sdk_indexing_thumbnail_1783783974108.jpg";
+import SUI_CONTRACT_TESTING_IMAGE from "../assets/images/sui_contract_testing_thumbnail_1783783987062.jpg";
+import LOFI_FOUNDATION_IMAGE from "../assets/images/lofi_foundation_thumbnail_1783858146459.jpg";
+import YETI_BADGE_ASSET from "../assets/images/yeti_badge_1779633396226.png";
+
+const BADGE_IMAGES: Record<string, string> = {
+  "sui-basics": SUI_BASICS_IMAGE,
+  "sui-defi": SUI_DEFI_IMAGE,
+  "sui-protocols": SUI_PROTOCOLS_IMAGE,
+  "sui-history": SUI_HISTORY_IMAGE,
+  "sui-move-coding": SUI_MOVE_CODING_IMAGE,
+  "sui-sdk-indexing": SUI_SDK_INDEXING_IMAGE,
+  "sui-contract-testing": SUI_CONTRACT_TESTING_IMAGE,
+  "lofi-foundation": LOFI_FOUNDATION_IMAGE,
+  "worthless-nft": YETI_BADGE_ASSET,
+};
+
 interface ProfileWidgetProps {
   user: UserProfile;
   onChangeUser: (updates: Partial<UserProfile>) => void;
@@ -166,6 +188,33 @@ export function ProfileWidget({
       borderColor: "border-yellow-400",
       glowColor: "shadow-yellow-500/10",
       bgClass: "bg-yellow-50/70 text-amber-900 border-yellow-400/80",
+    },
+    {
+      id: "sui-sdk-indexing",
+      title: "Sui SDK & Indexer Badge",
+      emoji: "🔌",
+      description: "Mastered json-rpc clients, event subscriptions, and custom indexing schemas.",
+      borderColor: "border-teal-300",
+      glowColor: "shadow-teal-500/10",
+      bgClass: "bg-teal-50/70 text-teal-950 border-teal-400/80",
+    },
+    {
+      id: "sui-contract-testing",
+      title: "Sui Verification Badge",
+      emoji: "🧪",
+      description: "Mastered ts-sdk tests, forge dry-runs, and formal prover specifications.",
+      borderColor: "border-indigo-300",
+      glowColor: "shadow-indigo-500/10",
+      bgClass: "bg-indigo-50/70 text-indigo-950 border-indigo-400/80",
+    },
+    {
+      id: "lofi-foundation",
+      title: "Lofi Foundation Badge",
+      emoji: "☕",
+      description: "Mastered cozy lofi background loops, ambient study environments, and developer focus.",
+      borderColor: "border-[#D67B52]/40",
+      glowColor: "shadow-orange-500/10",
+      bgClass: "bg-[#D67B52]/10 text-orange-950 border-[#D67B52]/40",
     },
     {
       id: "worthless-nft",
@@ -664,6 +713,42 @@ export function ProfileWidget({
               walletConnected={!!user.walletAddress}
               color="text-[#3c3c3c] bg-yellow-50/40 border-2 border-[#3c3c3c]"
             />
+
+            {/* SDK Indexing badge */}
+            <BadgeMintRow
+              id="sui-sdk-indexing"
+              title="Sui SDK & Indexers"
+              isCompleted={user.completedTracks.includes("sui-sdk-indexing")}
+              mintedData={user.mintedBadges.find((b) => b.trackId === "sui-sdk-indexing")}
+              onMint={() => handleMintBadge("sui-sdk-indexing", "Sui SDK & Indexer Badge")}
+              isMinting={isMinting === "sui-sdk-indexing"}
+              walletConnected={!!user.walletAddress}
+              color="text-[#3c3c3c] bg-teal-50/40 border-2 border-[#3c3c3c]"
+            />
+
+            {/* Contract Testing badge */}
+            <BadgeMintRow
+              id="sui-contract-testing"
+              title="Sui Verification & Testing"
+              isCompleted={user.completedTracks.includes("sui-contract-testing")}
+              mintedData={user.mintedBadges.find((b) => b.trackId === "sui-contract-testing")}
+              onMint={() => handleMintBadge("sui-contract-testing", "Sui Verification Badge")}
+              isMinting={isMinting === "sui-contract-testing"}
+              walletConnected={!!user.walletAddress}
+              color="text-[#3c3c3c] bg-indigo-50/40 border-2 border-[#3c3c3c]"
+            />
+
+            {/* Lofi Foundation badge */}
+            <BadgeMintRow
+              id="lofi-foundation"
+              title="Lofi Foundation"
+              isCompleted={user.completedTracks.includes("lofi-foundation")}
+              mintedData={user.mintedBadges.find((b) => b.trackId === "lofi-foundation")}
+              onMint={() => handleMintBadge("lofi-foundation", "Lofi Foundation Badge")}
+              isMinting={isMinting === "lofi-foundation"}
+              walletConnected={!!user.walletAddress}
+              color="text-[#3c3c3c] bg-orange-50/40 border-2 border-[#3c3c3c]"
+            />
           </div>
 
           {/* Divider and Claimable Worthless NFT Section */}
@@ -778,10 +863,19 @@ export function ProfileWidget({
                   </div>
 
                   {/* Icon Medallion Badge circle */}
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 border-[#3c3c3c] ${
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 border-[#3c3c3c] overflow-hidden ${
                     isMinted ? "bg-white shadow-[2px_2px_0px_0px_#3c3c3c]" : "bg-[#E8E1D9]/40"
                   } mb-3`}>
-                    {renderBadgeIcon(badge.id, isMinted)}
+                    {BADGE_IMAGES[badge.id] ? (
+                      <img 
+                        src={BADGE_IMAGES[badge.id]} 
+                        alt={badge.title} 
+                        className={`w-full h-full object-cover ${isMinted ? "" : "opacity-45 grayscale"}`}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      renderBadgeIcon(badge.id, isMinted)
+                    )}
                   </div>
 
                   {/* Descriptions */}
@@ -1136,6 +1230,53 @@ const handleRealMint = () => {
             </div>
           )}
 
+        </div>
+      </div>
+
+      {/* DAILY STUDY LOGIN CALENDAR & STREAK RECORDS */}
+      <div id="login-calendar-records-panel" className="bg-white border-4 border-[#3c3c3c] rounded-[24px] p-6 shadow-[4px_4px_0px_0px_#3c3c3c]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-dashed border-[#3c3c3c]/15">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[#3c3c3c] font-mono flex items-center gap-2">
+              <Calendar className="text-[#D67B52]" size={18} />
+              <span>Cozy Study Days Log Calendar</span>
+            </h3>
+            <p className="text-xs text-[#6D5D6E] mt-1 font-sans">
+              Keep consistent study habits! We track every single calendar day you log in to study. Earn higher bonus multipliers the more days you study!
+            </p>
+          </div>
+          <div className="bg-[#FAF8F5] px-3.5 py-1.5 border-2 border-[#3c3c3c] rounded-2xl flex items-center gap-2 font-mono text-xs shadow-[2px_2px_0px_0px_#3c3c3c] self-start sm:self-auto select-none">
+            <span className="text-[#6D5D6E] font-bold">Total Days Logged:</span>
+            <span className="font-extrabold text-[#D67B52] bg-amber-50 px-2 py-0.5 border border-[#D67B52]/30 rounded">
+              {(user as any).loginDates?.length || 1} Days
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <span className="text-xs font-mono font-bold text-[#6D5D6E] block mb-2">My Attendance Log:</span>
+          {((user as any).loginDates && (user as any).loginDates.length > 0) ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              {((user as any).loginDates as string[]).map((dateStr, idx) => {
+                const d = new Date(dateStr + "T00:00:00");
+                const formatted = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                return (
+                  <div 
+                    key={idx}
+                    className="bg-[#A6CFBE]/10 border-2 border-[#3c3c3c] rounded-xl p-2.5 text-center flex flex-col items-center justify-center relative overflow-hidden shadow-[2px_2px_0px_0px_#3c3c3c]"
+                  >
+                    <span className="text-lg">🌲</span>
+                    <span className="text-[10px] font-mono font-black text-[#2d5241] mt-1">{formatted}</span>
+                    <span className="text-[8px] font-mono bg-[#A6CFBE]/30 text-[#2d5241] px-1.5 py-0.5 rounded-full mt-1 border border-[#3c3c3c]/15 font-bold">Day {idx + 1}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-[#FAF8F5] border-2 border-dashed border-[#3c3c3c]/20 p-6 rounded-2xl text-center text-xs text-[#6D5D6E]">
+              🏕️ No daily logs recorded yet. Today is your very first day logged in! Keep it up!
+            </div>
+          )}
         </div>
       </div>
 

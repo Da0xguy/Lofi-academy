@@ -27,6 +27,7 @@ Unlike conventional, dry developmental gateways, Lofi Quest places the user insi
 
 ## 3. Key Visual and Interactive Features
 *   **Dual Aesthetic Modes**: Toggle fluidly between a crisp, high-contrast light theme and a rich, eye-safe cabin dark mode.
+*   **Interactive Sui Trail Map & Thematic Backdrops**: A visual serpentine trail map connects modules dynamically. Based on the active track selection, the map dynamically loads customized scenic backing illustrations (e.g., beautiful mountains, liquid staking fields, and the warm, sleeping Yeti lofi room for the **Lofi Foundation**), stylized with subtle blur filters and soft gradient overlays to preserve high contrast and readability.
 *   **Interactive Chalkboards**: View custom visual slides containing explanatory schemas, code highlights, and interactive multiple-choice quizzes for each module.
 *   **Interactive Synthesizer/Cassette Player**: Includes an integrated lofi audio widget allowing students to play, pause, skip, and adjust the volume of a curated track list of cozy lofi beats.
 *   **Interactive Sandbox (PTB & DeFi Builder)**: Construct composite, multi-step transactions (Minting standard SUI coin, swapping tokens in a CLMM pool, depositing assets into a lending market, and staking tokens), executing simulated smart contracts on a virtual machine replica.
@@ -138,11 +139,15 @@ The helper companion **Yeti** was structured to offer conversational assistance.
 
 ---
 
-## 9. Persistent Multi-User Leaderboard Setup
-To create real community engagement, Lofi Quest integrates a cloud database to coordinate a live scoreboard showing study rankings:
+## 9. Persistent Multi-User Profiles & Leaderboard Setup
+To create real community engagement and prevent progress loss, Lofi Quest integrates a cloud database to manage user profiles and coordinate a live scoreboard showing study rankings:
 
-*   **Database Pipeline**: The backend `server.ts` queries a Cloud Firestore database.
-*   **Data Serialization**: Upon completing assessments, user schemas containing username, avatar configuration parameters, XP, completed milestones list, and timestamps serialize to the server.
+*   **User Profile Database Synchronization**:
+    *   `GET /api/user/profile/:userId`: Loads user stats, completed tracks, levels, custom avatar metadata, and streaks from Cloud Firestore on login.
+    *   `POST /api/user/profile/:userId`: Securely persists state updates back to Cloud Firestore whenever the user finishes a module slide, executes a simulated PTB, or gains XP.
+*   **Leaderboard Pipeline**: 
+    *   `GET /api/sui/leaderboard`: Collects top-ranking user documents from Cloud Firestore.
+    *   `POST /api/sui/leaderboard`: Syncs active scores on module completion.
 *   **Fallback Mock Indexes**: For local setups lacking database configurations, the endpoint blends realistic online bots to present mock competitors, keeping visual panels engaging and warm.
 
 ---

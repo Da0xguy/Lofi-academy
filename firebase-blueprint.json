@@ -16,6 +16,7 @@
         "mintedBadges": { "type": "array", "description": "List of minted badges stored in the user Kiosk" },
         "streak": { "type": "integer", "description": "Consecutive days studies logged in" },
         "lastLoginDate": { "type": "string", "description": "YYYY-MM-DD format of last study login" },
+        "loginDates": { "type": "array", "description": "Logged date strings in YYYY-MM-DD format" },
         "yetiHighScore": { "type": "integer", "description": "Verified maximum consensus arcade game score reached by user" },
         "yetiGamesPlayed": { "type": "integer", "description": "Total number of completed validation arcade starts for this user" }
       },

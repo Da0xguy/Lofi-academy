@@ -99,6 +99,7 @@ export async function saveFirebaseUserProfile(userId: string, profileData: any) 
     })) : [],
     streak: Number(profileData.streak ?? 1),
     lastLoginDate: profileData.lastLoginDate || new Date().toISOString().split("T")[0],
+    loginDates: Array.isArray(profileData.loginDates) ? profileData.loginDates : (profileData.lastLoginDate ? [profileData.lastLoginDate] : []),
     yetiHighScore: Number(profileData.yetiHighScore ?? 0),
     yetiGamesPlayed: Number(profileData.yetiGamesPlayed ?? 0)
   };

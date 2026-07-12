@@ -57,6 +57,7 @@ export interface UserProfile {
   }[];
   streak: number;
   lastLoginDate: string;
+  loginDates?: string[];
   yetiHighScore: number;
   yetiGamesPlayed: number;
 }

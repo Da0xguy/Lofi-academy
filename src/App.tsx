@@ -100,13 +100,15 @@ const getModuleVideo = (module: TrackModule) => {
 import YETI_STUDY_ASSET from "./assets/images/yeti_study_space_1779949789879.png";
 import YETI_BADGE_ASSET from "./assets/images/yeti_badge_1779633396226.png";
 
-import SUI_BASICS_IMAGE from "./assets/images/sui_basics_thumbnail_1783783912295.jpg";
-import SUI_DEFI_IMAGE from "./assets/images/sui_defi_thumbnail_1783783923939.jpg";
-import SUI_PROTOCOLS_IMAGE from "./assets/images/sui_protocols_thumbnail_1783783935982.jpg";
-import SUI_HISTORY_IMAGE from "./assets/images/sui_history_thumbnail_1783783947579.jpg";
-import SUI_MOVE_CODING_IMAGE from "./assets/images/sui_move_coding_thumbnail_1783783961981.jpg";
-import SUI_SDK_INDEXING_IMAGE from "./assets/images/sui_sdk_indexing_thumbnail_1783783974108.jpg";
-import SUI_CONTRACT_TESTING_IMAGE from "./assets/images/sui_contract_testing_thumbnail_1783783987062.jpg";
+import SUI_BASICS_IMAGE from "./assets/images/sui_basics_thumbnail_1783860770092.jpg";
+import SUI_DEFI_IMAGE from "./assets/images/sui_defi_thumbnail_1783860783163.jpg";
+import SUI_PROTOCOLS_IMAGE from "./assets/images/sui_protocols_thumbnail_1783860795899.jpg";
+import SUI_HISTORY_IMAGE from "./assets/images/sui_history_thumbnail_1783860808900.jpg";
+import SUI_MOVE_CODING_IMAGE from "./assets/images/sui_move_coding_thumbnail_1783860820032.jpg";
+import SUI_SDK_INDEXING_IMAGE from "./assets/images/sui_sdk_indexing_thumbnail_1783860832941.jpg";
+import SUI_CONTRACT_TESTING_IMAGE from "./assets/images/sui_contract_testing_thumbnail_1783860844351.jpg";
+import LOFI_FOUNDATION_IMAGE from "./assets/images/lofi_foundation_thumbnail_1783860857043.jpg";
+import GREEN_FOREST_MAP_BG from "./assets/images/green_forest_trail_map_bg_1783860733665.jpg";
 
 const TRACK_IMAGES: Record<string, string> = {
   "sui-basics": SUI_BASICS_IMAGE,
@@ -116,6 +118,7 @@ const TRACK_IMAGES: Record<string, string> = {
   "sui-move-coding": SUI_MOVE_CODING_IMAGE,
   "sui-sdk-indexing": SUI_SDK_INDEXING_IMAGE,
   "sui-contract-testing": SUI_CONTRACT_TESTING_IMAGE,
+  "lofi-foundation": LOFI_FOUNDATION_IMAGE,
 };
 
 export default function App() {
@@ -346,7 +349,12 @@ export default function App() {
             // Auto-link SUI wallet if connected
             const activeWallet = cloudProfile.walletAddress || currentAccount?.address || user.walletAddress || null;
 
-            const mergedProfile = {
+            const mergedDates = Array.from(new Set([
+              ...(Array.isArray(cloudProfile.loginDates) ? cloudProfile.loginDates : []),
+              ...(Array.isArray(user.loginDates) ? user.loginDates : (user.lastLoginDate ? [user.lastLoginDate] : []))
+            ]));
+
+            const rawProfile: UserProfile = {
               username: cloudProfile.username || user.username || "CozyExplorer",
               avatar: cloudProfile.avatar || user.avatar || "🦊",
               email: user.email,
@@ -360,22 +368,43 @@ export default function App() {
               mintedBadges: mergedBadges,
               streak: Math.max(Number(cloudProfile.streak ?? 1), user.streak),
               lastLoginDate: cloudProfile.lastLoginDate || user.lastLoginDate || new Date().toISOString().split("T")[0],
+              loginDates: mergedDates,
               yetiHighScore: Math.max(Number(cloudProfile.yetiHighScore ?? 0), user.yetiHighScore),
               yetiGamesPlayed: Math.max(Number(cloudProfile.yetiGamesPlayed ?? 0), user.yetiGamesPlayed)
             };
 
-            setUser(mergedProfile);
-            await saveFirebaseUserProfile(emailLower, mergedProfile);
+            const dailyResult = checkDailyLoginProgress(rawProfile);
+            
+            if (dailyResult.isNewDay) {
+              setDailyLoginDaysCount(dailyResult.daysCount);
+              setDailyLoginStreak(dailyResult.newStreak);
+              setDailyLoginBonusAmount(dailyResult.bonusXP);
+            }
+
+            setUser(dailyResult.updatedProfile);
+            await saveFirebaseUserProfile(emailLower, dailyResult.updatedProfile);
           } else {
             // First time this email is used, initialize profile in cloud
             const activeWallet = currentAccount?.address || user.walletAddress || null;
-            const updatedProfile = {
+            const initialDates = Array.isArray(user.loginDates) ? user.loginDates : (user.lastLoginDate ? [user.lastLoginDate] : [new Date().toISOString().split("T")[0]]);
+            
+            const rawProfile: UserProfile = {
               ...user,
               walletAddress: activeWallet,
-              claimedWelcomeXP: true
+              claimedWelcomeXP: true,
+              loginDates: initialDates
             };
-            await saveFirebaseUserProfile(emailLower, updatedProfile);
-            setUser(updatedProfile);
+
+            const dailyResult = checkDailyLoginProgress(rawProfile);
+            
+            if (dailyResult.isNewDay) {
+              setDailyLoginDaysCount(dailyResult.daysCount);
+              setDailyLoginStreak(dailyResult.newStreak);
+              setDailyLoginBonusAmount(dailyResult.bonusXP);
+            }
+
+            await saveFirebaseUserProfile(emailLower, dailyResult.updatedProfile);
+            setUser(dailyResult.updatedProfile);
           }
           loadedFirebaseEmailRef.current = emailLower;
         } catch (error: any) {
@@ -397,6 +426,87 @@ export default function App() {
 
   // Streak bonus claim option
   const [claimedStreakBonus, setClaimedStreakBonus] = useState<boolean>(false);
+  const [showDailyLoginOverlay, setShowDailyLoginOverlay] = useState<boolean>(false);
+  const [dailyLoginBonusAmount, setDailyLoginBonusAmount] = useState<number>(0);
+  const [dailyLoginDaysCount, setDailyLoginDaysCount] = useState<number>(0);
+  const [dailyLoginStreak, setDailyLoginStreak] = useState<number>(0);
+
+  // Helper function to process daily login and streak-based XP
+  const checkDailyLoginProgress = (currentProfile: UserProfile): { 
+    updatedProfile: UserProfile; 
+    bonusXP: number; 
+    newStreak: number; 
+    daysCount: number; 
+    isNewDay: boolean; 
+  } => {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const lastLogin = currentProfile.lastLoginDate || "";
+    
+    if (lastLogin !== todayStr) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split("T")[0];
+      
+      let newStreak = 1;
+      if (lastLogin === yesterdayStr) {
+        newStreak = (currentProfile.streak || 1) + 1;
+      } else {
+        newStreak = 1;
+      }
+      
+      const currentDates = currentProfile.loginDates || [];
+      const updatedDates = Array.from(new Set([...currentDates, todayStr]));
+      // 15 bonus XP per total logged in day
+      const bonusXP = updatedDates.length * 15;
+      
+      return {
+        updatedProfile: {
+          ...currentProfile,
+          lastLoginDate: todayStr,
+          streak: newStreak,
+          loginDates: updatedDates,
+          xp: currentProfile.xp + bonusXP
+        },
+        bonusXP,
+        newStreak,
+        daysCount: updatedDates.length,
+        isNewDay: true
+      };
+    }
+    
+    // Already logged in today
+    const currentDates = currentProfile.loginDates || [];
+    const updatedDates = currentDates.includes(lastLogin) ? currentDates : [...currentDates, lastLogin];
+    return {
+      updatedProfile: {
+        ...currentProfile,
+        loginDates: updatedDates
+      },
+      bonusXP: 0,
+      newStreak: currentProfile.streak,
+      daysCount: updatedDates.length,
+      isNewDay: false
+    };
+  };
+
+  // Local-only daily login check
+  useEffect(() => {
+    if (user.email) return; // Managed by Firebase Sync to avoid double awards
+
+    const res = checkDailyLoginProgress(user);
+    if (res.isNewDay) {
+      setUser(res.updatedProfile);
+      setDailyLoginDaysCount(res.daysCount);
+      setDailyLoginStreak(res.newStreak);
+      setDailyLoginBonusAmount(res.bonusXP);
+    } else {
+      // If profile doesn't have loginDates setup yet, initialize it
+      if (!user.loginDates || user.loginDates.length === 0) {
+        setUser(res.updatedProfile);
+      }
+    }
+  }, [user.email]);
+
   const [leaderboardRefreshCode, setLeaderboardRefreshCode] = useState<number>(0);
 
   // States for XP and Level up celebratory animations/popups
@@ -856,6 +966,20 @@ export default function App() {
       className="min-h-screen bg-[#F9F6F0] text-[#3c3c3c] flex flex-col font-sans selection:bg-[#D67B52] selection:text-white relative"
     >
       <CustomCursor />
+
+      {/* Dynamic Screen Backdrop Image matching the active course map */}
+      {activeTrack && TRACK_IMAGES[activeTrack.id] && (
+        <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden">
+          <img 
+            src={TRACK_IMAGES[activeTrack.id]} 
+            alt="" 
+            className="w-full h-full object-cover opacity-[0.06] dark:opacity-[0.04] transition-all duration-700 ease-in-out scale-105 filter blur-[3px]" 
+            referrerPolicy="no-referrer"
+          />
+          {/* Subtle vignette/gradient fading out the edges */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#F9F6F0]/20 via-transparent to-[#F9F6F0]/50 dark:from-zinc-950/20 dark:to-zinc-950/50" />
+        </div>
+      )}
       
       {/* 1. TOP HEADER & HUD STATUS */}
       <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
@@ -958,25 +1082,6 @@ export default function App() {
               </motion.div>
             </div>
 
-            {/* Daily Streak Indicator */}
-            <div className="flex items-center gap-1.5 bg-white border-2 border-[#3c3c3c] px-2.5 sm:px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
-              <Flame size={14} className="text-orange-500 animate-pulse fill-orange-500" />
-              <span className="text-[#6D5D6E] font-bold hidden sm:inline">Streak:</span>
-              <strong className="text-orange-500 font-extrabold">{user.streak}<span className="hidden sm:inline"> Day</span></strong>
-              
-              {!claimedStreakBonus ? (
-                <button
-                  onClick={handleClaimStreakBonus}
-                  id="btn-claim-streak"
-                  className="ml-1 px-1.5 py-0.5 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold border border-[#3c3c3c] rounded hover:shadow-[1px_1px_0px_0px_#3c3c3c] text-[9px] sm:text-[10px] uppercase cursor-pointer"
-                >
-                  Bonus
-                </button>
-              ) : (
-                <span className="ml-1 text-[9px] sm:text-[10px] text-green-600 uppercase font-sans font-bold">✓</span>
-              )}
-            </div>
-
             {/* Wallet Quick Status indicator */}
             <div className="text-xs font-mono flex items-center gap-2">
               <ConnectButton connectText="Connect Wallet" />
@@ -987,13 +1092,10 @@ export default function App() {
                     setDarkMode(!darkMode);
                   });
                 }}
-                className="px-3 py-1.5 bg-white border-2 border-[#3c3c3c] rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs font-bold text-[#3c3c3c] hover:scale-102 transition-all cursor-pointer flex items-center gap-1.5 active:translate-y-[1px]"
+                className="p-2 bg-white border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c] hover:scale-105 active:translate-y-[1px] transition-all cursor-pointer flex items-center justify-center"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               >
-                <span className="flex items-center justify-center shrink-0">
-                  {darkMode ? <Moon size={13} className="text-indigo-400 fill-indigo-400" /> : <Sun size={13} className="text-amber-500 fill-amber-500" />}
-                </span>
-                <span className="hidden sm:inline">{darkMode ? "Dark" : "Light"}</span>
+                {darkMode ? <Moon size={14} className="text-indigo-400 fill-indigo-400" /> : <Sun size={14} className="text-amber-500 fill-amber-500" />}
               </button>
             </div>
           </div>
@@ -1147,6 +1249,7 @@ export default function App() {
                   activeModuleId={activeModuleId}
                   onSelectModule={handleStartModule}
                   userXp={user.xp}
+                  trackImage={TRACK_IMAGES[activeTrack.id]}
                 />
 
                 <div className="space-y-4">
@@ -1272,7 +1375,7 @@ export default function App() {
                   totalSteps={activeModule.steps.length}
                   onNext={handleNextStep}
                   onPrev={handlePrevStep}
-                  yetiStudyAsset={YETI_STUDY_ASSET}
+                  yetiStudyAsset={TRACK_IMAGES[activeTrack.id] || YETI_STUDY_ASSET}
                 />
               </div>
             )}
@@ -1893,6 +1996,9 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Daily Login Habit Celebration Sparkle Popup Overlay */}
+      {/* Completely removed per user request */}
 
       {/* Footer copyright */}
       <footer className="border-t-4 border-[#3c3c3c] bg-[#F3EFEA] p-4 text-center text-[10px] text-[#6D5D6E] font-mono">

@@ -9,6 +9,7 @@ interface SuiTrailMapProps {
   activeModuleId: string;
   onSelectModule: (mod: TrackModule) => void;
   userXp?: number;
+  trackImage?: string;
 }
 
 export default function SuiTrailMap({
@@ -17,6 +18,7 @@ export default function SuiTrailMap({
   activeModuleId,
   onSelectModule,
   userXp,
+  trackImage,
 }: SuiTrailMapProps) {
   const [hoveredModId, setHoveredModId] = useState<string | null>(null);
 
@@ -108,9 +110,20 @@ export default function SuiTrailMap({
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-[#D67B52] text-white border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c]">
-            <Map size={16} />
-          </div>
+          {trackImage ? (
+            <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] shrink-0 bg-white">
+              <img 
+                src={trackImage} 
+                alt="" 
+                className="w-full h-full object-cover" 
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ) : (
+            <div className="p-2 bg-[#D67B52] text-white border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] shrink-0">
+              <Map size={16} />
+            </div>
+          )}
           <div>
             <h3 className="text-xs sm:text-sm font-black font-sans text-[#3c3c3c] uppercase tracking-tight flex items-center gap-1.5">
               <span>Sui Adventure Map</span>
@@ -147,6 +160,20 @@ export default function SuiTrailMap({
       {/* Interactive Map Visual Area */}
       <div className="relative bg-[#B1D3C5]/15 border-2 border-[#3c3c3c] rounded-2xl p-2 sm:p-3 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-stone-400">
         
+        {/* Background Theme Image of the specific Map Set */}
+        {trackImage && (
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden rounded-2xl">
+            <img 
+              src={trackImage} 
+              alt={activeTrack?.title} 
+              className="w-full h-full object-cover opacity-[0.25] filter saturate-[0.8] contrast-[1.1] blur-[1px]" 
+              referrerPolicy="no-referrer"
+            />
+            {/* Soft gradient fading out the image edges and adding a cozy overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FAF8F5]/60 via-[#FAF8F5]/10 to-[#FAF8F5]/40" />
+          </div>
+        )}
+
         {/* Background Grass and Terrain Texture styling */}
         <div className="absolute inset-0 bg-[#A6CFBE]/10 opacity-70 pointer-events-none" />
 
