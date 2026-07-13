@@ -67,50 +67,88 @@ const defaultLeaderboard: LeaderboardEntry[] = [
 // API Endpoints
 // --------------------------------------------------------
 
+// Helper to fetch and format the leaderboard with de-duplication & privacy masking
+async function fetchAndFormatLeaderboard(): Promise<LeaderboardEntry[]> {
+  const usersCol = collection(db, "users");
+  const snapshot = await getDocs(usersCol);
+  const uniqueUsersMap = new Map<string, LeaderboardEntry>();
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (!data) return;
+
+    const badgeIds = Array.isArray(data.mintedBadges)
+      ? data.mintedBadges.map((b: any) => b?.trackId).filter(Boolean)
+      : (Array.isArray(data.completedTracks) ? data.completedTracks : []);
+
+    const email = (data.email || "").toLowerCase().trim();
+    const wallet = (data.walletAddress || "").toLowerCase().trim();
+    const docId = docSnap.id.toLowerCase().trim();
+
+    // Determine canonical identity key
+    const canonicalId = email || wallet || docId;
+    if (!canonicalId) return;
+
+    // Build masked wallet/identity string for public leaderboard display
+    let displayWallet = wallet || docId;
+    if (displayWallet.includes("@")) {
+      const [name, domain] = displayWallet.split("@");
+      const prefix = name.length > 3 ? name.substring(0, 3) : name;
+      displayWallet = `${prefix}...@${domain}`;
+    }
+
+    const xp = Number(data.xp ?? 0);
+    const level = Number(data.level ?? 1);
+    const yetiHighScore = Number(data.yetiHighScore ?? 0);
+
+    const existing = uniqueUsersMap.get(canonicalId);
+    if (existing) {
+      if (xp > existing.xp) {
+        existing.xp = xp;
+        existing.level = level;
+        existing.username = String(data.username || existing.username);
+        existing.avatar = String(data.avatar || existing.avatar);
+      }
+      existing.badges = Array.from(new Set([...existing.badges, ...badgeIds]));
+      if (yetiHighScore > (existing.yetiHighScore || 0)) {
+        existing.yetiHighScore = yetiHighScore;
+      }
+    } else {
+      uniqueUsersMap.set(canonicalId, {
+        username: String(data.username || "CozyExplorer"),
+        avatar: String(data.avatar || "🦊"),
+        wallet: displayWallet,
+        xp: xp,
+        level: level,
+        badges: badgeIds,
+        rankDirection: "same",
+        yetiHighScore: yetiHighScore
+      });
+    }
+  });
+
+  const dbUsers = Array.from(uniqueUsersMap.values());
+  const activeWallets = new Set(
+    dbUsers
+      .map((u) => typeof u.wallet === "string" ? u.wallet.toLowerCase() : "")
+      .filter(Boolean)
+  );
+
+  const finalLeaderboard = [...dbUsers];
+  for (const b of defaultLeaderboard) {
+    if (!activeWallets.has(b.wallet.toLowerCase())) {
+      finalLeaderboard.push(b);
+    }
+  }
+
+  finalLeaderboard.sort((a, b) => b.xp - a.xp);
+  return finalLeaderboard;
+}
+
 // 1. Get Leaderboard & Top 10 with Firestore sync
 app.get("/api/sui/leaderboard", async (req, res) => {
   try {
-    const usersCol = collection(db, "users");
-    const snapshot = await getDocs(usersCol);
-    const dbUsers: LeaderboardEntry[] = [];
-    
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      if (!data) return;
-      
-      const badgeIds = Array.isArray(data.mintedBadges)
-        ? data.mintedBadges.map((b: any) => b?.trackId).filter(Boolean)
-        : (Array.isArray(data.completedTracks) ? data.completedTracks : []);
-
-      const walletStr = data.walletAddress || docSnap.id || "";
-      if (!walletStr) return;
-
-      dbUsers.push({
-        username: String(data.username || "CozyExplorer"),
-        avatar: String(data.avatar || "🦊"),
-        wallet: String(walletStr),
-        xp: Number(data.xp ?? 0),
-        level: Number(data.level ?? 1),
-        badges: badgeIds,
-        rankDirection: "same",
-        yetiHighScore: Number(data.yetiHighScore ?? 0)
-      });
-    });
-
-    const activeWallets = new Set(
-      dbUsers
-        .map(u => typeof u.wallet === "string" ? u.wallet.toLowerCase() : "")
-        .filter(Boolean)
-    );
-    const finalLeaderboard = [...dbUsers];
-    for (const b of defaultLeaderboard) {
-      if (!activeWallets.has(b.wallet.toLowerCase())) {
-        finalLeaderboard.push(b);
-      }
-    }
-
-    // Sort descending by XP
-    finalLeaderboard.sort((a, b) => b.xp - a.xp);
+    const finalLeaderboard = await fetchAndFormatLeaderboard();
     res.json({ success: true, leaderboard: finalLeaderboard });
   } catch (err) {
     console.error("Firestore leaderboard retrieval failed:", err);
@@ -120,14 +158,16 @@ app.get("/api/sui/leaderboard", async (req, res) => {
 
 // 2. Submit/Update User Progress & XP on Leaderboard
 app.post("/api/sui/leaderboard", async (req, res) => {
-  const { username, wallet, xp, level, badges, avatar } = req.body;
+  const { username, wallet, xp, level, badges, avatar, email } = req.body;
   if (!wallet) {
     res.status(400).json({ success: false, error: "Missing wallet address" });
     return;
   }
   
   const cleanWallet = wallet.toLowerCase().trim();
-  const userDocRef = doc(db, "users", cleanWallet);
+  const cleanEmail = email ? email.toLowerCase().trim() : "";
+  const docId = cleanEmail || cleanWallet;
+  const userDocRef = doc(db, "users", docId);
   
   try {
     const existingSnap = await getDoc(userDocRef);
@@ -137,8 +177,8 @@ app.post("/api/sui/leaderboard", async (req, res) => {
       finalProfile = {
         username: username || data.username || `Yeti-${cleanWallet.substring(2, 6)}`,
         avatar: avatar || data.avatar || "🐻",
-        walletAddress: data.walletAddress || (cleanWallet.includes("@") ? null : cleanWallet),
-        email: data.email || (cleanWallet.includes("@") ? cleanWallet : null),
+        walletAddress: data.walletAddress || (cleanWallet.includes("@") || cleanWallet.startsWith("0x_guest_") ? null : cleanWallet),
+        email: data.email || cleanEmail || (cleanWallet.includes("@") ? cleanWallet : null),
         password: data.password || null,
         xp: Math.max(Number(data.xp ?? 0), Number(xp ?? 0)),
         level: Math.max(Number(data.level ?? 1), Number(level ?? 1)),
@@ -167,10 +207,10 @@ app.post("/api/sui/leaderboard", async (req, res) => {
       }
     } else {
       finalProfile = {
-        username: username || `Yeti-${cleanWallet.substring(2, 6)}`,
+        username: username || (cleanEmail ? cleanEmail.split("@")[0] : `Yeti-${cleanWallet.substring(2, 6)}`),
         avatar: avatar || "🐻",
-        walletAddress: cleanWallet.includes("@") ? null : cleanWallet,
-        email: cleanWallet.includes("@") ? cleanWallet : null,
+        walletAddress: cleanWallet.includes("@") || cleanWallet.startsWith("0x_guest_") ? null : cleanWallet,
+        email: cleanEmail || (cleanWallet.includes("@") ? cleanWallet : null),
         password: null,
         xp: Number(xp ?? 0),
         level: Number(level ?? 1),
@@ -182,7 +222,7 @@ app.post("/api/sui/leaderboard", async (req, res) => {
           tokenId: `token-${Math.random().toString(36).substring(2, 8)}`,
           txHash: `0x_mock_tx_${Math.random().toString(16).substring(2, 10)}`,
           mintedAt: new Date().toISOString()
-        })) : [],
+         })) : [],
         streak: 1,
         lastLoginDate: new Date().toISOString().split("T")[0],
         yetiHighScore: 0,
@@ -192,47 +232,7 @@ app.post("/api/sui/leaderboard", async (req, res) => {
     
     await setDoc(userDocRef, finalProfile);
     
-    // Now trigger a refresh of the leaderboard to return to client
-    const usersCol = collection(db, "users");
-    const snapshot = await getDocs(usersCol);
-    const dbUsers: LeaderboardEntry[] = [];
-    
-    snapshot.forEach((snap) => {
-      const data = snap.data();
-      if (!data) return;
-      
-      const badgeIds = Array.isArray(data.mintedBadges)
-        ? data.mintedBadges.map((b: any) => b?.trackId).filter(Boolean)
-        : (Array.isArray(data.completedTracks) ? data.completedTracks : []);
-
-      const walletStr = data.walletAddress || snap.id || "";
-      if (!walletStr) return;
-
-      dbUsers.push({
-        username: String(data.username || "CozyExplorer"),
-        avatar: String(data.avatar || "🦊"),
-        wallet: String(walletStr),
-        xp: Number(data.xp ?? 0),
-        level: Number(data.level ?? 1),
-        badges: badgeIds,
-        rankDirection: "same",
-        yetiHighScore: Number(data.yetiHighScore ?? 0)
-      });
-    });
-
-    const activeWallets = new Set(
-      dbUsers
-        .map(u => typeof u.wallet === "string" ? u.wallet.toLowerCase() : "")
-        .filter(Boolean)
-    );
-    const finalLeaderboard = [...dbUsers];
-    for (const b of defaultLeaderboard) {
-      if (!activeWallets.has(b.wallet.toLowerCase())) {
-        finalLeaderboard.push(b);
-      }
-    }
-    
-    finalLeaderboard.sort((a, b) => b.xp - a.xp);
+    const finalLeaderboard = await fetchAndFormatLeaderboard();
     res.json({ success: true, leaderboard: finalLeaderboard });
   } catch (err) {
     console.error("Firestore leaderboard save failed:", err);

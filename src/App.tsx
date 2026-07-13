@@ -299,17 +299,15 @@ export default function App() {
 
   const currentAccount = useCurrentAccount();
   const [isSyncingFirebase, setIsSyncingFirebase] = useState<boolean>(false);
-  const loadedFirebaseEmailRef = React.useRef<string | null>(null);
+  const loadedFirebaseKeyRef = React.useRef<string | null>(null);
 
   // Load and merge user profile from Firebase Firestore when Email or SUI wallet address changes
   useEffect(() => {
-    const syncEmailWithFirebase = async () => {
-      // Primary synchronization key is user.email
-      if (user.email) {
-        const emailLower = user.email.toLowerCase();
-        
-        if (loadedFirebaseEmailRef.current === emailLower) {
-          // If already loaded/synced this email, and a new SUI wallet is connected, link/sync it
+    const syncProfileWithFirebase = async () => {
+      const activeKey = user.email?.toLowerCase().trim() || currentAccount?.address?.toLowerCase().trim();
+      if (activeKey) {
+        if (loadedFirebaseKeyRef.current === activeKey) {
+          // If already loaded/synced this key, and SUI wallet connected is different, update it
           if (currentAccount?.address && user.walletAddress !== currentAccount.address) {
             setUser((prev) => ({
               ...prev,
@@ -321,7 +319,7 @@ export default function App() {
         
         setIsSyncingFirebase(true);
         try {
-          const cloudProfile = await getFirebaseUserProfile(emailLower);
+          const cloudProfile = await getFirebaseUserProfile(activeKey);
           
           if (cloudProfile) {
             // Merge cloud progress with local progress, taking the highest metrics
@@ -357,8 +355,8 @@ export default function App() {
             const rawProfile: UserProfile = {
               username: cloudProfile.username || user.username || "CozyExplorer",
               avatar: cloudProfile.avatar || user.avatar || "🦊",
-              email: user.email,
-              password: user.password,
+              email: user.email || cloudProfile.email || null,
+              password: user.password || cloudProfile.password || null,
               walletAddress: activeWallet,
               xp: mergedXP,
               level: mergedLevel,
@@ -382,9 +380,9 @@ export default function App() {
             }
 
             setUser(dailyResult.updatedProfile);
-            await saveFirebaseUserProfile(emailLower, dailyResult.updatedProfile);
+            await saveFirebaseUserProfile(activeKey, dailyResult.updatedProfile);
           } else {
-            // First time this email is used, initialize profile in cloud
+            // First time this key is used, initialize profile in cloud
             const activeWallet = currentAccount?.address || user.walletAddress || null;
             const initialDates = Array.isArray(user.loginDates) ? user.loginDates : (user.lastLoginDate ? [user.lastLoginDate] : [new Date().toISOString().split("T")[0]]);
             
@@ -403,25 +401,25 @@ export default function App() {
               setDailyLoginBonusAmount(dailyResult.bonusXP);
             }
 
-            await saveFirebaseUserProfile(emailLower, dailyResult.updatedProfile);
+            await saveFirebaseUserProfile(activeKey, dailyResult.updatedProfile);
             setUser(dailyResult.updatedProfile);
           }
-          loadedFirebaseEmailRef.current = emailLower;
+          loadedFirebaseKeyRef.current = activeKey;
         } catch (error: any) {
           if (error instanceof Error && error.message.includes("offline")) {
             console.warn("[Firestore Sync] Device/Firestore is offline. Utilizing cached local progress.");
           } else {
-            console.error("Firebase email syncing failed:", error);
+            console.error("Firebase syncing failed:", error);
           }
         } finally {
           setIsSyncingFirebase(false);
         }
       } else {
-        loadedFirebaseEmailRef.current = null;
+        loadedFirebaseKeyRef.current = null;
       }
     };
     
-    syncEmailWithFirebase();
+    syncProfileWithFirebase();
   }, [user.email, currentAccount?.address]);
 
   // Streak bonus claim option
@@ -565,10 +563,11 @@ export default function App() {
     localStorage.setItem("sui_yeti_user", JSON.stringify(user));
     
     // Auto-sync profile updates directly into Firestore
-    if (user.email && loadedFirebaseEmailRef.current === user.email.toLowerCase()) {
+    const activeKey = user.email?.toLowerCase().trim() || user.walletAddress?.toLowerCase().trim();
+    if (activeKey && loadedFirebaseKeyRef.current === activeKey) {
       const saveToFirestore = async () => {
         try {
-          await saveFirebaseUserProfile(user.email!.toLowerCase(), user);
+          await saveFirebaseUserProfile(activeKey, user);
         } catch (error) {
           console.error("Failed to sync profile update to Firebase:", error);
         }
@@ -585,7 +584,8 @@ export default function App() {
   // Sync user score to the backend leaderboard on any updates to achievements
   useEffect(() => {
     const syncToLeaderboard = async () => {
-      let activeWallet = user.walletAddress;
+      // The leaderboard identifier is the walletAddress if available, otherwise email, otherwise guestId
+      let activeWallet = user.walletAddress || user.email;
       if (!activeWallet) {
         let guestId = localStorage.getItem("sui_yeti_guest_wallet");
         if (!guestId) {
@@ -607,6 +607,7 @@ export default function App() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               wallet: activeWallet,
+              email: user.email,
               username: user.username,
               xp: user.xp,
               level: user.level,
@@ -637,7 +638,7 @@ export default function App() {
     }, 450);
 
     return () => clearTimeout(debounceTimer);
-  }, [user.walletAddress, user.xp, user.level, JSON.stringify(user.mintedBadges), user.username, user.avatar]);
+  }, [user.walletAddress, user.email, user.xp, user.level, JSON.stringify(user.mintedBadges), user.username, user.avatar]);
 
   // Helper. Award dynamic XP safely
   const handleAwardXP = (amount: number) => {
@@ -955,7 +956,79 @@ export default function App() {
     );
   }
 
+  const renderHudStats = (isMobile: boolean = false) => (
+    <div 
+      id={isMobile ? "hud-stats-mobile" : "hud-stats"} 
+      className={`flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-2 py-1 sm:px-3.5 sm:py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-[11px] sm:text-xs ${isMobile ? "w-full max-w-full justify-between" : ""}`}
+    >
+      <div className="flex items-center gap-1 font-bold shrink-0">
+        <User size={13} className="text-[#89A8B2]" />
+        <span className="text-[#3c3c3c] max-w-[65px] sm:max-w-[100px] truncate">{user.username}</span>
+      </div>
+      <div className="h-4 w-px bg-[#3c3c3c]/30 mx-0.5 sm:mx-1 shrink-0"></div>
+      
+      {/* Animated XP Container */}
+      <motion.div 
+        className="flex items-center gap-0.5 relative shrink-0"
+        animate={animateXPHUD ? {
+          scale: [1, 1.25, 0.95, 1.15, 1],
+          color: ["#3c3c3c", "#D67B52", "#3c3c3c"]
+        } : {}}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <span className="text-[#6D5D6E] font-bold hidden sm:inline">XP:</span>
+        <span className="sm:hidden text-[#D67B52]" title="XP">✨</span>
+        <strong className="text-[#D67B52] font-extrabold">{user.xp}</strong>
+        <AnimatePresence>
+          {animateXPHUD && (
+            <motion.span 
+              key="xp-bubble"
+              id="hud-xp-bubble"
+              initial={{ opacity: 0, y: 8, scale: 0.8 }}
+              animate={{ opacity: 1, y: -20, scale: 1.1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black text-[#D67B52] bg-amber-50 border border-[#D67B52] px-1 rounded-md shadow-xs pointer-events-none whitespace-nowrap z-50"
+            >
+              ✨ +XP
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
+      <div className="h-4 w-px bg-[#3c3c3c]/30 mx-0.5 sm:mx-1 shrink-0"></div>
+
+      {/* Animated Level Container */}
+      <motion.div 
+        className="flex items-center gap-0.5 relative cursor-help shrink-0"
+        animate={animateLevelUpHUD ? {
+          scale: [1, 1.45, 0.9, 1.25, 0.95, 1.1, 1],
+          rotate: [0, -12, 12, -8, 8, -3, 0],
+          color: ["#3c3c3c", "#47a36c", "#3c3c3c"]
+        } : {}}
+        title="Your Current Lofi Rank Level"
+        transition={{ duration: 1.6, ease: "easeInOut" }}
+      >
+        <span className="text-[#6D5D6E] font-bold hidden sm:inline">Lvl:</span>
+        <Trophy size={14} className="sm:hidden text-[#89A8B2] shrink-0" title="Level" />
+        <strong className="text-[#89A8B2] font-extrabold ml-1 sm:ml-0">{user.level}</strong>
+        <AnimatePresence>
+          {animateLevelUpHUD && (
+            <motion.span 
+              key="lvl-bubble"
+              id="hud-lvl-bubble"
+              initial={{ opacity: 0, y: 12, scale: 0.7 }}
+              animate={{ opacity: 1, y: -24, scale: 1.2 }}
+              exit={{ opacity: 0, y: -35 }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black uppercase text-green-700 bg-green-50 border border-green-500 px-1 py-0.5 rounded-md shadow-xs pointer-events-none whitespace-nowrap z-50 animate-bounce"
+            >
+              Level Up! ✨
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
 
   return (
     <motion.div
@@ -982,28 +1055,51 @@ export default function App() {
       )}
       
       {/* 1. TOP HEADER & HUD STATUS */}
-      <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
+      <header className="border-b-4 border-[#3c3c3c] bg-[#F3EFEA] sticky top-0 z-40 px-4 sm:px-6 py-4 shadow-[0px_4px_0px_0px_#3c3c3c]/10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           
           {/* Logo Branding & Mobile Toggle Row */}
-          <div className="flex items-center justify-between w-full md:w-auto">
-            <div 
-              onClick={handleReturnToLanding}
-              className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
-              title="Return to Guided Introduction"
-            >
-              <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
-              <div>
-                <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
-                  Lofi Academy
-                </h1>
+          <div className="flex items-center justify-between w-full md:w-auto gap-3">
+            
+            {/* Desktop logo branding */}
+            <div className="hidden md:block">
+              <div 
+                onClick={handleReturnToLanding}
+                className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
+                title="Return to Guided Introduction"
+              >
+                <Compass size={24} className="text-[#D67B52] group-hover:rotate-12 transition-transform" />
+                <div>
+                  <h1 className="text-xl font-bold font-serif tracking-tight text-[#3c3c3c] flex items-center gap-1.5 matches-title">
+                    Lofi Academy
+                  </h1>
+                </div>
               </div>
+            </div>
+
+            {/* Mobile layout: if mobileMenuOpen is true, show brand; if false, show the stats component directly instead of the brand name! */}
+            <div className="md:hidden flex-1 min-w-0">
+              {mobileMenuOpen ? (
+                <div 
+                  onClick={handleReturnToLanding}
+                  className="flex items-center gap-2 cursor-pointer hover:opacity-90 active:translate-y-[0.5px] transition-all select-none group"
+                  title="Return to Guided Introduction"
+                >
+                  <Compass size={20} className="text-[#D67B52] group-hover:rotate-12 transition-transform shrink-0" />
+                  <h1 className="text-sm font-bold font-serif tracking-tight text-[#3c3c3c] truncate">
+                    Lofi Academy
+                  </h1>
+                </div>
+              ) : (
+                /* The HUD Stats component (this div) shown directly on mobile navbar instead of brand logo name */
+                renderHudStats(true)
+              )}
             </div>
 
             {/* Mobile menu toggle trigger button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-[#F3EFEA] border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c] font-mono text-xs font-bold active:translate-y-[2px] transition-all"
+              className="md:hidden flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-[#F3EFEA] border-2 border-[#3c3c3c] rounded-xl shadow-[2px_2px_0px_0px_#3c3c3c] text-[#3c3c3c] font-mono text-xs font-bold active:translate-y-[2px] transition-all shrink-0"
             >
               <span className="text-[10px] tracking-wider uppercase">Menu</span>
               {mobileMenuOpen ? <X size={14} className="text-[#D67B52]" /> : <Menu size={14} />}
@@ -1013,74 +1109,13 @@ export default function App() {
           {/* Real-time Developer HUD Score bar - collapses on mobile */}
           <div className={`${mobileMenuOpen ? "flex" : "hidden md:flex"} flex-wrap items-center gap-4 select-none w-full md:w-auto pt-3 md:pt-0 border-t border-dashed md:border-t-0 border-[#3c3c3c]/20 justify-start md:justify-end`}>
             {/* XP and Level Indicators */}
-            <div id="hud-stats" className="flex items-center gap-2 bg-white border-2 border-[#3c3c3c] px-2.5 sm:px-3.5 py-1.5 rounded-2xl shadow-[2px_2px_0px_0px_#3c3c3c] font-mono text-xs">
-              <div className="flex items-center gap-1 font-bold">
-                <User size={13} className="text-[#89A8B2]" />
-                <span className="text-[#3c3c3c] max-w-[65px] sm:max-w-[100px] truncate">{user.username}</span>
+            {!mobileMenuOpen ? (
+              <div className="hidden md:block">
+                {renderHudStats(false)}
               </div>
-              <div className="h-4 w-px bg-[#3c3c3c]/30 mx-0.5 sm:mx-1"></div>
-              
-              {/* Animated XP Container */}
-              <motion.div 
-                className="flex items-center gap-0.5 relative"
-                animate={animateXPHUD ? {
-                  scale: [1, 1.25, 0.95, 1.15, 1],
-                  color: ["#3c3c3c", "#D67B52", "#3c3c3c"]
-                } : {}}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <span className="text-[#6D5D6E] font-bold hidden sm:inline">XP:</span>
-                <span className="sm:hidden text-[#D67B52]" title="XP">✨</span>
-                <strong className="text-[#D67B52] font-extrabold">{user.xp}</strong>
-                <AnimatePresence>
-                  {animateXPHUD && (
-                    <motion.span 
-                      key="xp-bubble"
-                      id="hud-xp-bubble"
-                      initial={{ opacity: 0, y: 8, scale: 0.8 }}
-                      animate={{ opacity: 1, y: -20, scale: 1.1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black text-[#D67B52] bg-amber-50 border border-[#D67B52] px-1 rounded-md shadow-xs pointer-events-none whitespace-nowrap"
-                    >
-                      ✨ +XP
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              <div className="h-4 w-px bg-[#3c3c3c]/30 mx-0.5 sm:mx-1"></div>
-
-              {/* Animated Level Container */}
-              <motion.div 
-                className="flex items-center gap-0.5 relative cursor-help"
-                animate={animateLevelUpHUD ? {
-                  scale: [1, 1.45, 0.9, 1.25, 0.95, 1.1, 1],
-                  rotate: [0, -12, 12, -8, 8, -3, 0],
-                  color: ["#3c3c3c", "#47a36c", "#3c3c3c"]
-                } : {}}
-                title="Your Current Lofi Rank Level"
-                transition={{ duration: 1.6, ease: "easeInOut" }}
-              >
-                <span className="text-[#6D5D6E] font-bold hidden sm:inline">Lvl:</span>
-                <Trophy size={14} className="sm:hidden text-[#89A8B2] shrink-0" title="Level" />
-                <strong className="text-[#89A8B2] font-extrabold ml-1 sm:ml-0">{user.level}</strong>
-                <AnimatePresence>
-                  {animateLevelUpHUD && (
-                    <motion.span 
-                      key="lvl-bubble"
-                      id="hud-lvl-bubble"
-                      initial={{ opacity: 0, y: 12, scale: 0.7 }}
-                      animate={{ opacity: 1, y: -24, scale: 1.2 }}
-                      exit={{ opacity: 0, y: -35 }}
-                      transition={{ duration: 1.5, ease: "easeOut" }}
-                      className="absolute left-1/2 -translate-x-1/2 text-[9px] font-black uppercase text-green-700 bg-green-50 border border-green-500 px-1 py-0.5 rounded-md shadow-xs pointer-events-none whitespace-nowrap z-50 animate-bounce"
-                    >
-                      Level Up! ✨
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </div>
+            ) : (
+              renderHudStats(false)
+            )}
 
             {/* Wallet Quick Status indicator */}
             <div className="text-xs font-mono flex items-center gap-2">

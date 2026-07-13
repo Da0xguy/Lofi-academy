@@ -253,12 +253,7 @@ export function SuiArticlesWidget() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [aiAnalysis, setAiAnalysis] = useState<string>("");
   const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
-  const [isArticleExpanded, setIsArticleExpanded] = useState<boolean>(false);
-
-  // Reset collapse when switching active article
-  useEffect(() => {
-    setIsArticleExpanded(false);
-  }, [activeArticle.id]);
+  const [showDetailOnMobile, setShowDetailOnMobile] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem("sui_yeti_articles", JSON.stringify(articles));
@@ -324,42 +319,46 @@ export function SuiArticlesWidget() {
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Banner */}
-      <div className="bg-white border-2 border-[#3c3c3c] rounded-3xl p-5 shadow-[4px_4px_0px_0px_#3c3c3c] text-[#3c3c3c] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      {/* 1. Header Banner - hidden when viewing detail on mobile to maximize readability */}
+      <div className={`bg-white border-2 border-[#3c3c3c] rounded-3xl p-6 md:p-8 shadow-[4px_4px_0px_0px_#3c3c3c] text-[#3c3c3c] flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all ${
+        showDetailOnMobile ? "hidden lg:flex" : "flex"
+      }`}>
+        <div className="space-y-1.5">
           <span className="text-xs font-mono text-[#D67B52] tracking-wider font-extrabold uppercase flex items-center gap-1.5 leading-none">
             <span className="animate-pulse w-2 h-2 rounded-full bg-[#D67B52]"></span>
             <span>Ecosystem Newsroom</span>
           </span>
-          <h2 className="text-xl font-bold text-[#3c3c3c] font-serif mt-1 flex items-center gap-1.5">
-            <Newspaper size={20} className="text-[#89A8B2]" />
+          <h2 className="text-2xl font-bold text-[#3c3c3c] font-serif mt-1 flex items-center gap-2">
+            <Newspaper size={24} className="text-[#89A8B2]" />
             <span>Sui Cozy Gazette & Articles Hub</span>
           </h2>
-          <p className="text-xs text-[#6D5D6E] font-medium font-sans mt-0.5">
+          <p className="text-sm text-[#6D5D6E] font-semibold font-sans">
             Learn about parallel execution, sub-second consensus networks, Kiosks, and validator structures inside Yeti's library.
           </p>
         </div>
 
         {/* Dynamic search bar */}
-        <div className="relative max-w-xs w-full">
+        <div className="relative max-w-sm w-full">
           <input
             type="text"
             placeholder="Search articles & guides..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-[#FAF8F5] border-2 border-[#3c3c3c] rounded-2xl font-mono text-[#3c3c3c] placeholder-[#6D5D6E]/50 focus:outline-none focus:border-[#D67B52] transition-colors shadow-inner"
+            className="w-full pl-10 pr-4 py-2.5 text-xs bg-[#FAF8F5] border-2 border-[#3c3c3c] rounded-2xl font-mono text-[#3c3c3c] placeholder-[#6D5D6E]/50 focus:outline-none focus:border-[#D67B52] transition-colors shadow-inner"
           />
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3c3c3c]/50" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3c3c3c]/50" />
         </div>
       </div>
 
-      {/* Categories filter deck */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Categories filter deck - hidden when viewing detail on mobile */}
+      <div className={`flex flex-wrap items-center gap-2.5 ${
+        showDetailOnMobile ? "hidden lg:flex" : "flex"
+      }`}>
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-full border-2 text-xs font-mono font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-full border-2 text-xs font-mono font-bold transition-all cursor-pointer ${
               selectedCategory === cat
                 ? "bg-[#D67B52] text-white border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c]"
                 : "bg-white hover:bg-[#FAF8F5] text-stone-700 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]"
@@ -371,19 +370,36 @@ export function SuiArticlesWidget() {
       </div>
 
       {/* 2. Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* LEFT COLUMN: ACTIVE CHOSEN ARTICLE DISPLAY */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white border-3 border-[#3c3c3c] rounded-[32px] p-6 shadow-[6px_6px_0px_0px_#3c3c3c] relative overflow-hidden">
+        <div className={`lg:col-span-8 space-y-6 ${showDetailOnMobile ? "block" : "hidden"} lg:block`}>
+          
+          {/* Mobile Back Button */}
+          {showDetailOnMobile && (
+            <div className="lg:hidden mb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDetailOnMobile(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-white hover:bg-[#FAF8F5] text-[#D67B52] font-mono text-xs font-bold rounded-2xl border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] active:translate-y-[1px] cursor-pointer transition-all"
+              >
+                <span>← Back to Gazette Articles</span>
+              </button>
+            </div>
+          )}
+
+          <div className="bg-white border-3 border-[#3c3c3c] rounded-[32px] p-6 md:p-8 shadow-[6px_6px_0px_0px_#3c3c3c] relative overflow-hidden">
             
             {/* Background decorative page paper seal */}
-            <div className="absolute right-4 top-4 text-stone-100/5 select-none pointer-events-none">
-              {renderAuthorIcon(activeArticle.avatarChar, 140)}
+            <div className="absolute right-6 top-6 text-stone-100/5 select-none pointer-events-none">
+              {renderAuthorIcon(activeArticle.avatarChar, 160)}
             </div>
 
             {/* Article Top Bezel */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-dashed border-[#3c3c3c]/15 pb-4 mb-5 text-xs font-mono relative z-10">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-dashed border-[#3c3c3c]/15 pb-5 mb-6 text-xs font-mono relative z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-[#3c3c3c]/40"></span>
                 <span className="font-bold tracking-widest text-emerald-600 uppercase">COZY_READABLE_BYTECODE</span>
@@ -391,20 +407,20 @@ export function SuiArticlesWidget() {
               <div className="flex items-center gap-2 text-stone-500 text-[11px] font-bold">
                 <Calendar size={12} />
                 <span>{activeArticle.date}</span>
-                <span className="bg-[#3c3c3c] text-[#FAF8F5] px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider">
+                <span className="bg-[#3c3c3c] text-[#FAF8F5] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider">
                   {activeArticle.category}
                 </span>
               </div>
             </div>
 
             {/* Author Profile Plate */}
-            <div className="flex items-center justify-between gap-4 mb-6 relative z-10">
+            <div className="flex items-center justify-between gap-4 mb-8 relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#E8E1D9] border-2 border-[#3c3c3c] flex items-center justify-center shadow-[2px_2px_0px_0px_#3c3c3c]">
-                  {renderAuthorIcon(activeArticle.avatarChar, 20)}
+                <div className="w-12 h-12 rounded-xl bg-[#E8E1D9] border-2 border-[#3c3c3c] flex items-center justify-center shadow-[2px_2px_0px_0px_#3c3c3c]">
+                  {renderAuthorIcon(activeArticle.avatarChar, 24)}
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-stone-800 text-xs sm:text-sm leading-tight">
+                  <h4 className="font-serif font-bold text-stone-800 text-sm md:text-base leading-tight">
                     {activeArticle.author}
                   </h4>
                   <p className="text-[10px] font-mono text-[#D67B52] uppercase font-black tracking-wider">
@@ -416,71 +432,46 @@ export function SuiArticlesWidget() {
               {/* Likes counter option */}
               <button
                 onClick={() => handleLikeArticle(activeArticle.id)}
-                className={`py-1.5 px-3.5 border-2 border-[#3c3c3c] rounded-2xl flex items-center gap-1.5 font-mono text-xs font-bold transition-all active:translate-y-[1px] cursor-pointer shadow-[2px_2px_0px_0px_#3c3c3c] ${
+                className={`py-2 px-4 border-2 border-[#3c3c3c] rounded-2xl flex items-center gap-2 font-mono text-xs font-bold transition-all active:translate-y-[1px] cursor-pointer shadow-[2px_2px_0px_0px_#3c3c3c] ${
                   activeArticle.isLiked 
                     ? "bg-rose-50 text-rose-600 border-rose-500" 
                     : "bg-[#FAF8F5] text-stone-700 hover:bg-[#FAF8F5]/80"
                 }`}
                 title="Like this ecosystem article"
               >
-                <ThumbsUp size={12} className={activeArticle.isLiked ? "fill-rose-500 text-rose-500" : ""} />
+                <ThumbsUp size={13} className={activeArticle.isLiked ? "fill-rose-500 text-rose-500" : ""} />
                 <span>{activeArticle.likes} Likes</span>
               </button>
             </div>
 
             {/* Article Editorial Room */}
-            <div className="space-y-5 relative z-10 font-sans leading-relaxed text-[#3c3c3c]">
-              <h3 className="text-xl sm:text-2xl font-bold font-serif text-[#3c3c3c] tracking-tight leading-tight">
+            <div className="space-y-6 relative z-10 font-sans leading-relaxed text-[#3c3c3c]">
+              <h3 className="text-2xl sm:text-3xl font-extrabold font-serif text-[#3c3c3c] tracking-tight leading-snug">
                 {activeArticle.title}
               </h3>
 
-              <div className="bg-[#FAF8F5] border-l-4 border-[#89A8B2] p-4 rounded-r-2xl italic font-serif text-[#3c3c3c]/85 text-xs sm:text-sm">
+              <div className="bg-[#FAF8F5] border-l-4 border-[#89A8B2] p-5 rounded-r-2xl italic font-serif text-[#3c3c3c]/85 text-sm md:text-base leading-relaxed">
                 "{activeArticle.intro}"
               </div>
 
-              {/* Editorial paragraphs - Responsive collapse on mobile */}
-              <div className="space-y-4 text-xs sm:text-[13px] text-stone-700 leading-relaxed font-sans">
-                {/* On Mobile: Show first paragraph + toggle if collapsed, or show all if expanded */}
-                <div className="block md:hidden space-y-4">
-                  {activeArticle.bodyParagraphs.map((para, i) => {
-                    // Only render first paragraph if not expanded
-                    if (i > 0 && !isArticleExpanded) return null;
-                    return (
-                      <p key={i} className="text-justify font-medium">
-                        {para}
-                      </p>
-                    );
-                  })}
-                  {activeArticle.bodyParagraphs.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setIsArticleExpanded(!isArticleExpanded)}
-                      className="w-full mt-2 py-2.5 bg-[#FAF8F5] border-2 border-dashed border-[#3c3c3c]/35 hover:bg-[#FAF8F5]/80 text-[#D67B52] rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <span>{isArticleExpanded ? "Collapse Article ↩" : `Expand Full Article (${activeArticle.bodyParagraphs.length - 1} more paragraphs) ☕`}</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* On Desktop: Always show all paragraphs */}
-                <div className="hidden md:block space-y-4">
-                  {activeArticle.bodyParagraphs.map((para, i) => (
-                    <p key={i} className="text-justify font-medium">
-                      {para}
-                    </p>
-                  ))}
-                </div>
+              {/* Editorial paragraphs - spacious and highly readable */}
+              <div className="space-y-5 text-sm sm:text-base text-stone-700 leading-relaxed font-sans font-medium text-justify">
+                {activeArticle.bodyParagraphs.map((para, i) => (
+                  <p key={i}>
+                    {para}
+                  </p>
+                ))}
               </div>
 
               {/* Key Bullet Highlights Panel */}
-              <div className="bg-[#FAF8F5] border-2 border-[#3c3c3c] rounded-2xl p-4.5 space-y-2 mt-6">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-[#D67B52] font-black flex items-center gap-1.5">
-                  <BookMarked size={12} />
+              <div className="bg-[#FAF8F5] border-2 border-[#3c3c3c] rounded-2xl p-5 md:p-6 space-y-3 mt-8 shadow-inner">
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#D67B52] font-black flex items-center gap-2">
+                  <BookMarked size={14} />
                   <span>Key takeaways & milestones</span>
                 </span>
-                <ul className="space-y-1.5 pl-1">
+                <ul className="space-y-2.5 pl-1">
                   {activeArticle.takeaways.map((take, idx) => (
-                    <li key={idx} className="text-xs font-medium text-stone-800 flex items-start gap-2">
+                    <li key={idx} className="text-xs sm:text-sm font-semibold text-stone-800 flex items-start gap-2.5">
                       <span className="text-[#89A8B2] font-black mt-0.5">•</span>
                       <span>{take}</span>
                     </li>
@@ -489,18 +480,18 @@ export function SuiArticlesWidget() {
               </div>
 
               {/* External officially referenced blog link */}
-              <div className="pt-4 border-t border-dashed border-[#3c3c3c]/15 flex items-center justify-between">
-                <span className="text-[10px] text-stone-400 font-mono">
+              <div className="pt-5 border-t border-dashed border-[#3c3c3c]/15 flex items-center justify-between">
+                <span className="text-xs text-stone-400 font-mono">
                   {activeArticle.readTime} • {activeArticle.views} reader hits
                 </span>
                 <a
                   href={activeArticle.externalLink}
                   target="_blank"
                   referrerPolicy="no-referrer"
-                  className="inline-flex items-center gap-1.5 text-[#D67B52] font-extrabold hover:underline font-mono text-[11px]"
+                  className="inline-flex items-center gap-1.5 text-[#D67B52] font-extrabold hover:underline font-mono text-xs"
                 >
                   <span>Official Dev Article</span>
-                  <ExternalLink size={12} />
+                  <ExternalLink size={13} />
                 </a>
               </div>
             </div>
@@ -508,47 +499,47 @@ export function SuiArticlesWidget() {
           </div>
 
           {/* AI ECOSYSTEM CRITIC / INTERPRETATION CHAIR */}
-          <div className="bg-[#FAF8F5] border-2 border-[#3c3c3c] rounded-[24px] p-5 space-y-3.5 relative shadow-[4px_4px_0px_0px_#3c3c3c]">
+          <div className="bg-[#FAF8F5] border-2 border-[#3c3c3c] rounded-[24px] p-6 space-y-4 relative shadow-[4px_4px_0px_0px_#3c3c3c]">
             <div className="flex items-center gap-2">
-              <div className="p-1 px-1.5 bg-purple-100 text-purple-700 border border-purple-400 rounded-md">
-                <Sparkles size={13} className="animate-spin text-purple-600" />
+              <div className="p-1.5 bg-purple-100 text-purple-700 border border-purple-400 rounded-md">
+                <Sparkles size={14} className="animate-spin text-purple-600" />
               </div>
-              <h4 className="text-xs font-mono font-bold text-[#3c3c3c] uppercase tracking-wider">
+              <h4 className="text-xs md:text-sm font-mono font-bold text-[#3c3c3c] uppercase tracking-wider">
                 Yeti Library AI Assistant: Smart Article Commentary
               </h4>
             </div>
 
             {!aiAnalysis && !isAiLoading ? (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#3c3c3c]/10">
-                <p className="text-[11px] font-sans text-stone-600 font-medium leading-relaxed">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4.5 rounded-xl border border-[#3c3c3c]/10">
+                <p className="text-xs font-sans text-stone-600 font-medium leading-relaxed">
                   Yeti reviews actual transaction structures inside this article. Ask Yeti for smart real-time commentary!
                 </p>
                 <button
                   onClick={handleAskYetiAi}
-                  className="shrink-0 px-3.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-mono font-bold rounded-xl border border-[#3c3c3c]/20 hover:scale-102 flex items-center gap-1.5 z-10 transition-all text-xs cursor-pointer shadow-sm shadow-purple-600/10"
+                  className="shrink-0 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-mono font-bold rounded-xl border border-[#3c3c3c]/20 hover:scale-102 flex items-center gap-2 z-10 transition-all text-xs cursor-pointer shadow-sm shadow-purple-600/10"
                 >
-                  <Sparkles size={12} />
+                  <Sparkles size={13} />
                   <span>Generate AI Commentary</span>
                 </button>
               </div>
             ) : isAiLoading ? (
-              <div className="bg-white p-4 rounded-xl border border-stone-200 flex items-center justify-center gap-3 text-stone-500 font-mono text-xs">
-                <RotateCcw size={14} className="animate-spin text-purple-600" />
+              <div className="bg-white p-5 rounded-xl border border-stone-200 flex items-center justify-center gap-3 text-stone-500 font-mono text-xs">
+                <RotateCcw size={15} className="animate-spin text-purple-600" />
                 <span>Yeti is studying consensus DAG states... Cozying up...</span>
               </div>
             ) : (
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-purple-50/40 border border-purple-200/65 rounded-xl p-4 text-[11px] font-mono leading-relaxed text-[#3c3c3c]"
+                className="bg-purple-50/40 border border-purple-200/65 rounded-xl p-5 text-xs font-mono leading-relaxed text-[#3c3c3c]"
               >
-                <div className="flex justify-between items-center mb-2.5 text-[10px] text-purple-700 uppercase tracking-widest font-extrabold pb-1 border-b border-purple-100/30">
+                <div className="flex justify-between items-center mb-3 text-[10px] text-purple-700 uppercase tracking-widest font-extrabold pb-1.5 border-b border-purple-100/30">
                   <span>⚡ AI Analysis Verified</span>
                   <button 
                     onClick={handleAskYetiAi}
                     className="text-purple-600 hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <RotateCcw size={10} />
+                    <RotateCcw size={11} />
                     <span>Run code scan</span>
                   </button>
                 </div>
@@ -562,20 +553,20 @@ export function SuiArticlesWidget() {
         </div>
 
         {/* RIGHT COLUMN: ARTICLE SELECTION PANEL */}
-        <div className="lg:col-span-4 space-y-5">
-          <div className="bg-white border-2 border-[#3c3c3c] rounded-3xl p-5 shadow-[4px_4px_0px_0px_#3c3c3c]">
-            <div className="border-b-2 border-[#3c3c3c]/15 pb-3 mb-4 select-none">
-              <h3 className="font-bold text-sm text-[#3c3c3c] font-serif flex items-center gap-2">
-                <BookOpen size={16} className="text-[#D67B52]" />
+        <div className={`lg:col-span-4 space-y-5 ${showDetailOnMobile ? "hidden" : "block"} lg:block`}>
+          <div className="bg-white border-2 border-[#3c3c3c] rounded-3xl p-5 md:p-6 shadow-[4px_4px_0px_0px_#3c3c3c]">
+            <div className="border-b-2 border-[#3c3c3c]/15 pb-4 mb-4 select-none">
+              <h3 className="font-bold text-base text-[#3c3c3c] font-serif flex items-center gap-2">
+                <BookOpen size={18} className="text-[#D67B52]" />
                 <span>Available Articles ({filteredArticles.length})</span>
               </h3>
-              <p className="text-[10px] text-[#6D5D6E] mt-0.5 font-sans font-medium">
-                Click any newspaper bulletin or article card to load its content onto active print desk board.
+              <p className="text-xs text-[#6D5D6E] mt-1 font-sans font-medium">
+                Tap any article card below to open the full detailed view and read.
               </p>
             </div>
 
-            {/* BULLETIN DECK STACK */}
-            <div className="space-y-3.5 max-h-[640px] overflow-y-auto pr-1">
+            {/* BULLETIN DECK STACK - beautifully spaced out to avoid cramp */}
+            <div className="space-y-4 max-h-[640px] overflow-y-auto pr-1">
               {filteredArticles.length === 0 ? (
                 <div className="p-8 text-center text-stone-400 font-mono text-xs bg-stone-50 border border-dashed border-[#3c3c3c]/20 rounded-2xl select-none">
                   No ecosystem articles match the filter.
@@ -598,41 +589,44 @@ export function SuiArticlesWidget() {
                       onClick={() => {
                         setActiveArticle(art);
                         setAiAnalysis("");
+                        setShowDetailOnMobile(true);
+                        // Smooth scroll to top on mobile so they see the header
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      whileHover={{ x: 2 }}
-                      className={`p-3.5 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-3 relative ${
+                      whileHover={{ scale: 1.01, x: 2 }}
+                      className={`p-4.5 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-4 relative ${
                         isActive 
                           ? "bg-white border-[#D67B52] shadow-[3px_3px_0px_0px_#D67B52]"
                           : `${chosenBg} border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c]`
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-stone-100/80 border border-stone-300 flex items-center justify-center select-none">
-                        {renderAuthorIcon(art.avatarChar, 16)}
+                      <div className="w-10 h-10 rounded-xl bg-stone-100/80 border border-stone-300 flex items-center justify-center select-none shrink-0">
+                        {renderAuthorIcon(art.avatarChar, 18)}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1.5 mb-1 text-[9px] font-mono select-none">
-                          <span className="font-extrabold text-[#D67B52] uppercase">
+                        <div className="flex items-center justify-between gap-1.5 mb-1 select-none">
+                          <span className="font-mono font-black text-[#D67B52] text-[9px] uppercase tracking-wider">
                             BULLETIN_0{idx + 1}
                           </span>
-                          <span className="font-bold text-[#6D5D6E] flex items-center gap-0.5">
-                            <Clock size={10} />
+                          <span className="font-mono font-bold text-[#6D5D6E] text-[10px] flex items-center gap-0.5">
+                            <Clock size={11} />
                             {art.readTime}
                           </span>
                         </div>
 
-                        <h4 className="font-bold text-[#3c3c3c] text-xs leading-snug truncate">
+                        <h4 className="font-bold text-[#3c3c3c] text-sm leading-snug">
                           {art.title}
                         </h4>
                         
-                        <p className="text-[10px] text-stone-500 font-sans mt-0.5 truncate">
+                        <p className="text-xs text-stone-500 font-sans mt-1 leading-relaxed line-clamp-2">
                           {art.summary}
                         </p>
                       </div>
 
                       {isActive && (
-                        <div className="absolute right-2 bottom-2 text-[#D67B52]">
-                          <Award size={13} className="animate-pulse" />
+                        <div className="absolute right-2.5 bottom-2.5 text-[#D67B52]">
+                          <Award size={15} className="animate-pulse" />
                         </div>
                       )}
                     </motion.div>
@@ -642,16 +636,16 @@ export function SuiArticlesWidget() {
             </div>
 
             {/* ECOSYSTEM TELEMETRY PANEL */}
-            <div className="bg-[#FAF8F5] border-2 border-dashed border-[#3c3c3c]/20 p-4 rounded-xl mt-5 font-mono text-[9px] text-stone-600 select-none space-y-1.5">
-              <div className="font-bold uppercase tracking-wider text-[#D67B52] flex items-center gap-1 text-[9.5px]">
-                <Clock size={11} className="animate-spin text-[#D67B52]" />
+            <div className="bg-[#FAF8F5] border-2 border-dashed border-[#3c3c3c]/20 p-5 rounded-xl mt-6 font-mono text-[10px] text-stone-600 select-none space-y-2">
+              <div className="font-bold uppercase tracking-wider text-[#D67B52] flex items-center gap-1.5 text-xs">
+                <Clock size={12} className="animate-spin text-[#D67B52]" />
                 <span>SUI NETWORK FIELD METRICS</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-stone-200/50 pb-1">
                 <span>ACTIVE VALIDATORS:</span>
                 <span className="font-bold">146 NODES GLOBAL</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-stone-200/50 pb-1">
                 <span>CONCURRENT EPS:</span>
                 <span className="font-bold text-emerald-600">297,000 tx/sec</span>
               </div>

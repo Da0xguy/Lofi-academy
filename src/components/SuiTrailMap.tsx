@@ -21,6 +21,7 @@ export default function SuiTrailMap({
   trackImage,
 }: SuiTrailMapProps) {
   const [hoveredModId, setHoveredModId] = useState<string | null>(null);
+  const [showMapOnMobile, setShowMapOnMobile] = useState<boolean>(false);
 
   const modules = activeTrack?.modules || [];
   const totalModules = modules.length;
@@ -157,8 +158,32 @@ export default function SuiTrailMap({
         </div>
       </div>
 
+      {/* Mobile Show Map Button Toggle */}
+      <div className="md:hidden mb-4">
+        {!showMapOnMobile ? (
+          <button
+            type="button"
+            onClick={() => setShowMapOnMobile(true)}
+            className="w-full py-3 px-4 bg-[#D67B52] hover:bg-[#D67B52]/90 text-white font-mono font-bold rounded-xl border-2 border-[#3c3c3c] shadow-[2px_2px_0px_0px_#3c3c3c] flex items-center justify-center gap-2 cursor-pointer transition-all text-xs active:translate-y-[1px]"
+          >
+            <Map size={14} />
+            <span>Show Map</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowMapOnMobile(false)}
+            className="w-full py-2.5 px-4 bg-white hover:bg-[#FAF8F5] text-stone-700 font-mono font-bold rounded-xl border-2 border-[#3c3c3c] shadow-[1px_1px_0px_0px_#3c3c3c] flex items-center justify-center gap-2 cursor-pointer transition-all text-xs"
+          >
+            <span>Hide Map ↩</span>
+          </button>
+        )}
+      </div>
+
       {/* Interactive Map Visual Area */}
-      <div className="relative bg-[#B1D3C5]/15 border-2 border-[#3c3c3c] rounded-2xl p-2 sm:p-3 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-stone-400">
+      <div className={`relative bg-[#B1D3C5]/15 border-2 border-[#3c3c3c] rounded-2xl p-2 sm:p-3 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-stone-400 ${
+        showMapOnMobile ? "block" : "hidden md:block"
+      }`}>
         
         {/* Background Theme Image of the specific Map Set */}
         {trackImage && (
@@ -523,7 +548,9 @@ export default function SuiTrailMap({
       </div>
 
       {/* Guidance note */}
-      <div className="mt-3 flex items-center justify-between bg-white/60 p-2 rounded-xl border border-[#3c3c3c]/10 text-[9px] font-mono text-[#6D5D6E]">
+      <div className={`mt-3 flex items-center justify-between bg-white/60 p-2 rounded-xl border border-[#3c3c3c]/10 text-[9px] font-mono text-[#6D5D6E] ${
+        showMapOnMobile ? "flex" : "hidden md:flex"
+      }`}>
         <span className="flex items-center gap-1">
           <Sparkles size={11} className="text-[#D67B52]" />
           <span>Light up the connection lines by proving your smart contract capability!</span>
